@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101713" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Dreamworld" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <title>Dreamworld — Wake & Remember</title>
+  <style>
+    :root {
+      --night: #101713;
+      --night-soft: #17211b;
+      --mist: #e7eadf;
+      --muted: #a9b2a8;
+      --line: rgba(231, 234, 223, 0.14);
+      --moon: #f3dca0;
+      --sage: #9ebfa6;
+      --sage-dark: #284435;
+      --danger: #dfb1a5;
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 100%; background: var(--night); color: var(--mist); }
+
+    body {
+      min-height: 100dvh;
+      font-family: Georgia, "Times New Roman", serif;
+      overflow-x: hidden;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      position: relative;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: max(24px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
+      isolation: isolate;
+    }
+
+    .app::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 75% 15%, rgba(243, 220, 160, 0.08), transparent 26%),
+        linear-gradient(180deg, #0c130f 0%, #18231c 72%, #101713 100%);
+    }
+
+    .stars, .stars::before, .stars::after {
+      position: fixed;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,.65) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 72% 28%, rgba(255,255,255,.42) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 38% 12%, rgba(255,255,255,.5) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 90% 62%, rgba(255,255,255,.32) 0 1px, transparent 1.5px);
+      background-size: 280px 240px;
+      opacity: .52;
+    }
+
+    .stars::before { transform: translate(72px, 110px); opacity: .55; }
+    .stars::after { transform: translate(160px, 38px); opacity: .3; }
+
+    .phone {
+      width: min(100%, 420px);
+      min-height: min(780px, calc(100dvh - 40px));
+      border: 1px solid var(--line);
+      border-radius: 38px;
+      background: rgba(12, 19, 15, 0.86);
+      box-shadow: 0 28px 70px rgba(0,0,0,.42);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 26px 8px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      letter-spacing: .03em;
+    }
+
+    .brand { display: flex; align-items: center; gap: 9px; }
+    .brand-mark { width: 9px; height: 9px; background: var(--moon); border-radius: 50%; box-shadow: 0 0 18px rgba(243,220,160,.55); }
+
+    .home {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 46px 28px 30px;
+    }
+
+    .eyebrow {
+      color: var(--sage);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+    }
+
+    h1 { font-size: clamp(45px, 12vw, 64px); line-height: .98; font-weight: 400; letter-spacing: -.045em; margin: 0; text-wrap: balance; }
+    .subhead { color: var(--muted); font-size: 17px; line-height: 1.55; margin: 22px 0 0; max-width: 30ch; }
+
+    .moon-scene { height: 190px; position: relative; margin: 18px 0; }
+    .moon {
+      position: absolute;
+      width: 118px;
+      height: 118px;
+      border-radius: 50%;
+      background: var(--moon);
+      top: 12px;
+      right: 12%;
+      box-shadow: 0 0 55px rgba(243,220,160,.22);
+    }
+    .moon::after {
+      content: "";
+      position: absolute;
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      background: #101713;
+      top: -12px;
+      left: -23px;
+    }
+    .hill { position: absolute; left: -35%; right: -35%; bottom: -20px; height: 96px; background: #263b2d; border-radius: 50% 50% 0 0; transform: rotate(-3deg); }
+    .hill.two { background: #1d2e23; bottom: -50px; left: 12%; right: -55%; transform: rotate(5deg); }
+
+    .actions { display: grid; gap: 12px; }
+    .button {
+      min-height: 58px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+      padding: 14px 20px;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button:active { transform: translateY(1px) scale(.99); }
+    .button:focus-visible { outline: 3px solid var(--moon); outline-offset: 3px; }
+    .primary { background: var(--moon); color: #1a201a; font-weight: 700; }
+    .secondary { background: transparent; color: var(--mist); border-color: var(--line); }
+    .secondary:hover { background: rgba(255,255,255,.04); border-color: rgba(231,234,223,.28); }
+
+    .countdown { min-height: 20px; text-align: center; color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+
+    .alarm {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      background: #e9eadf;
+      color: #172019;
+      padding: max(34px, env(safe-area-inset-top)) 26px max(28px, env(safe-area-inset-bottom));
+    }
+    .alarm.visible { display: flex; animation: wake .45s ease-out both; }
+
+    .alarm-top { display: flex; justify-content: space-between; align-items: center; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #607066; }
+    .alarm-label { display: inline-flex; align-items: center; gap: 8px; }
+    .ring-dot { width: 8px; height: 8px; border-radius: 50%; background: #9b4c3f; animation: pulse 1s infinite; }
+
+    .alarm-copy { margin: auto 0; }
+    .time { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: clamp(62px, 21vw, 88px); line-height: 1; letter-spacing: -.08em; margin: 0 0 34px; }
+    .alarm h2 { font-size: 42px; font-weight: 400; line-height: 1.04; letter-spacing: -.035em; margin: 0 0 15px; }
+    .alarm p { color: #5c6b61; line-height: 1.5; font-size: 17px; margin: 0; max-width: 30ch; }
+
+    .choice-label { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #607066; margin-bottom: 12px; }
+    .choices { display: grid; gap: 11px; }
+    .dream-yes { background: var(--sage-dark); color: white; }
+    .dream-no { background: transparent; color: #28352d; border-color: rgba(40,53,45,.22); }
+
+    .result {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding: 34px 28px;
+      background: var(--night-soft);
+      text-align: left;
+    }
+    .result.visible { display: flex; animation: wake .4s ease-out both; }
+    .result h2 { font-size: 44px; font-weight: 400; letter-spacing: -.035em; line-height: 1.03; margin: 0 0 18px; }
+    .result p { color: var(--muted); font-size: 17px; line-height: 1.55; margin: 0 0 32px; }
+    .record-orb { width: 92px; height: 92px; border-radius: 50%; background: var(--danger); margin-bottom: 34px; position: relative; box-shadow: 0 0 0 12px rgba(223,177,165,.08); }
+    .record-orb::after { content: ""; position: absolute; inset: 33px 27px; border: 3px solid #382622; border-top: 0; border-radius: 0 0 18px 18px; }
+    .no-dream-mark { width: 92px; height: 92px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; margin-bottom: 34px; color: var(--moon); font-size: 36px; }
+
+    .dev-note { margin-top: 14px; color: #78847c; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.5; }
+
+    @keyframes wake { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
+    @keyframes pulse { 50% { opacity: .35; transform: scale(.75); } }
+
+    @media (max-width: 480px) {
+      .app { padding: 0; }
+      .phone { width: 100%; min-height: 100dvh; border: 0; border-radius: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="stars" aria-hidden="true"></div>
+    <section class="phone" aria-label="Dreamworld alarm prototype">
+      <header class="status">
+        <span class="brand"><span class="brand-mark"></span> DREAMWORLD</span>
+        <span id="statusTime">6:58 AM</span>
+      </header>
+
+      <div class="home" id="homeScreen">
+        <div>
+          <p class="eyebrow">Wake & remember</p>
+          <h1>Catch it before it fades.</h1>
+          <p class="subhead">A quiet bridge between sleep and your growing dream world.</p>
+        </div>
+
+        <div class="moon-scene" aria-hidden="true">
+          <div class="moon"></div>
+          <div class="hill"></div>
+          <div class="hill two"></div>
+        </div>
+
+        <div class="actions">
+          <button class="button primary" id="demoAlarm">Set demo alarm · 3 seconds</button>
+          <button class="button secondary" id="triggerNow">Trigger alarm now</button>
+          <div class="countdown" id="countdown" aria-live="polite"></div>
+          <div class="dev-note">On iPhone: open in Safari, tap Share, then “Add to Home Screen.”</div>
+        </div>
+      </div>
+
+      <section class="alarm" id="alarmScreen" role="dialog" aria-modal="true" aria-labelledby="alarmQuestion">
+        <div class="alarm-top">
+          <span class="alarm-label"><span class="ring-dot"></span> MORNING ALARM</span>
+          <span id="alarmDate"></span>
+        </div>
+
+        <div class="alarm-copy">
+          <p class="time" id="alarmTime">7:00</p>
+          <h2 id="alarmQuestion">Did you have a dream?</h2>
+          <p>Don’t search for every detail. Start with whatever is still here.</p>
+        </div>
+
+        <div>
+          <div class="choice-label">Choose while it’s fresh</div>
+          <div class="choices">
+            <button class="button dream-yes" id="hadDream">Yes, I remember something</button>
+            <button class="button dream-no" id="noDream">No dream this morning</button>
+          </div>
+          <div class="dev-note">Prototype behavior: choosing either option stops the alarm and records the response locally.</div>
+        </div>
+      </section>
+
+      <section class="result" id="dreamResult" aria-live="polite">
+        <div class="record-orb" aria-hidden="true"></div>
+        <p class="eyebrow">Dream found</p>
+        <h2>Say what you remember.</h2>
+        <p>The next prototype phase will begin recording here with one tap.</p>
+        <button class="button primary" id="dreamDone">Continue to voice capture</button>
+        <button class="button secondary" data-reset>Back to demo</button>
+      </section>
+
+      <section class="result" id="noDreamResult" aria-live="polite">
+        <div class="no-dream-mark" aria-hidden="true">☾</div>
+        <p class="eyebrow">Morning logged</p>
+        <h2>That’s okay.</h2>
+        <p>No dream was recorded today. Your world will be waiting whenever one returns.</p>
+        <button class="button primary" data-reset>Finish</button>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const alarmScreen = document.getElementById('alarmScreen');
+    const countdown = document.getElementById('countdown');
+    const dreamResult = document.getElementById('dreamResult');
+    const noDreamResult = document.getElementById('noDreamResult');
+    let alarmTimer = null;
+    let countdownTimer = null;
+    let audioContext = null;
+    let ringInterval = null;
+
+    function formatClock(date = new Date()) {
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('statusTime').textContent = formatClock(now);
+      document.getElementById('alarmTime').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).replace(/\s?[AP]M/i, '');
+      document.getElementById('alarmDate').textContent = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase();
+    }
+
+    function playChime() {
+      try {
+        audioContext ??= new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioContext.currentTime;
+        [0, 0.18, 0.42].forEach((offset, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.value = [392, 523.25, 659.25][index];
+          gain.gain.setValueAtTime(0.0001, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.12, now + offset + 0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.42);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start(now + offset);
+          oscillator.stop(now + offset + 0.45);
+        });
+      } catch (error) {
+        console.info('Audio is unavailable in this browser.', error);
+      }
+    }
+
+    function stopAlarmSound() {
+      if (ringInterval) window.clearInterval(ringInterval);
+      ringInterval = null;
+    }
+
+    // Prototype alarm-entry function. A native app would call this from its
+    // platform alarm/notification handler when the scheduled alarm fires.
+    function triggerAlarm() {
+      window.clearTimeout(alarmTimer);
+      window.clearInterval(countdownTimer);
+      alarmTimer = null;
+      countdownTimer = null;
+      countdown.textContent = '';
+      updateClock();
+      alarmScreen.classList.add('visible');
+      playChime();
+      ringInterval = window.setInterval(playChime, 2400);
+      document.getElementById('hadDream').focus();
+    }
+
+    function scheduleDemoAlarm(delayMs = 3000) {
+      window.clearTimeout(alarmTimer);
+      window.clearInterval(countdownTimer);
+      const firesAt = Date.now() + delayMs;
+      const tick = () => {
+        const remaining = Math.max(0, Math.ceil((firesAt - Date.now()) / 1000));
+        countdown.textContent = remaining ? `Alarm in ${remaining}…` : 'Waking…';
+      };
+      tick();
+      countdownTimer = window.setInterval(tick, 200);
+      alarmTimer = window.setTimeout(triggerAlarm, delayMs);
+    }
+
+    function recordDreamResponse(hadDream) {
+      stopAlarmSound();
+      alarmScreen.classList.remove('visible');
+      const entry = { hadDream, answeredAt: new Date().toISOString() };
+      localStorage.setItem('dreamworld:lastWakeResponse', JSON.stringify(entry));
+      (hadDream ? dreamResult : noDreamResult).classList.add('visible');
+    }
+
+    function resetPrototype() {
+      stopAlarmSound();
+      alarmScreen.classList.remove('visible');
+      dreamResult.classList.remove('visible');
+      noDreamResult.classList.remove('visible');
+      countdown.textContent = '';
+      document.getElementById('demoAlarm').focus();
+    }
+
+    document.getElementById('demoAlarm').addEventListener('click', () => scheduleDemoAlarm(3000));
+    document.getElementById('triggerNow').addEventListener('click', triggerAlarm);
+    document.getElementById('hadDream').addEventListener('click', () => recordDreamResponse(true));
+    document.getElementById('noDream').addEventListener('click', () => recordDreamResponse(false));
+    document.getElementById('dreamDone').addEventListener('click', () => alert('Voice capture is the next prototype phase.'));
+    document.querySelectorAll('[data-reset]').forEach(button => button.addEventListener('click', resetPrototype));
+
+    updateClock();
+    window.setInterval(updateClock, 30000);
+    window.DreamworldPrototype = { triggerAlarm, scheduleDemoAlarm, recordDreamResponse };
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f4f1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Dreamworld — Alarm flow wireframes</title>
+  <style>
+    :root {
+      --paper: #f4f4f1;
+      --ink: #171817;
+      --muted: #686b68;
+      --line: #c8cac6;
+      --soft: #e7e8e4;
+      --white: #fff;
+      --focus: #305f4a;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--paper); color: var(--ink); }
+    body { min-height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+    .prototype-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: max(12px, env(safe-area-inset-top)) 14px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(244,244,241,.96);
+    }
+    .prototype-bar strong { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 9px; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 520px; margin: 0 auto; }
+    .tab { min-height: 42px; border: 1px solid var(--line); border-radius: 9px; background: var(--white); color: var(--ink); cursor: pointer; font-size: 12px; font-weight: 650; padding: 7px; }
+    .tab[aria-selected="true"] { background: var(--ink); color: var(--white); border-color: var(--ink); }
+
+    .shell { width: min(100%, 440px); min-height: calc(100dvh - 92px); margin: 0 auto; padding: 0 22px max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; }
+    .screen { display: none; flex: 1; min-height: 620px; flex-direction: column; }
+    .screen.active { display: flex; }
+    .status { height: 52px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 650; }
+    .test-note { margin: 0 -6px 12px; padding: 10px 12px; border: 1px dashed #9c9f9a; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .content { flex: 1; display: flex; flex-direction: column; }
+    .alarm-label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .alarm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); animation: pulse 1.15s infinite; }
+    .clock { margin: 28px 0 0; font-size: clamp(68px, 22vw, 92px); line-height: 1; letter-spacing: -.07em; font-weight: 300; }
+    h1 { margin: 42px 0 12px; font-size: 35px; line-height: 1.08; letter-spacing: -.035em; }
+    .lead { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.45; max-width: 31ch; }
+    .spacer { flex: 1; min-height: 34px; }
+    .actions { display: grid; gap: 10px; padding-top: 18px; }
+    .button { min-height: 58px; border-radius: 14px; padding: 14px 18px; border: 1px solid var(--ink); cursor: pointer; font-weight: 700; }
+    .primary { background: var(--ink); color: var(--white); }
+    .secondary { background: var(--white); color: var(--ink); border-color: var(--line); }
+    .quiet { min-height: 48px; border: 0; background: transparent; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+    .microcopy { text-align: center; color: var(--muted); font-size: 12px; line-height: 1.4; margin: 2px 12px 0; }
+
+    .mic { width: 112px; height: 112px; margin: 50px auto 8px; border: 2px solid var(--ink); border-radius: 50%; display: grid; place-items: center; font-size: 40px; }
+    .big-action { min-height: 112px; font-size: 22px; border-radius: 22px; }
+    .binary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .binary .button { min-height: 94px; font-size: 18px; }
+    .prompt { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 24px; color: var(--muted); font-size: 14px; }
+
+    .outcome { display: none; flex: 1; flex-direction: column; justify-content: center; }
+    .outcome.active { display: flex; }
+    .outcome-mark { width: 58px; height: 58px; border: 2px solid var(--ink); border-radius: 50%; display: grid; place-items: center; font-size: 25px; margin-bottom: 24px; }
+    .outcome h2 { margin: 0 0 10px; font-size: 32px; letter-spacing: -.03em; }
+    .outcome p { color: var(--muted); line-height: 1.5; margin: 0 0 28px; }
+    .recording-line { height: 44px; display: flex; align-items: center; gap: 4px; margin-bottom: 20px; }
+    .recording-line i { display: block; width: 4px; border-radius: 4px; background: var(--ink); animation: wave .8s ease-in-out infinite alternate; }
+    .recording-line i:nth-child(1) { height: 12px; }
+    .recording-line i:nth-child(2) { height: 28px; animation-delay: -.25s; }
+    .recording-line i:nth-child(3) { height: 18px; animation-delay: -.5s; }
+    .recording-line i:nth-child(4) { height: 36px; animation-delay: -.1s; }
+    .recording-line i:nth-child(5) { height: 16px; animation-delay: -.4s; }
+
+    .rationale { margin-top: 14px; padding: 14px; background: var(--soft); border-radius: 12px; color: #454845; font-size: 13px; line-height: 1.45; }
+    .rationale b { color: var(--ink); }
+
+    @keyframes pulse { 50% { opacity: .25; } }
+    @keyframes wave { to { transform: scaleY(.45); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="prototype-bar">
+    <strong>Low-fidelity comparison · choose a flow</strong>
+    <nav class="tabs" aria-label="Wireframe alternatives">
+      <button class="tab" data-flow="direct" aria-selected="true">A · Direct</button>
+      <button class="tab" data-flow="question" aria-selected="false">B · Ask first</button>
+      <button class="tab" data-flow="recall" aria-selected="false">C · Recall cue</button>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="screen active" data-screen="direct">
+      <div class="status"><span>7:00</span><span>Dreamworld</span></div>
+      <div class="test-note">Testing hypothesis: speaking should require no decision beyond tapping one large button.</div>
+      <div class="content flow-content">
+        <div class="alarm-label"><span class="alarm-dot"></span> Alarm sounding</div>
+        <div class="clock">7:00</div>
+        <h1>Hold on to your dream.</h1>
+        <p class="lead">Start anywhere. You can organize it later.</p>
+        <div class="spacer"></div>
+        <div class="actions">
+          <button class="button primary big-action" data-answer="record">Start talking</button>
+          <button class="quiet" data-answer="none">I didn’t have a dream</button>
+          <p class="microcopy">Your recording stays private.</p>
+        </div>
+        <div class="rationale"><b>Why this may win:</b> it removes the yes/no gate and prioritizes the behavior the product needs.</div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="question">
+      <div class="status"><span>7:00</span><span>Dreamworld</span></div>
+      <div class="test-note">Testing hypothesis: an explicit dream/no-dream choice feels clearer immediately after waking.</div>
+      <div class="content flow-content">
+        <div class="alarm-label"><span class="alarm-dot"></span> Alarm sounding</div>
+        <div class="clock">7:00</div>
+        <h1>Did you dream?</h1>
+        <p class="lead">Choose the closest answer. A fragment still counts.</p>
+        <div class="spacer"></div>
+        <div class="binary">
+          <button class="button primary" data-answer="record">Yes</button>
+          <button class="button secondary" data-answer="none">No</button>
+        </div>
+        <div class="prompt">If you choose yes, recording starts on the next screen.</div>
+        <div class="rationale"><b>Trade-off:</b> clearest classification, but it introduces an extra step before capture.</div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="recall">
+      <div class="status"><span>7:00</span><span>Dreamworld</span></div>
+      <div class="test-note">Testing hypothesis: a gentle memory cue helps recall without turning into dream interpretation.</div>
+      <div class="content flow-content">
+        <div class="alarm-label"><span class="alarm-dot"></span> Alarm sounding</div>
+        <div class="clock">7:00</div>
+        <div class="mic" aria-hidden="true">●</div>
+        <h1>What’s still with you?</h1>
+        <p class="lead">A person, a place, a feeling—or just one image.</p>
+        <div class="spacer"></div>
+        <div class="actions">
+          <button class="button primary" data-answer="record">Record what I remember</button>
+          <button class="button secondary" data-answer="none">Nothing this morning</button>
+        </div>
+        <div class="rationale"><b>Trade-off:</b> potentially better recall, but more words and visual content to process.</div>
+      </div>
+    </section>
+
+    <section class="outcome" id="recordOutcome">
+      <div class="recording-line" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <h2>Listening…</h2>
+      <p>“I was somewhere near the ocean…”</p>
+      <button class="button primary" data-back>Finish test</button>
+    </section>
+
+    <section class="outcome" id="noneOutcome">
+      <div class="outcome-mark" aria-hidden="true">✓</div>
+      <h2>Morning logged.</h2>
+      <p>No dream today. There is nothing else you need to do.</p>
+      <button class="button primary" data-back>Finish</button>
+    </section>
+  </main>
+
+  <script>
+    const tabs = [...document.querySelectorAll('.tab')];
+    const screens = [...document.querySelectorAll('.screen')];
+    const outcomes = [...document.querySelectorAll('.outcome')];
+    let activeFlow = 'direct';
+
+    function showFlow(flow) {
+      activeFlow = flow;
+      outcomes.forEach(outcome => outcome.classList.remove('active'));
+      screens.forEach(screen => screen.classList.toggle('active', screen.dataset.screen === flow));
+      tabs.forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.flow === flow)));
+      localStorage.setItem('dreamworld:selectedWireframe', flow);
+    }
+
+    function showOutcome(kind) {
+      screens.forEach(screen => screen.classList.remove('active'));
+      outcomes.forEach(outcome => outcome.classList.remove('active'));
+      document.getElementById(kind === 'record' ? 'recordOutcome' : 'noneOutcome').classList.add('active');
+      localStorage.setItem('dreamworld:lastWireframeTest', JSON.stringify({ flow: activeFlow, answer: kind, testedAt: new Date().toISOString() }));
+    }
+
+    tabs.forEach(tab => tab.addEventListener('click', () => showFlow(tab.dataset.flow)));
+    document.querySelectorAll('[data-answer]').forEach(button => button.addEventListener('click', () => showOutcome(button.dataset.answer)));
+    document.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showFlow(activeFlow)));
+
+    showFlow(localStorage.getItem('dreamworld:selectedWireframe') || 'direct');
+  </script>
+</body>
+</html>

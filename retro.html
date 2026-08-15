@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#11102b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Dreamworld" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <title>Dreamworld — Retro Wake Prototype</title>
+  <style>
+    :root {
+      --void: #0b0920;
+      --night: #11102b;
+      --panel: #1c1940;
+      --panel-hi: #292358;
+      --ink: #fff6d6;
+      --muted: #b7aed6;
+      --cyan: #55e6d2;
+      --pink: #ff6f91;
+      --gold: #ffd166;
+      --purple: #7868e6;
+      --shadow: #070613;
+      --pixel: 4px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--void); color: var(--ink); }
+    body {
+      min-height: 100dvh;
+      overflow-x: hidden;
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+      image-rendering: pixelated;
+    }
+    button { font: inherit; }
+
+    .app {
+      position: relative;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: max(18px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+      isolation: isolate;
+      background:
+        linear-gradient(rgba(255,255,255,.018) 50%, transparent 50%) 0 0 / 100% 4px,
+        radial-gradient(circle at 50% -10%, #31256a 0%, var(--night) 36%, var(--void) 74%);
+    }
+
+    .app::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      pointer-events: none;
+      opacity: .18;
+      background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(0,0,0,.28) 3px 4px);
+      mix-blend-mode: multiply;
+    }
+
+    .stars, .stars::before, .stars::after {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--ink), var(--ink)),
+        linear-gradient(var(--cyan), var(--cyan)),
+        linear-gradient(var(--pink), var(--pink)),
+        linear-gradient(var(--gold), var(--gold));
+      background-repeat: no-repeat;
+      background-size: 2px 2px, 3px 3px, 2px 2px, 2px 2px;
+      background-position: 12% 14%, 82% 18%, 68% 72%, 18% 78%;
+      opacity: .72;
+    }
+    .stars::before { transform: translate(37px, 96px); opacity: .55; }
+    .stars::after { transform: translate(118px, 36px); opacity: .32; }
+
+    .console {
+      position: relative;
+      width: min(100%, 430px);
+      min-height: min(790px, calc(100dvh - 24px));
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--night);
+      border: var(--pixel) solid var(--ink);
+      box-shadow:
+        0 0 0 var(--pixel) var(--shadow),
+        12px 12px 0 0 rgba(0,0,0,.42);
+      clip-path: polygon(0 12px, 4px 12px, 4px 4px, 12px 4px, 12px 0, calc(100% - 12px) 0, calc(100% - 12px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 12px, 100% 12px, 100% calc(100% - 12px), calc(100% - 4px) calc(100% - 12px), calc(100% - 4px) calc(100% - 4px), calc(100% - 12px) calc(100% - 4px), calc(100% - 12px) 100%, 12px 100%, 12px calc(100% - 4px), 4px calc(100% - 4px), 4px calc(100% - 12px), 0 calc(100% - 12px));
+    }
+
+    .status-bar {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: var(--pixel) solid var(--ink);
+      background: var(--panel);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+    .status-brand { color: var(--cyan); text-shadow: 2px 2px 0 var(--shadow); }
+    .battery { display: inline-flex; gap: 3px; align-items: center; color: var(--muted); }
+    .battery i { width: 6px; height: 10px; display: block; background: var(--cyan); }
+
+    .screen { display: none; flex: 1; min-height: 0; flex-direction: column; padding: 22px 20px 20px; }
+    .screen.active { display: flex; animation: screen-in .22s steps(3, end) both; }
+
+    .chapter {
+      margin: 0 0 8px;
+      color: var(--gold);
+      font-size: 11px;
+      line-height: 1.4;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1, h2 { margin: 0; font-weight: 900; text-transform: uppercase; text-shadow: 3px 3px 0 var(--shadow); }
+    h1 { max-width: 11ch; font-size: clamp(38px, 11vw, 55px); line-height: .98; letter-spacing: -.06em; }
+    h2 { font-size: clamp(30px, 9vw, 42px); line-height: 1.02; letter-spacing: -.045em; }
+    .copy { color: var(--muted); font-size: 14px; line-height: 1.55; margin: 16px 0 0; }
+
+    .world-window {
+      position: relative;
+      height: 230px;
+      margin: 24px -4px 22px;
+      overflow: hidden;
+      border: var(--pixel) solid var(--ink);
+      background:
+        linear-gradient(180deg, #241d52 0 48%, #392664 48% 62%, #1a3d46 62% 75%, #16312f 75%);
+      box-shadow: inset 0 0 0 var(--pixel) var(--shadow);
+    }
+    .moon-pixel {
+      position: absolute;
+      top: 26px;
+      right: 35px;
+      width: 58px;
+      height: 58px;
+      background: var(--gold);
+      box-shadow: 8px 0 0 var(--gold), -8px 0 0 var(--gold), 0 8px 0 var(--gold), 0 -8px 0 var(--gold), 8px 8px 0 var(--gold), -8px -8px 0 var(--gold);
+    }
+    .moon-pixel::after { content: ""; position: absolute; width: 50px; height: 50px; top: -8px; left: -18px; background: #241d52; box-shadow: -8px 8px 0 #241d52; }
+    .mountain { position: absolute; bottom: 42px; left: 18px; width: 0; height: 0; border-left: 78px solid transparent; border-right: 78px solid transparent; border-bottom: 104px solid #3f4789; }
+    .mountain::after { content: ""; position: absolute; top: 49px; left: -78px; border-left: 78px solid transparent; border-right: 78px solid transparent; border-bottom: 55px solid #263e65; }
+    .mountain.two { left: 160px; transform: scale(.72); transform-origin: bottom; opacity: .75; }
+    .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; background: repeating-linear-gradient(90deg, #102421 0 12px, #17332d 12px 24px); border-top: var(--pixel) solid var(--cyan); }
+    .player-sprite { position: absolute; bottom: 42px; left: 50%; width: 12px; height: 20px; background: var(--pink); transform: translateX(-50%); box-shadow: -4px 4px 0 var(--pink), 4px 4px 0 var(--pink), 0 -8px 0 var(--gold), -4px -4px 0 var(--gold), 4px -4px 0 var(--gold); }
+
+    .actions { display: grid; gap: 12px; margin-top: auto; }
+    .btn {
+      position: relative;
+      min-height: 58px;
+      padding: 15px 17px;
+      border: var(--pixel) solid var(--ink);
+      border-radius: 0;
+      cursor: pointer;
+      text-align: left;
+      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: .035em;
+      box-shadow: 6px 6px 0 var(--shadow);
+      transition: transform .08s steps(1), box-shadow .08s steps(1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn::before { content: ">"; margin-right: 10px; }
+    .btn:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--shadow); }
+    .btn:focus-visible { outline: var(--pixel) solid var(--cyan); outline-offset: var(--pixel); }
+    .btn-primary { background: var(--cyan); color: var(--void); }
+    .btn-secondary { background: var(--panel-hi); color: var(--ink); }
+    .btn-danger { background: var(--pink); color: var(--void); }
+    .btn-quiet { background: transparent; color: var(--muted); border-color: var(--muted); box-shadow: 4px 4px 0 var(--shadow); }
+
+    .test-note { margin-top: 14px; color: #877fa8; font-size: 10px; line-height: 1.45; }
+
+    .alarm-screen { background: linear-gradient(180deg, #151035, var(--night)); }
+    .alarm-head { display: flex; align-items: center; justify-content: space-between; color: var(--pink); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .alarm-head span:first-child::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; background: var(--pink); animation: blink .8s steps(1) infinite; }
+    .clock { margin: 34px 0 26px; color: var(--ink); font-size: clamp(70px, 22vw, 94px); line-height: .85; letter-spacing: -.1em; font-weight: 900; text-shadow: 5px 5px 0 #392b70; }
+    .dialogue {
+      position: relative;
+      margin: 0 0 18px;
+      padding: 17px 16px;
+      border: var(--pixel) solid var(--ink);
+      background: var(--panel);
+      box-shadow: inset 0 0 0 var(--pixel) var(--shadow), 6px 6px 0 var(--shadow);
+    }
+    .dialogue::after { content: "▼"; position: absolute; right: 12px; bottom: 7px; color: var(--gold); font-size: 11px; animation: bob .7s steps(2) infinite; }
+    .dialogue strong { display: block; color: var(--gold); font-size: 12px; margin-bottom: 8px; text-transform: uppercase; }
+    .dialogue p { margin: 0; font-size: 15px; line-height: 1.45; }
+
+    .record-orb {
+      position: relative;
+      width: 128px;
+      height: 128px;
+      margin: 42px auto 28px;
+      border: var(--pixel) solid var(--ink);
+      background: var(--pink);
+      box-shadow:
+        0 0 0 8px var(--panel-hi),
+        0 0 0 12px var(--ink),
+        9px 9px 0 12px var(--shadow);
+      animation: record-pulse 1.1s steps(3) infinite;
+    }
+    .record-orb::before { content: ""; position: absolute; inset: 33px 46px 44px; background: var(--void); box-shadow: 0 20px 0 -4px var(--void), -12px 20px 0 -8px var(--void), 12px 20px 0 -8px var(--void); }
+    .record-state { text-align: center; }
+    .record-state .chapter { color: var(--pink); }
+    .timer { margin: 16px 0 5px; color: var(--cyan); font-size: 28px; font-weight: 900; letter-spacing: .08em; }
+    .signal { display: flex; height: 34px; justify-content: center; align-items: center; gap: 4px; margin: 14px 0 6px; }
+    .signal i { display: block; width: 5px; height: 10px; background: var(--cyan); animation: signal 600ms steps(3) infinite alternate; }
+    .signal i:nth-child(2) { animation-delay: -100ms; height: 24px; }
+    .signal i:nth-child(3) { animation-delay: -300ms; height: 15px; }
+    .signal i:nth-child(4) { animation-delay: -180ms; height: 30px; }
+    .signal i:nth-child(5) { animation-delay: -400ms; height: 18px; }
+    .signal i:nth-child(6) { animation-delay: -240ms; height: 26px; }
+    .signal i:nth-child(7) { animation-delay: -80ms; height: 12px; }
+    .live-truth { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .live-truth strong { color: var(--cyan); }
+
+    .save-glyph {
+      width: 112px;
+      height: 112px;
+      margin: 44px auto 34px;
+      display: grid;
+      place-items: center;
+      color: var(--void);
+      background: var(--gold);
+      border: var(--pixel) solid var(--ink);
+      box-shadow: 8px 8px 0 var(--shadow);
+      font-size: 56px;
+      font-weight: 900;
+    }
+    .save-glyph.no-dream { background: var(--purple); color: var(--ink); }
+    .result-copy { text-align: center; }
+    .result-copy h2 { color: var(--gold); }
+    .result-copy p { color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .loot-line { margin: 22px 0; padding: 12px; border-top: 2px dashed var(--panel-hi); border-bottom: 2px dashed var(--panel-hi); color: var(--cyan); font-size: 12px; text-align: center; text-transform: uppercase; }
+
+    .playback { display: none; width: 100%; margin: 16px 0 0; }
+    .error-box { display: none; margin: 18px 0; padding: 13px; border: var(--pixel) solid var(--pink); color: var(--ink); background: rgba(255,111,145,.12); font-size: 12px; line-height: 1.5; }
+    .error-box.visible { display: block; }
+
+    @keyframes screen-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes bob { 50% { transform: translateY(3px); } }
+    @keyframes record-pulse { 50% { background: #f0537d; } }
+    @keyframes signal { to { transform: scaleY(.35); } }
+
+    @media (max-width: 480px) {
+      .app { padding: 0; }
+      .console { width: 100%; min-height: 100dvh; border-width: 0; clip-path: none; box-shadow: none; }
+      .status-bar { padding-top: max(12px, env(safe-area-inset-top)); min-height: calc(46px + env(safe-area-inset-top)); }
+      .screen { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="stars" aria-hidden="true"></div>
+    <section class="console" aria-label="Dreamworld retro gaming prototype">
+      <header class="status-bar">
+        <span class="status-brand">DREAMWORLD // DEMO</span>
+        <span class="battery" aria-label="Dream signal full"><i></i><i></i><i></i><i></i></span>
+      </header>
+
+      <section class="screen active" id="homeScreen">
+        <p class="chapter">Dream log // Cartridge 01</p>
+        <h1>Catch the dream.</h1>
+        <p class="copy">Before the memory fades, save the fragment that followed you home.</p>
+        <div class="world-window" aria-label="Pixel dream landscape">
+          <div class="moon-pixel"></div>
+          <div class="mountain"></div>
+          <div class="mountain two"></div>
+          <div class="player-sprite"></div>
+          <div class="ground"></div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="demoAlarm">Set demo alarm // 3 sec</button>
+          <button class="btn btn-secondary" id="triggerNow">Trigger alarm now</button>
+        </div>
+        <p class="test-note" id="demoStatus" aria-live="polite">iPhone test build — keep Safari open for the demo alarm.</p>
+      </section>
+
+      <section class="screen alarm-screen" id="alarmScreen" role="dialog" aria-modal="true" aria-labelledby="alarmTitle">
+        <div class="alarm-head"><span>Wake signal</span><span id="alarmDate">SAT 15</span></div>
+        <div class="clock" id="alarmTime">7:00</div>
+        <div class="dialogue">
+          <strong>Dreamworld</strong>
+          <p id="alarmTitle">A dream is fading. Save whatever you still remember.</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="startTalking">Start talking</button>
+          <button class="btn btn-secondary" id="noRecall">Nothing to log</button>
+          <button class="btn btn-quiet" id="backToSleep">Not now</button>
+        </div>
+        <p class="test-note">No streaks. No penalty. A fragment is enough.</p>
+      </section>
+
+      <section class="screen" id="recordScreen" aria-labelledby="recordTitle">
+        <div class="record-state">
+          <div class="record-orb" aria-hidden="true"></div>
+          <p class="chapter">Live dream signal</p>
+          <h2 id="recordTitle">Listening</h2>
+          <div class="timer" id="recordTimer">00:00</div>
+          <div class="signal" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="live-truth" id="recordTruth"><strong>MIC ACTIVE</strong> // audio is being captured</p>
+        </div>
+        <div class="error-box" id="micError" role="alert"></div>
+        <div class="actions">
+          <button class="btn btn-primary" id="stopAndSave">Stop + save dream</button>
+          <button class="btn btn-quiet" id="cancelRecording">Cancel recording</button>
+        </div>
+      </section>
+
+      <section class="screen" id="savedScreen" aria-labelledby="savedTitle">
+        <div class="save-glyph" aria-hidden="true">◆</div>
+        <div class="result-copy">
+          <p class="chapter">Memory secured</p>
+          <h2 id="savedTitle">Dream saved</h2>
+          <p>Your original recording is safe. Analysis and world growth happen later, when you’re awake.</p>
+        </div>
+        <div class="loot-line">New dream fragment added to your world</div>
+        <audio class="playback" id="playback" controls></audio>
+        <div class="actions">
+          <button class="btn btn-primary" id="finishDream">Finish</button>
+          <button class="btn btn-secondary" id="recordAgain">Add another fragment</button>
+        </div>
+      </section>
+
+      <section class="screen" id="noDreamScreen" aria-labelledby="noDreamTitle">
+        <div class="save-glyph no-dream" aria-hidden="true">—</div>
+        <div class="result-copy">
+          <p class="chapter">Morning complete</p>
+          <h2 id="noDreamTitle">Nothing logged</h2>
+          <p>That’s completely fine. Your world stays exactly as it is, waiting for the next dream.</p>
+        </div>
+        <div class="loot-line">No penalty // no streak lost</div>
+        <div class="actions">
+          <button class="btn btn-primary" id="finishNoDream">Finish</button>
+          <button class="btn btn-secondary" id="undoNoDream">Wait — I remember something</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const screens = [...document.querySelectorAll('.screen')];
+    const demoStatus = document.getElementById('demoStatus');
+    const recordTimer = document.getElementById('recordTimer');
+    const recordTruth = document.getElementById('recordTruth');
+    const micError = document.getElementById('micError');
+    const playback = document.getElementById('playback');
+
+    let alarmTimeout = null;
+    let countdownInterval = null;
+    let mediaRecorder = null;
+    let mediaStream = null;
+    let audioChunks = [];
+    let timerInterval = null;
+    let recordingStartedAt = 0;
+    let playbackUrl = null;
+
+    function showScreen(id) {
+      screens.forEach(screen => screen.classList.toggle('active', screen.id === id));
+      window.scrollTo(0, 0);
+    }
+
+    function formatClock(date = new Date()) {
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/i, '');
+    }
+
+    function updateAlarmClock() {
+      const now = new Date();
+      document.getElementById('alarmTime').textContent = formatClock(now);
+      document.getElementById('alarmDate').textContent = now.toLocaleDateString([], { weekday: 'short', day: 'numeric' }).toUpperCase();
+    }
+
+    function playRetroChime() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const context = new AudioContext();
+        const start = context.currentTime;
+        [261.63, 329.63, 392].forEach((frequency, index) => {
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+          oscillator.type = 'square';
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(0.0001, start + index * 0.11);
+          gain.gain.exponentialRampToValueAtTime(0.045, start + index * 0.11 + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + index * 0.11 + 0.16);
+          oscillator.connect(gain).connect(context.destination);
+          oscillator.start(start + index * 0.11);
+          oscillator.stop(start + index * 0.11 + 0.18);
+        });
+      } catch (error) {
+        console.info('Audio cue unavailable', error);
+      }
+    }
+
+    function triggerAlarm() {
+      window.clearTimeout(alarmTimeout);
+      window.clearInterval(countdownInterval);
+      demoStatus.textContent = 'Alarm triggered.';
+      updateAlarmClock();
+      showScreen('alarmScreen');
+      playRetroChime();
+      document.getElementById('startTalking').focus();
+    }
+
+    function scheduleDemoAlarm(delayMs = 3000) {
+      window.clearTimeout(alarmTimeout);
+      window.clearInterval(countdownInterval);
+      const target = Date.now() + delayMs;
+      const update = () => {
+        const seconds = Math.max(0, Math.ceil((target - Date.now()) / 1000));
+        demoStatus.textContent = seconds ? `Alarm signal in ${seconds}…` : 'Waking…';
+      };
+      update();
+      countdownInterval = window.setInterval(update, 200);
+      alarmTimeout = window.setTimeout(triggerAlarm, delayMs);
+    }
+
+    function updateTimer() {
+      const elapsed = Math.max(0, Math.floor((Date.now() - recordingStartedAt) / 1000));
+      const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const seconds = String(elapsed % 60).padStart(2, '0');
+      recordTimer.textContent = `${minutes}:${seconds}`;
+    }
+
+    async function startRecording() {
+      showScreen('recordScreen');
+      micError.classList.remove('visible');
+      micError.textContent = '';
+      recordTimer.textContent = '00:00';
+      audioChunks = [];
+
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        recordTruth.innerHTML = '<strong>SIMULATION MODE</strong> // recording API unavailable';
+        recordingStartedAt = Date.now();
+        timerInterval = window.setInterval(updateTimer, 250);
+        return;
+      }
+
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(mediaStream);
+        mediaRecorder.addEventListener('dataavailable', event => {
+          if (event.data.size > 0) audioChunks.push(event.data);
+        });
+        mediaRecorder.addEventListener('stop', finalizeRecording);
+        mediaRecorder.start(500);
+        recordingStartedAt = Date.now();
+        timerInterval = window.setInterval(updateTimer, 250);
+        recordTruth.innerHTML = '<strong>MIC ACTIVE</strong> // audio is being captured';
+        if (navigator.vibrate) navigator.vibrate(40);
+      } catch (error) {
+        recordTruth.innerHTML = '<strong>MIC OFF</strong> // nothing is being captured';
+        micError.textContent = 'Microphone access is off. Allow access in Safari settings, or return and choose another path.';
+        micError.classList.add('visible');
+      }
+    }
+
+    function stopTracks() {
+      if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+      mediaStream = null;
+    }
+
+    function finalizeRecording() {
+      stopTracks();
+      if (audioChunks.length) {
+        const mimeType = mediaRecorder?.mimeType || 'audio/mp4';
+        const blob = new Blob(audioChunks, { type: mimeType });
+        if (playbackUrl) URL.revokeObjectURL(playbackUrl);
+        playbackUrl = URL.createObjectURL(blob);
+        playback.src = playbackUrl;
+        playback.style.display = 'block';
+      } else {
+        playback.removeAttribute('src');
+        playback.style.display = 'none';
+      }
+      localStorage.setItem('dreamworld:retroLastCapture', new Date().toISOString());
+      showScreen('savedScreen');
+      if (navigator.vibrate) navigator.vibrate([35, 35, 70]);
+    }
+
+    function stopAndSave() {
+      window.clearInterval(timerInterval);
+      timerInterval = null;
+      recordTruth.innerHTML = '<strong>SAVING</strong> // preserving your recording';
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      } else {
+        finalizeRecording();
+      }
+    }
+
+    function cancelRecording() {
+      window.clearInterval(timerInterval);
+      timerInterval = null;
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.removeEventListener('stop', finalizeRecording);
+        mediaRecorder.stop();
+      }
+      stopTracks();
+      showScreen('alarmScreen');
+    }
+
+    function logNoDream() {
+      localStorage.setItem('dreamworld:retroNoRecall', new Date().toISOString());
+      showScreen('noDreamScreen');
+    }
+
+    function resetPrototype() {
+      window.clearTimeout(alarmTimeout);
+      window.clearInterval(countdownInterval);
+      window.clearInterval(timerInterval);
+      stopTracks();
+      showScreen('homeScreen');
+      demoStatus.textContent = 'iPhone test build — keep Safari open for the demo alarm.';
+    }
+
+    document.getElementById('demoAlarm').addEventListener('click', () => scheduleDemoAlarm(3000));
+    document.getElementById('triggerNow').addEventListener('click', triggerAlarm);
+    document.getElementById('startTalking').addEventListener('click', startRecording);
+    document.getElementById('noRecall').addEventListener('click', logNoDream);
+    document.getElementById('backToSleep').addEventListener('click', resetPrototype);
+    document.getElementById('stopAndSave').addEventListener('click', stopAndSave);
+    document.getElementById('cancelRecording').addEventListener('click', cancelRecording);
+    document.getElementById('finishDream').addEventListener('click', resetPrototype);
+    document.getElementById('recordAgain').addEventListener('click', startRecording);
+    document.getElementById('finishNoDream').addEventListener('click', resetPrototype);
+    document.getElementById('undoNoDream').addEventListener('click', startRecording);
+
+    updateAlarmClock();
+    window.DreamworldRetro = { triggerAlarm, scheduleDemoAlarm, startRecording, logNoDream, resetPrototype };
+  </script>
+</body>
+</html>

@@ -309,7 +309,77 @@ Before approving a screen or feature, ask:
 14. Is this an incremental improvement or an unvalidated radical bet?
 15. What evidence would cause us to change or remove it?
 
-## 13. Current strategic decision
+## 13. Reference-driven visual design workflow
+
+AI may assist visual exploration, but it may not invent Dreamworld’s interface from a vague prompt.
+
+### Step 1 — Collect references by design problem
+
+Build separate reference boards for:
+
+- wake and alarm interactions;
+- voice recording and truthful state feedback;
+- low-light accessibility;
+- reflective journals and archives;
+- maps, worlds, and long-term visual continuity;
+- correction, privacy, and deletion controls.
+
+Use sources such as Mobbin, 21st.dev, platform conventions, and products with relevant interaction patterns. Extract transferable principles rather than cloning a distinctive proprietary interface.
+
+### Step 2 — State what to avoid
+
+Every design prompt must include an anti-style list grounded in the product, such as:
+
+- no default purple/blue technology gradient;
+- no random emoji as interface icons;
+- no stacks of generic rounded cards;
+- no glassmorphism or blur without a functional depth model;
+- no decorative waveform that implies recording falsely;
+- no oversized marketing copy on an operational wake screen;
+- no hidden controls in pursuit of minimalism;
+- no dream imagery competing with capture before the memory is safe.
+
+### Step 3 — Explore materially different styles
+
+Generate at least three coherent visual directions after the interaction flow is validated:
+
+1. **Quiet utility:** nearly invisible, system-adjacent, and behavior-first.
+2. **Tactile journal:** intimate, editorial, and materially warm without sacrificing state clarity.
+3. **Living world:** atmospheric and distinctive, with expressive imagery delayed until after capture.
+
+Do not treat color swaps as different directions.
+
+### Step 4 — Lock a style guide before implementation
+
+Define and document:
+
+- color roles and accessibility contrast;
+- type families, weights, sizes, and line heights;
+- spacing scale;
+- border, divider, and radius rules;
+- elevation and shadow rules;
+- icon and illustration language;
+- motion posture and reduced-motion behavior;
+- component states: default, pressed, focused, disabled, listening, paused, saving, saved, and failed;
+- sound and haptic vocabulary.
+
+Use design tokens and reusable components so implementation receives structured context rather than screenshots alone. Figma-to-code or MCP-style transfer may help preserve tokens and components, but generated code still requires accessibility, behavior, and device testing.
+
+### Step 5 — Apply the system to one critical flow first
+
+Before styling the whole app, apply the chosen system to:
+
+> alarm → capture or no recall → listening → saved → exit
+
+Test that flow in real morning conditions. Only extend the visual system after both usability and visual comprehension survive testing.
+
+### Step 6 — Audit fidelity and slop
+
+Compare implementation against the approved references and tokens. Check for generic AI defaults, visual inconsistency, false signifiers, inaccessible contrast, missing states, and unnecessary decoration. Correct the system rather than patching isolated pixels.
+
+This workflow incorporates the useful process demonstrated in the shared Instagram reel: start from references, explore styles, explicitly name what to avoid, lock colors/typography/spacing/components, and then translate the system into code. It does not replace user research, problem framing, low-fidelity prototyping, or testing.
+
+## 14. Current strategic decision
 
 Dreamworld should pursue **radical meaning through incremental execution**:
 

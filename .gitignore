@@ -1,5 +1,5 @@
-# Private source material and extracted book text
-research-design-of-everyday-things.md
+# Private source material and working research briefs
+research-*.md
 
 # Local development artifacts
 .DS_Store

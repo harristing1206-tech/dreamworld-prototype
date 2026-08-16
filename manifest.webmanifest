@@ -1,12 +1,13 @@
 {
-  "name": "Dreamworld — Wake & Remember",
+  "id": "./world.html",
+  "name": "Dreamworld",
   "short_name": "Dreamworld",
-  "description": "A voice-first dream journal prototype.",
-  "start_url": "./",
+  "description": "A private, voice-first dream world.",
+  "start_url": "./world.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#101713",
-  "theme_color": "#101713",
+  "background_color": "#0d1321",
+  "theme_color": "#0d1321",
   "orientation": "portrait",
   "icons": [
     {

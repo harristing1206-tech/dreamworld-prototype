@@ -1,0 +1,3 @@
+<!-- Merge this key into the native iOS target's Info.plist. -->
+<key>NSAlarmKitUsageDescription</key>
+<string>Dreamworld uses alarms you schedule to help you capture dreams immediately after waking.</string>

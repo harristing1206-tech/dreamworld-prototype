@@ -185,15 +185,25 @@ Use layered defenses: incremental local save, retained original audio, retryable
 
 The visual design must emerge from the tested interaction rather than decorate an unvalidated flow.
 
+The signed-off product direction is **world-first**:
+
+- After a brief transition, the current dream world is the default home surface.
+- Persistent, restrained navigation provides direct access to World, Dreams, Capture, and Settings.
+- Returning users do not need explanatory headlines or product-description copy on the home surface.
+- The retro-game identity should come from the world art, sprite construction, motion, typography, and interaction details—not competing effects or multiple bright accent colors.
+- Use one muted, coherent palette and reserve contrast for current state and primary action.
+
+Additional posture:
+
 - Calm does not require fantasy illustration.
 - Minimal does not mean invisible controls.
 - Aesthetic novelty may not replace conventional state communication.
-- World-building imagery belongs after raw capture is safe.
+- World-building imagery belongs after raw capture is safe during the wake flow, while the normal app home may foreground the existing world.
 - Low-light treatment must preserve contrast and legibility.
 - Animation should clarify continuity or state—not merely look dreamlike.
 - A visual element must improve orientation, confidence, recall, or meaning to remain.
 
-The visual world may be rich. The wake interaction must be quiet and explicit.
+The world home may be visually rich. The wake and capture interactions must remain quiet and explicit.
 
 ## 8. Ethical and privacy standard
 

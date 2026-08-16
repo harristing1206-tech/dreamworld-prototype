@@ -83,7 +83,49 @@
 
     .world-view { overflow: hidden; }
     .world-scene { position: absolute; inset: 0; }
-    .world-scene svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; image-rendering: pixelated; }
+    .world-scene svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; image-rendering: pixelated; transition: filter 1.8s ease; }
+    .app[data-phase="blue-hour"] .world-scene svg { filter: brightness(.92) saturate(.86); }
+    .app[data-phase="sunrise"] .world-scene svg { filter: brightness(1.14) saturate(.9); }
+    .app[data-phase="morning"] .world-scene svg { filter: brightness(1.32) saturate(.82); }
+    .app[data-phase="noon"] .world-scene svg { filter: brightness(1.48) saturate(.72); }
+    .app[data-phase="afternoon"] .world-scene svg { filter: brightness(1.3) saturate(.86); }
+    .app[data-phase="golden-hour"] .world-scene svg { filter: brightness(1.14) saturate(.98); }
+    .app[data-phase="sunset"] .world-scene svg { filter: brightness(.98) saturate(.92); }
+    .app[data-phase="night"] .world-scene svg { filter: brightness(.78) saturate(.78); }
+    .phase-wash { position: absolute; inset: 0; pointer-events: none; transition: background 1.8s ease, opacity 1.8s ease; mix-blend-mode: soft-light; }
+    .stars-layer, .moon-body, .sun-body { transition: opacity 1.8s ease, transform 1.8s ease; transform-box: fill-box; transform-origin: center; }
+    .sun-body { opacity: 0; }
+
+    .app[data-phase="blue-hour"] .phase-wash { background: rgba(45, 68, 92, .26); }
+    .app[data-phase="sunrise"] .phase-wash { background: rgba(182, 138, 92, .3); }
+    .app[data-phase="morning"] .phase-wash { background: rgba(142, 160, 150, .18); }
+    .app[data-phase="noon"] .phase-wash { background: rgba(231, 223, 197, .24); }
+    .app[data-phase="afternoon"] .phase-wash { background: rgba(171, 159, 118, .18); }
+    .app[data-phase="golden-hour"] .phase-wash { background: rgba(182, 154, 99, .34); }
+    .app[data-phase="sunset"] .phase-wash { background: rgba(146, 91, 78, .3); }
+    .app[data-phase="night"] .phase-wash { background: rgba(13, 19, 33, .12); }
+
+    .app[data-phase="sunrise"] .moon-body,
+    .app[data-phase="morning"] .moon-body,
+    .app[data-phase="noon"] .moon-body,
+    .app[data-phase="afternoon"] .moon-body,
+    .app[data-phase="golden-hour"] .moon-body { opacity: 0; }
+    .app[data-phase="sunrise"] .sun-body,
+    .app[data-phase="morning"] .sun-body,
+    .app[data-phase="noon"] .sun-body,
+    .app[data-phase="afternoon"] .sun-body,
+    .app[data-phase="golden-hour"] .sun-body { opacity: 1; }
+    .app[data-phase="sunrise"] .sun-body { transform: translate(-180px, 155px); }
+    .app[data-phase="morning"] .sun-body { transform: translate(-120px, 65px); }
+    .app[data-phase="noon"] .sun-body { transform: translate(-45px, -10px); }
+    .app[data-phase="afternoon"] .sun-body { transform: translate(15px, 45px); }
+    .app[data-phase="golden-hour"] .sun-body { transform: translate(30px, 145px); }
+    .app[data-phase="morning"] .stars-layer,
+    .app[data-phase="noon"] .stars-layer,
+    .app[data-phase="afternoon"] .stars-layer { opacity: 0; }
+    .app[data-phase="sunrise"] .stars-layer,
+    .app[data-phase="golden-hour"] .stars-layer { opacity: .18; }
+    .app[data-phase="sunset"] .stars-layer { opacity: .45; }
 
     .world-hud {
       position: absolute;
@@ -282,19 +324,28 @@
 <body>
   <div class="boot" aria-hidden="true"><div class="boot-mark"></div></div>
 
-  <main class="app" aria-label="Dreamworld prototype">
+  <main class="app" id="app" data-phase="night" aria-label="Dreamworld prototype">
     <section class="view world-view active" id="worldView" data-view="world" aria-label="Current dream world">
       <div class="world-scene">
         <svg viewBox="0 0 430 780" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A quiet pixel-art island beneath a crescent moon">
           <rect width="430" height="780" fill="#0d1321"/>
-          <rect x="35" y="86" width="3" height="3" fill="#e7dfc5"/>
-          <rect x="84" y="145" width="2" height="2" fill="#8ea096"/>
-          <rect x="139" y="73" width="2" height="2" fill="#b69a63"/>
-          <rect x="260" y="112" width="3" height="3" fill="#e7dfc5"/>
-          <rect x="342" y="158" width="2" height="2" fill="#8ea096"/>
-          <rect x="390" y="93" width="3" height="3" fill="#b69a63"/>
-          <rect x="319" y="65" width="62" height="62" fill="#d8cfad"/>
-          <rect x="303" y="81" width="62" height="62" fill="#0d1321"/>
+          <g class="stars-layer">
+            <rect x="35" y="86" width="3" height="3" fill="#e7dfc5"/>
+            <rect x="84" y="145" width="2" height="2" fill="#8ea096"/>
+            <rect x="139" y="73" width="2" height="2" fill="#b69a63"/>
+            <rect x="260" y="112" width="3" height="3" fill="#e7dfc5"/>
+            <rect x="342" y="158" width="2" height="2" fill="#8ea096"/>
+            <rect x="390" y="93" width="3" height="3" fill="#b69a63"/>
+          </g>
+          <g class="moon-body">
+            <rect x="319" y="65" width="62" height="62" fill="#d8cfad"/>
+            <rect x="303" y="81" width="62" height="62" fill="#0d1321"/>
+          </g>
+          <g class="sun-body">
+            <rect x="319" y="65" width="48" height="48" fill="#d8cfad"/>
+            <rect x="311" y="73" width="64" height="32" fill="#d8cfad"/>
+            <rect x="327" y="57" width="32" height="64" fill="#d8cfad"/>
+          </g>
 
           <polygon points="0,350 66,282 132,350" fill="#182434"/>
           <polygon points="73,350 170,238 267,350" fill="#1c2a39"/>
@@ -346,11 +397,12 @@
             <rect x="230" y="458" width="33" height="43" fill="#3e5b57" transform="translate(0,130) scale(1,-1) translate(0,-959)"/>
           </g>
         </svg>
+        <div class="phase-wash" aria-hidden="true"></div>
       </div>
 
       <div class="world-hud">
         <span class="world-id">World 01</span>
-        <span class="world-progress">2 places</span>
+        <span class="world-progress" id="worldPhase">Night · 2 places</span>
       </div>
       <button class="hotspot hotspot-arch" data-place="The Quiet Gate" data-kind="Dream landmark" aria-label="Open The Quiet Gate"></button>
       <button class="hotspot hotspot-tree" data-place="Pale Tree" data-kind="Recurring symbol" aria-label="Open Pale Tree"></button>
@@ -423,6 +475,23 @@
     let startedAt = 0;
     let audioUrl = null;
     let hasCapture = false;
+
+    function getTimePhase(hour) {
+      if (hour >= 5 && hour < 6) return { id: 'blue-hour', label: 'Blue hour' };
+      if (hour >= 6 && hour < 8) return { id: 'sunrise', label: 'Sunrise' };
+      if (hour >= 8 && hour < 11) return { id: 'morning', label: 'Morning' };
+      if (hour >= 11 && hour < 14) return { id: 'noon', label: 'Noon' };
+      if (hour >= 14 && hour < 17) return { id: 'afternoon', label: 'Afternoon' };
+      if (hour >= 17 && hour < 19) return { id: 'golden-hour', label: 'Golden hour' };
+      if (hour >= 19 && hour < 21) return { id: 'sunset', label: 'Sunset' };
+      return { id: 'night', label: 'Night' };
+    }
+
+    function applyTimePhase(date = new Date()) {
+      const phase = getTimePhase(date.getHours() + date.getMinutes() / 60);
+      document.getElementById('app').dataset.phase = phase.id;
+      document.getElementById('worldPhase').textContent = `${phase.label} · 2 places`;
+    }
 
     function openView(name) {
       views.forEach(view => view.classList.toggle('active', view.dataset.view === name));
@@ -536,6 +605,10 @@
     micButton.addEventListener('click', toggleRecording);
     saveButton.addEventListener('click', saveDream);
     document.getElementById('noDreamButton').addEventListener('click', logNoDream);
+    applyTimePhase();
+    window.setInterval(applyTimePhase, 60000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) applyTimePhase(); });
+    window.DreamworldDayCycle = { getTimePhase, applyTimePhase };
   </script>
 </body>
 </html>

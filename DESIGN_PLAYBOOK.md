@@ -192,6 +192,8 @@ The signed-off product direction is **world-first**:
 - Returning users do not need explanatory headlines or product-description copy on the home surface.
 - The retro-game identity should come from the world art, sprite construction, motion, typography, and interaction details—not competing effects or multiple bright accent colors.
 - Use one muted, coherent palette and reserve contrast for current state and primary action.
+- The world must reflect the user’s real local time through distinct morning blue hour, sunrise, morning, noon, afternoon, golden hour, sunset, and night states. Celestial bodies, stars, light, color temperature, and ambient motion should change coherently rather than applying a superficial tint.
+- The prototype may use local clock bands; the native product should calculate solar phases from local date and location when permission is available, with a privacy-preserving clock-based fallback.
 
 Additional posture:
 

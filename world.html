@@ -272,11 +272,13 @@
     .alarm-editor-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .alarm-platform-note { margin: 18px 0 0; color: var(--sage); font-size: 10px; line-height: 1.5; }
 
-    .ringing-overlay { position: absolute; z-index: 70; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: max(74px, env(safe-area-inset-top)) 24px calc(52px + env(safe-area-inset-bottom)); background: radial-gradient(circle at 50% 28%, #24313d 0, #101722 44%, #090e17 100%); opacity: 0; visibility: hidden; transform: scale(1.015); transition: opacity 520ms cubic-bezier(.22,.61,.36,1), transform 520ms cubic-bezier(.22,.61,.36,1), visibility 520ms; }
+    .ringing-overlay { --slide-progress: 0; --slide-percent: 0%; position: absolute; z-index: 70; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: max(74px, env(safe-area-inset-top)) 24px calc(52px + env(safe-area-inset-bottom)); background: radial-gradient(circle at 50% 28%, #24313d 0, #101722 44%, #090e17 100%); opacity: 0; visibility: hidden; transform: scale(1.015); transition: opacity 520ms cubic-bezier(.22,.61,.36,1), transform 520ms cubic-bezier(.22,.61,.36,1), visibility 520ms; }
+    .ringing-overlay::after { content: ""; position: absolute; z-index: 0; inset: 0; background: #03060b; opacity: calc(var(--slide-progress) * .58); pointer-events: none; transition: opacity 45ms linear; }
+    .ringing-overlay > * { position: relative; z-index: 1; }
     .ringing-overlay.visible { opacity: 1; visibility: visible; transform: scale(1); }
     .ringing-overlay.visible.stopping { opacity: 0; transform: scale(.975); pointer-events: none; }
-    .ringing-kicker { color: var(--gold); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .16em; text-transform: uppercase; }
-    .ringing-center { text-align: center; }
+    .ringing-kicker { color: var(--gold); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .16em; text-transform: uppercase; opacity: calc(1 - var(--slide-progress) * .65); transition: opacity 45ms linear; }
+    .ringing-center { text-align: center; opacity: calc(1 - var(--slide-progress) * .68); transform: scale(calc(1 - var(--slide-progress) * .018)); transition: opacity 45ms linear, transform 45ms linear; }
     .ringing-icon { position: relative; width: 68px; height: 68px; margin: 0 auto 28px; border: 2px solid var(--paper); border-radius: 50%; }
     .ringing-icon::before { content: ""; position: absolute; left: 31px; top: 14px; width: 2px; height: 21px; background: var(--paper); transform-origin: bottom; transform: rotate(-18deg); }
     .ringing-icon::after { content: ""; position: absolute; left: 32px; top: 33px; width: 17px; border-top: 2px solid var(--paper); transform: rotate(28deg); transform-origin: left; }
@@ -284,12 +286,12 @@
     .ringing-label { margin: 12px 0 0; color: var(--sage); font-size: 15px; }
     .ringing-actions { width: 100%; max-width: 340px; }
     .snooze-alarm { width: 100%; margin-bottom: 18px; }
-    .slide-track { position: relative; height: 66px; border: 1px solid rgba(231,223,197,.28); border-radius: 34px; background: rgba(255,255,255,.05); overflow: hidden; transition: border-color 180ms ease, background 180ms ease; }
+    .slide-track { position: relative; height: 66px; border: 1px solid rgba(231,223,197,.28); border-radius: 34px; background: linear-gradient(90deg, rgba(231,223,197,.18) 0 var(--slide-percent), rgba(255,255,255,.05) var(--slide-percent) 100%); overflow: hidden; transition: border-color 180ms ease, background 45ms linear, box-shadow 180ms ease; }
     .slide-track.armed { border-color: rgba(231,223,197,.7); background: rgba(255,255,255,.1); }
-    .slide-track::before { content: "slide to stop"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--sage); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
+    .slide-track::before { content: "slide to stop"; position: absolute; inset: 0; display: grid; place-items: center; color: rgba(231,223,197,calc(.55 + var(--slide-progress) * .45)); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; text-shadow: 0 0 calc(3px + var(--slide-progress) * 14px) rgba(231,223,197,calc(.18 + var(--slide-progress) * .72)); text-transform: uppercase; pointer-events: none; transition: color 45ms linear, text-shadow 45ms linear; }
     .slide-stop { position: absolute; inset: 0; width: 100%; height: 66px; margin: 0; opacity: .98; appearance: none; background: transparent; cursor: grab; }
     .slide-stop::-webkit-slider-runnable-track { height: 66px; background: transparent; }
-    .slide-stop::-webkit-slider-thumb { appearance: none; width: 58px; height: 58px; margin-top: 4px; border: 0; border-radius: 50%; background: var(--paper); box-shadow: 0 0 0 1px rgba(13,19,33,.2); }
+    .slide-stop::-webkit-slider-thumb { appearance: none; width: 58px; height: 58px; margin-top: 4px; border: 0; border-radius: 50%; background: var(--paper); box-shadow: 0 0 0 1px rgba(13,19,33,.2), 0 0 calc(2px + var(--slide-progress) * 18px) rgba(231,223,197,calc(.12 + var(--slide-progress) * .7)); }
     .ringing-footnote { margin-top: 12px; color: #65746f; font: 700 7px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
 
     .toggle { width: 44px; height: 26px; padding: 3px; border: 1px solid var(--line); border-radius: 20px; background: var(--deep); cursor: pointer; }
@@ -755,6 +757,8 @@
       ringingKicker.textContent = 'Dreamworld alarm';
       ringingTime.textContent = formatAlarmTime(alarm.time);
       slideStop.value = 0;
+      ringingOverlay.style.setProperty('--slide-progress', '0');
+      ringingOverlay.style.setProperty('--slide-percent', '0%');
       slideStop.closest('.slide-track').classList.remove('armed');
       ringingOverlay.classList.remove('stopping');
       ringingOverlay.classList.add('visible');
@@ -823,7 +827,10 @@
       }
     });
     slideStop.addEventListener('input', () => {
-      slideStop.closest('.slide-track').classList.toggle('armed', Number(slideStop.value) >= 92);
+      const value = Number(slideStop.value);
+      ringingOverlay.style.setProperty('--slide-progress', String(value / 100));
+      ringingOverlay.style.setProperty('--slide-percent', `${value}%`);
+      slideStop.closest('.slide-track').classList.toggle('armed', value >= 92);
     });
     slideStop.addEventListener('change', () => {
       const completed = Number(slideStop.value) >= 92;
@@ -832,6 +839,8 @@
         stopRingingAlarm();
       } else {
         slideStop.value = 0;
+        ringingOverlay.style.setProperty('--slide-progress', '0');
+        ringingOverlay.style.setProperty('--slide-percent', '0%');
       }
     });
     document.getElementById('snoozeAlarmButton').addEventListener('click', snoozeDreamworldAlarm);

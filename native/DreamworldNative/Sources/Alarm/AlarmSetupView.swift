@@ -226,22 +226,33 @@ private struct AlarmRingPreviewView: View {
             )
             .ignoresSafeArea()
 
+            Color.black
+                .opacity(slideValue * 0.58)
+                .ignoresSafeArea()
+                .animation(.linear(duration: 0.04), value: slideValue)
+
             VStack(spacing: 24) {
                 Text("DREAMWORLD ALARM")
                     .font(.caption2.weight(.bold).monospaced())
                     .tracking(2)
                     .foregroundStyle(.orange.opacity(0.8))
+                    .opacity(1 - slideValue * 0.65)
 
                 Spacer()
 
-                Image(systemName: "alarm.fill")
-                    .font(.system(size: 58, weight: .light))
-                    .foregroundStyle(.white)
-                Text(time.formatted(date: .omitted, time: .shortened))
-                    .font(.system(size: 62, weight: .medium, design: .monospaced))
-                    .minimumScaleFactor(0.7)
-                Text("Wake & capture")
-                    .foregroundStyle(.secondary)
+                VStack(spacing: 16) {
+                    Image(systemName: "alarm.fill")
+                        .font(.system(size: 58, weight: .light))
+                        .foregroundStyle(.white)
+                    Text(time.formatted(date: .omitted, time: .shortened))
+                        .font(.system(size: 62, weight: .medium, design: .monospaced))
+                        .minimumScaleFactor(0.7)
+                    Text("Wake & capture")
+                        .foregroundStyle(.secondary)
+                }
+                .opacity(1 - slideValue * 0.68)
+                .scaleEffect(1 - slideValue * 0.018)
+                .animation(.linear(duration: 0.04), value: slideValue)
 
                 Spacer()
 
@@ -256,12 +267,14 @@ private struct AlarmRingPreviewView: View {
 
                 ZStack {
                     Capsule()
-                        .fill(.white.opacity(0.08))
-                        .overlay(Capsule().stroke(.white.opacity(0.2)))
+                        .fill(.white.opacity(0.08 + slideValue * 0.12))
+                        .overlay(Capsule().stroke(.white.opacity(0.2 + slideValue * 0.45)))
+                        .shadow(color: .white.opacity(slideValue * 0.3), radius: 4 + slideValue * 10)
                     Text("SLIDE TO STOP")
                         .font(.caption2.weight(.bold).monospaced())
                         .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.55 + slideValue * 0.45))
+                        .shadow(color: .white.opacity(0.18 + slideValue * 0.72), radius: 3 + slideValue * 14)
                     Slider(value: $slideValue, in: 0...1) { editing in
                         guard !editing else { return }
                         if slideValue >= 0.92 {
@@ -271,6 +284,7 @@ private struct AlarmRingPreviewView: View {
                         }
                     }
                     .tint(.white)
+                    .shadow(color: .white.opacity(slideValue * 0.7), radius: 2 + slideValue * 12)
                     .padding(.horizontal, 8)
                     .accessibilityLabel("Slide to stop alarm")
                 }

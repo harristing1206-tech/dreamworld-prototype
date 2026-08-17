@@ -56,26 +56,30 @@ final class DreamAlarmService: ObservableObject {
             : .weekly(Array(weekdays))
         let schedule: Alarm.Schedule = .relative(.init(time: time, repeats: recurrence))
 
-        let recordButton = AlarmButton(
-            text: "Record Dream",
+        let snoozeButton = AlarmButton(
+            text: "Snooze",
             textColor: .white,
-            systemImageName: "waveform.circle.fill"
+            systemImageName: "zzz"
         )
         let alert = AlarmPresentation.Alert(
             title: "Dreamworld",
-            secondaryButton: recordButton,
-            secondaryButtonBehavior: .custom
+            secondaryButton: snoozeButton,
+            secondaryButtonBehavior: .countdown
+        )
+        let presentation = AlarmPresentation(
+            alert: alert,
+            countdown: AlarmPresentation.Countdown(title: "Snoozed")
         )
         let attributes = AlarmAttributes<DreamAlarmMetadata>(
-            presentation: AlarmPresentation(alert: alert),
+            presentation: presentation,
             metadata: DreamAlarmMetadata(destination: "capture"),
             tintColor: Color(red: 0.58, green: 0.68, blue: 0.63)
         )
         let configuration = AlarmManager.AlarmConfiguration<DreamAlarmMetadata>(
-            countdownDuration: nil,
+            countdownDuration: Alarm.CountdownDuration(preAlert: nil, postAlert: 9 * 60),
             schedule: schedule,
             attributes: attributes,
-            secondaryIntent: OpenDreamCaptureIntent(alarmID: id.uuidString)
+            stopIntent: OpenDreamCaptureIntent(alarmID: id.uuidString)
         )
 
         _ = try await manager.schedule(id: id, configuration: configuration)

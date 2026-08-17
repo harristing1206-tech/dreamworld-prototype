@@ -94,7 +94,7 @@ struct AlarmSetupView: View {
                     .foregroundStyle(statusMessage.hasPrefix("Scheduled") ? .mint : .orange)
             }
         } footer: {
-            Text("The alarm uses Apple’s system alarm experience. Record Dream opens Capture; recording begins only when you tap the microphone.")
+            Text("The alarm uses Apple’s system alarm experience. Snooze waits nine minutes; stopping the alarm opens Capture, where recording begins only when you tap the microphone.")
         }
     }
 

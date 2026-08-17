@@ -1,14 +1,14 @@
 # Dreamworld Native — AlarmKit Wake & Capture
 
-A native iOS 26.1+ proof of concept where Dreamworld owns wake alarms, presents them through Apple’s AlarmKit system experience, and routes the **Record Dream** action directly to voice capture.
+A native iOS 26.1+ proof of concept where Dreamworld owns wake alarms, presents them through Apple’s AlarmKit system experience, and opens voice capture only after the user stops the alarm.
 
 ## Product flow
 
 1. The user opens the **Alarms** tab.
 2. They choose a time and optional repeat weekdays, then tap **Add Alarm**.
 3. Dreamworld requests AlarmKit authorization the first time and schedules a Dreamworld-owned system alarm.
-4. When it fires, iOS presents Apple’s system alarm surface with Dreamworld branding and a **Record Dream** secondary action.
-5. Record Dream opens the Capture tab, ready for an explicit microphone tap.
+4. When it fires, iOS presents Apple’s system alarm surface with Dreamworld branding, **Snooze**, and the system stop control.
+5. Snooze starts a nine-minute countdown. Stopping the alarm opens the Capture tab, ready for an explicit microphone tap.
 6. The user speaks, stops, and saves a local `.m4a` voice memo.
 
 Multiple alarms are supported. The Alarms tab reads the current AlarmKit schedule directly, so scheduled times and recurrence remain visible after relaunch.
@@ -17,7 +17,7 @@ Multiple alarms are supported. The Alarms tab reads the current AlarmKit schedul
 
 AlarmKit is the supported way for an App Store app to deliver a true system alarm that can break through silent mode and Focus after authorization. Apple owns the locked-screen alarm surface and its controls; AlarmKit does not expose an arbitrary custom swipe control there.
 
-Dreamworld therefore includes a separate **Preview Ringing Screen** in the Alarms tab. It demonstrates the requested iOS-familiar visual hierarchy, **Record Dream** action, and a 92%-threshold **Slide to Stop** gesture inside the app. This prototype does not claim to replace Apple’s locked-screen controls.
+Dreamworld therefore includes a separate **Preview Ringing Screen** in the Alarms tab. It demonstrates the requested iOS-familiar visual hierarchy, **Snooze** action, and a 92%-threshold **Slide to Stop** gesture inside the app. Crossing the threshold only arms the action; stopping commits when the user lifts their finger. A valid release fades into Capture, while Snooze fades back to Alarms. This prototype does not claim to replace Apple’s locked-screen controls.
 
 ## Why recording does not begin silently
 
@@ -77,7 +77,7 @@ Core tests cover:
 3. Approve Dreamworld alarm access.
 4. Confirm the new time appears under Active Dreamworld alarms.
 5. Lock the phone and let the alarm fire.
-6. Confirm Apple’s system alarm presentation displays Dreamworld and **Record Dream**.
-7. Tap Record Dream and confirm Dreamworld opens Capture.
+6. Confirm Apple’s system alarm presentation displays Dreamworld, **Snooze**, and the system stop control.
+7. Stop the alarm and confirm Dreamworld opens Capture only after the stop action completes.
 8. Tap the microphone, speak, stop, and confirm the local save indicator appears.
-9. Separately open **Preview Ringing Screen** and confirm Slide to Stop dismisses only after crossing the threshold.
+9. Separately open **Preview Ringing Screen** and confirm Slide to Stop commits only when the finger is lifted beyond the threshold; releasing early resets it.

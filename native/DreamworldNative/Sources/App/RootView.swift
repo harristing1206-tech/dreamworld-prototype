@@ -15,6 +15,12 @@ struct RootView: View {
                 .tag(AppTab.capture)
                 .tabItem { Label("Capture", systemImage: "waveform.circle.fill") }
 
+            AlarmSetupView {
+                selectedTab = .capture
+            }
+                .tag(AppTab.alarms)
+                .tabItem { Label("Alarms", systemImage: "alarm.fill") }
+
             SettingsView()
                 .tag(AppTab.settings)
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
@@ -44,18 +50,12 @@ private struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("iOS alarm handoff") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Use your existing alarm")
-                            .font(.headline)
-                        Text("Dreamworld installs a Capture Dream App Shortcut automatically. In Shortcuts, create an Alarm → Is Stopped → Any automation, set it to Run Immediately, and choose Capture Dream as the action.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Text("Optional: repeat once with Is Snoozed. Apple requires each trigger to be approved separately.")
-                            .font(.caption)
-                            .foregroundStyle(.mint)
-                    }
-                    .padding(.vertical, 6)
+                Section("Alarms") {
+                    LabeledContent("Delivery", value: "AlarmKit")
+                    LabeledContent("Locked-screen controls", value: "Apple system")
+                    Text("Dreamworld schedules its own alarms. The in-app slide-to-stop interaction is a prototype; iOS controls the real locked-screen alarm presentation.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("Capture") {

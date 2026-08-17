@@ -3,11 +3,18 @@ import Foundation
 import SwiftUI
 
 struct AlarmSetupView: View {
+    let onRecordDream: () -> Void
+
     @StateObject private var service = DreamAlarmService()
     @State private var wakeTime = Calendar.current.date(from: DateComponents(hour: 7, minute: 30)) ?? Date()
     @State private var selectedWeekdays: Set<Locale.Weekday> = []
     @State private var statusMessage = ""
     @State private var isScheduling = false
+    @State private var showingRingPreview = false
+
+    init(onRecordDream: @escaping () -> Void = {}) {
+        self.onRecordDream = onRecordDream
+    }
 
     private let weekdays: [(String, Locale.Weekday)] = [
         ("S", .sunday), ("M", .monday), ("T", .tuesday), ("W", .wednesday),
@@ -21,8 +28,12 @@ struct AlarmSetupView: View {
                 repeatSection
                 scheduleSection
                 activeAlarmsSection
+                previewSection
             }
-            .navigationTitle("Wake Alarm")
+            .navigationTitle("Alarms")
+        }
+        .fullScreenCover(isPresented: $showingRingPreview) {
+            AlarmRingPreviewView(time: wakeTime, onRecordDream: onRecordDream)
         }
     }
 
@@ -70,7 +81,7 @@ struct AlarmSetupView: View {
                     if isScheduling {
                         ProgressView()
                     } else {
-                        Label("Schedule Dream Alarm", systemImage: "alarm.waves.left.and.right.fill")
+                        Label("Add Alarm", systemImage: "alarm.waves.left.and.right.fill")
                     }
                     Spacer()
                 }
@@ -87,6 +98,18 @@ struct AlarmSetupView: View {
         }
     }
 
+    private var previewSection: some View {
+        Section {
+            Button("Preview Ringing Screen") {
+                showingRingPreview = true
+            }
+        } header: {
+            Text("Interaction prototype")
+        } footer: {
+            Text("The slider previews Dreamworld’s in-app interaction. Apple controls the real locked-screen alarm buttons.")
+        }
+    }
+
     @ViewBuilder
     private var activeAlarmsSection: some View {
         Section("Active Dreamworld alarms") {
@@ -95,8 +118,16 @@ struct AlarmSetupView: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(service.scheduledAlarms, id: \.id) { alarm in
-                    HStack {
-                        Label("Dream alarm", systemImage: "alarm.fill")
+                    HStack(spacing: 12) {
+                        Image(systemName: "alarm.fill")
+                            .foregroundStyle(.mint)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(displayTime(for: alarm))
+                                .font(.headline.monospacedDigit())
+                            Text(repeatLabel(for: alarm))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                         Spacer()
                         Button("Cancel", role: .destructive) {
                             cancelAlarm(alarm.id)
@@ -104,6 +135,47 @@ struct AlarmSetupView: View {
                     }
                 }
             }
+        }
+    }
+
+    private func displayTime(for alarm: Alarm) -> String {
+        switch alarm.schedule {
+        case .relative(let relative):
+            let date = Calendar.current.date(
+                from: DateComponents(hour: relative.time.hour, minute: relative.time.minute)
+            )
+            return date?.formatted(date: .omitted, time: .shortened) ?? "Dream alarm"
+        case .fixed(let date):
+            return date.formatted(date: .omitted, time: .shortened)
+        case nil:
+            return "Dream alarm"
+        @unknown default:
+            return "Dream alarm"
+        }
+    }
+
+    private func repeatLabel(for alarm: Alarm) -> String {
+        guard case .relative(let relative)? = alarm.schedule else { return "Once" }
+        switch relative.repeats {
+        case .never:
+            return "Once"
+        case .weekly(let days):
+            return days.map(shortWeekday).joined(separator: " · ")
+        @unknown default:
+            return "Repeats"
+        }
+    }
+
+    private func shortWeekday(_ weekday: Locale.Weekday) -> String {
+        switch weekday {
+        case .sunday: return "Sun"
+        case .monday: return "Mon"
+        case .tuesday: return "Tue"
+        case .wednesday: return "Wed"
+        case .thursday: return "Thu"
+        case .friday: return "Fri"
+        case .saturday: return "Sat"
+        @unknown default: return "Day"
         }
     }
 
@@ -133,6 +205,101 @@ struct AlarmSetupView: View {
                 statusMessage = error.localizedDescription
             }
             isScheduling = false
+        }
+    }
+}
+
+private struct AlarmRingPreviewView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var slideValue = 0.0
+    @State private var isEnding = false
+
+    let time: Date
+    let onRecordDream: () -> Void
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color(red: 0.14, green: 0.19, blue: 0.24), Color(red: 0.03, green: 0.05, blue: 0.09)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Text("DREAMWORLD ALARM")
+                    .font(.caption2.weight(.bold).monospaced())
+                    .tracking(2)
+                    .foregroundStyle(.orange.opacity(0.8))
+
+                Spacer()
+
+                Image(systemName: "alarm.fill")
+                    .font(.system(size: 58, weight: .light))
+                    .foregroundStyle(.white)
+                Text(time.formatted(date: .omitted, time: .shortened))
+                    .font(.system(size: 62, weight: .medium, design: .monospaced))
+                    .minimumScaleFactor(0.7)
+                Text("Wake & capture")
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Button("Snooze") {
+                    endRinging(openCapture: false)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .tint(.white)
+                .foregroundStyle(.black)
+                .frame(maxWidth: .infinity)
+
+                ZStack {
+                    Capsule()
+                        .fill(.white.opacity(0.08))
+                        .overlay(Capsule().stroke(.white.opacity(0.2)))
+                    Text("SLIDE TO STOP")
+                        .font(.caption2.weight(.bold).monospaced())
+                        .tracking(1.5)
+                        .foregroundStyle(.secondary)
+                    Slider(value: $slideValue, in: 0...1) { editing in
+                        guard !editing else { return }
+                        if slideValue >= 0.92 {
+                            endRinging(openCapture: true)
+                        } else {
+                            withAnimation { slideValue = 0 }
+                        }
+                    }
+                    .tint(.white)
+                    .padding(.horizontal, 8)
+                    .accessibilityLabel("Slide to stop alarm")
+                }
+                .frame(height: 64)
+
+                Text("IN-APP INTERACTION PREVIEW · IOS OWNS LOCKED-SCREEN CONTROLS")
+                    .font(.system(size: 8, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 56)
+        }
+        .opacity(isEnding ? 0 : 1)
+        .scaleEffect(isEnding ? 0.975 : 1)
+        .animation(.easeInOut(duration: 0.52), value: isEnding)
+        .preferredColorScheme(.dark)
+    }
+
+    private func endRinging(openCapture: Bool) {
+        guard !isEnding else { return }
+        withAnimation {
+            isEnding = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.56) {
+            if openCapture {
+                onRecordDream()
+            }
+            dismiss()
         }
     }
 }

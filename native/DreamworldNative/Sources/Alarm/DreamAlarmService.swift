@@ -1,33 +1,9 @@
 @preconcurrency import AlarmKit
-import AppIntents
 import Foundation
 import SwiftUI
 
 struct DreamAlarmMetadata: AlarmMetadata {
     let destination: String
-}
-
-struct OpenDreamCaptureIntent: LiveActivityIntent {
-    static let routeKey = "DreamworldOpenCapture"
-    static let title: LocalizedStringResource = "Record Dream"
-    static let description = IntentDescription("Opens Dreamworld directly into voice capture.")
-    static let openAppWhenRun = true
-
-    @Parameter(title: "Alarm ID")
-    var alarmID: String
-
-    init(alarmID: String) {
-        self.alarmID = alarmID
-    }
-
-    init() {
-        alarmID = ""
-    }
-
-    func perform() async throws -> some IntentResult {
-        UserDefaults.standard.set(true, forKey: Self.routeKey)
-        return .result()
-    }
 }
 
 @MainActor
@@ -47,6 +23,7 @@ final class DreamAlarmService: ObservableObject {
     private var updatesTask: Task<Void, Never>?
 
     init() {
+        scheduledAlarms = (try? manager.alarms) ?? []
         observeAlarmUpdates()
     }
 

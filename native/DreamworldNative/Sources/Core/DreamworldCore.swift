@@ -41,6 +41,7 @@ public struct WakeSchedule: Equatable, Sendable {
 public enum AppTab: Equatable, Sendable {
     case world
     case capture
+    case alarms
     case settings
 }
 

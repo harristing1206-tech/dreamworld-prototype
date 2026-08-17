@@ -2,10 +2,21 @@ import AppIntents
 import DreamworldCore
 import Foundation
 
-struct OpenDreamCaptureIntent: AppIntent {
+struct OpenDreamCaptureIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Capture Dream"
     static let description = IntentDescription("Opens Dreamworld directly to voice capture.")
     static let supportedModes: IntentModes = [.foreground(.immediate)]
+
+    @Parameter(title: "Alarm ID")
+    var alarmID: String
+
+    init(alarmID: String) {
+        self.alarmID = alarmID
+    }
+
+    init() {
+        alarmID = ""
+    }
 
     @MainActor
     func perform() async throws -> some IntentResult {

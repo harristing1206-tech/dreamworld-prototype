@@ -1,28 +1,43 @@
-# Dreamworld Native — Wake & Capture
+# Dreamworld Native — Existing Alarm Handoff
 
-A native iOS 26.1+ proof of concept connecting Dreamworld to Apple’s system alarm experience through AlarmKit.
+A native iOS 26.1+ proof of concept that opens Dreamworld Capture from a user-controlled iOS alarm automation without adding an alarm-management destination to Dreamworld.
 
 ## Product flow
 
-1. Choose a wake time and optional repeating weekdays in the Alarm tab.
-2. Grant Dreamworld alarm permission.
-3. Dreamworld schedules an app-owned Apple system alarm.
-4. When it rings, choose Apple’s **Stop** action or Dreamworld’s **Record Dream** action.
-5. **Record Dream** opens the Capture tab.
-6. Tap the microphone to begin recording; tap Stop to save a local `.m4a` file.
+1. The user keeps their existing alarm in Apple Clock.
+2. Once, the user creates a Personal Automation in Shortcuts:
+   - Trigger: **Alarm → Is Stopped or Snoozed**
+   - Run immediately
+   - Action: **Open URLs** with `dreamworld://capture`
+3. When the alarm is stopped or snoozed, iOS opens Dreamworld directly to Capture.
+4. Capture is immediately ready for speech.
+5. The user taps the prominent microphone control, speaks, and stops to save a local `.m4a` file.
 
-Recording never starts merely because an alarm fired. The explicit microphone tap is intentional for privacy, shared-bedroom safety, and predictable iOS permission behavior.
+Dreamworld does not ask users to predict which morning will contain a remembered dream, and it does not create or replace their alarm.
 
-## Apple limitation
+## Why recording does not begin silently
 
-AlarmKit lets Dreamworld create and manage Dreamworld-owned alarms displayed by iOS. Apple does not expose the built-in Clock app’s alarm database, so Dreamworld cannot attach to or edit alarms the user previously created in Clock.
+An alarm-triggered automation can open Capture, but opening the app is not equivalent to explicit microphone consent. Dreamworld begins recording only after a clearly labeled **Record Dream** or microphone action. This avoids unexpected recording in shared bedrooms and preserves predictable iOS privacy behavior.
+
+## Apple boundary
+
+Apple does not expose the Clock app's alarm database to third-party apps. Dreamworld therefore cannot silently install this relationship itself. The user must create the Shortcuts personal automation once. The app registers `dreamworld://capture` so that automation reaches the correct destination.
+
+The earlier AlarmKit scheduling experiment remains under `Sources/Alarm/` for reference, but it is not part of the application target or primary navigation.
+
+## App navigation
+
+- **World** — the evolving dream world
+- **Capture** — voice-first dream capture
+- **Settings** — existing-alarm handoff instructions and capture preferences
+
+There is intentionally no Alarm tab.
 
 ## Requirements
 
 - macOS 26.2+
 - Xcode 26.6+
 - iOS 26.1+ deployment target
-- Physical iPhone on iOS 26.1+ for system alarm verification
 - XcodeGen 2.46+
 
 ## Generate and build
@@ -40,14 +55,6 @@ xcodebuild \
 
 ## Tests
 
-The platform-independent core can be tested directly:
-
-```bash
-swift test
-```
-
-Or through the generated Xcode project with an available simulator:
-
 ```bash
 xcodebuild \
   -project DreamworldNative.xcodeproj \
@@ -59,22 +66,20 @@ xcodebuild \
 
 Core tests cover:
 
-- Wake-time validation
-- One-time versus weekly recurrence
-- Alarm action routing into Capture
+- Valid and invalid `dreamworld://capture` routing
+- Alarm-action routing retained for the archived AlarmKit experiment
+- Wake-time validation retained for the archived experiment
 - Local `.m4a` recording paths
 - Unique recording filenames
 
 ## Physical iPhone acceptance test
 
-1. Select the project’s Dreamworld app target in Xcode.
-2. Choose the development team used to sign the app.
-3. Connect an iPhone running iOS 26.1 or newer.
-4. Build and run Dreamworld on the iPhone.
-5. In Alarm, schedule an alarm two minutes ahead with no weekdays selected.
-6. Lock the phone and enable silent mode or Focus.
-7. Confirm the system alarm appears and sounds.
-8. Tap **Record Dream**.
-9. Confirm Dreamworld opens to Capture without starting the microphone automatically.
-10. Tap the microphone, speak, stop, and confirm the `.m4a` save indicator appears.
-11. Repeat once with a weekly schedule and cancel it from Dreamworld.
+1. Select a development team and install Dreamworld on an iPhone.
+2. Open `dreamworld://capture` from Safari and confirm Capture opens.
+3. In Shortcuts, create a Personal Automation for **Alarm → Is Stopped or Snoozed**.
+4. Set it to run immediately and open `dreamworld://capture`.
+5. Set any existing Clock alarm two minutes ahead.
+6. Lock the phone and let the alarm fire.
+7. Stop or snooze the alarm.
+8. Confirm Dreamworld opens directly to Capture.
+9. Tap the microphone, speak, stop, and confirm the local save indicator appears.

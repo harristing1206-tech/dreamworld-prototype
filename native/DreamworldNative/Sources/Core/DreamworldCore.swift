@@ -41,7 +41,15 @@ public struct WakeSchedule: Equatable, Sendable {
 public enum AppTab: Equatable, Sendable {
     case world
     case capture
-    case alarm
+    case settings
+}
+
+public enum AppDeepLink {
+    public static func destination(for url: URL) -> AppTab? {
+        guard url.scheme?.lowercased() == "dreamworld" else { return nil }
+        guard url.host?.lowercased() == "capture" else { return nil }
+        return .capture
+    }
 }
 
 public enum AlarmAction: Equatable, Sendable {

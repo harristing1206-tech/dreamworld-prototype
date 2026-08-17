@@ -260,6 +260,7 @@
     .handoff-panel.visible { display: block; }
     .handoff-panel p { margin: 0 0 14px; color: var(--sage); font-size: 11px; line-height: 1.5; }
     .handoff-steps { margin: 0 0 18px; padding-left: 20px; color: var(--paper); font-size: 11px; line-height: 1.75; }
+    .handoff-steps code { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; }
     .handoff-note { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 8px; letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; }
     .toggle { width: 44px; height: 26px; padding: 3px; border: 1px solid var(--line); border-radius: 20px; background: var(--deep); cursor: pointer; }
     .toggle::after { content: ""; display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--sage); transition: transform 180ms ease, background 180ms ease; }
@@ -460,8 +461,8 @@
           <p>Dreamworld does not create or replace your alarm. Connect any existing iOS alarm with a personal automation:</p>
           <ol class="handoff-steps">
             <li>Open Shortcuts → Automation</li>
-            <li>Choose Alarm → Is Stopped or Snoozed</li>
-            <li>Open Dreamworld directly to Capture</li>
+            <li>Choose Alarm → Is Stopped or Snoozed, then Run Immediately</li>
+            <li>Choose Open URLs → <code>dreamworld://capture</code></li>
           </ol>
           <div class="handoff-note">Capture opens ready. Microphone begins only after an explicit Record Dream or microphone action.</div>
         </div>

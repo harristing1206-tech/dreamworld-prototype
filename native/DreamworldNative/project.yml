@@ -31,7 +31,6 @@ targets:
     platform: iOS
     sources:
       - path: Sources/App
-      - path: Sources/Alarm
       - path: Sources/Capture
     dependencies:
       - target: DreamworldCore
@@ -40,8 +39,12 @@ targets:
       properties:
         CFBundleDisplayName: Dreamworld
         UILaunchScreen: {}
-        NSAlarmKitUsageDescription: Dreamworld uses alarms you schedule to help you capture dreams immediately after waking.
         NSMicrophoneUsageDescription: Dreamworld records voice memos only when you choose to capture a dream.
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLName: tech.harristing1206.dreamworld.capture
+            CFBundleURLSchemes:
+              - dreamworld
         UIBackgroundModes: []
     settings:
       base:

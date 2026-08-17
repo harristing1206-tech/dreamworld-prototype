@@ -2,7 +2,6 @@ import DreamworldCore
 import SwiftUI
 
 struct RootView: View {
-    @Environment(\.scenePhase) private var scenePhase
     @State private var selectedTab: AppTab = .world
 
     var body: some View {
@@ -15,23 +14,45 @@ struct RootView: View {
                 .tag(AppTab.capture)
                 .tabItem { Label("Capture", systemImage: "waveform.circle.fill") }
 
-            AlarmSetupView()
-                .tag(AppTab.alarm)
-                .tabItem { Label("Alarm", systemImage: "alarm.fill") }
+            SettingsView()
+                .tag(AppTab.settings)
+                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
         .tint(Color(red: 0.58, green: 0.68, blue: 0.63))
-        .onAppear(perform: consumePendingAlarmRoute)
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                consumePendingAlarmRoute()
+        .onOpenURL { url in
+            if let destination = AppDeepLink.destination(for: url) {
+                selectedTab = destination
             }
         }
     }
+}
 
-    private func consumePendingAlarmRoute() {
-        guard UserDefaults.standard.bool(forKey: OpenDreamCaptureIntent.routeKey) else { return }
-        UserDefaults.standard.set(false, forKey: OpenDreamCaptureIntent.routeKey)
-        selectedTab = .capture
+private struct SettingsView: View {
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("iOS alarm handoff") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Use your existing alarm")
+                            .font(.headline)
+                        Text("In Shortcuts, create a personal automation for Alarm → Is Stopped or Snoozed, then open dreamworld://capture.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text("Dreamworld does not create or replace your alarm.")
+                            .font(.caption)
+                            .foregroundStyle(.mint)
+                    }
+                    .padding(.vertical, 6)
+                }
+
+                Section("Capture") {
+                    LabeledContent("Alarm destination", value: "Capture")
+                    LabeledContent("Microphone", value: "Explicit action")
+                    LabeledContent("Audio storage", value: "Local")
+                }
+            }
+            .navigationTitle("Settings")
+        }
     }
 }
 

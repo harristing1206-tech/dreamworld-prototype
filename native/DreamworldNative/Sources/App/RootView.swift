@@ -2,6 +2,7 @@ import DreamworldCore
 import SwiftUI
 
 struct RootView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var selectedTab: AppTab = .world
 
     var body: some View {
@@ -19,11 +20,23 @@ struct RootView: View {
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
         .tint(Color(red: 0.58, green: 0.68, blue: 0.63))
+        .onAppear(perform: consumeCaptureLaunchRequest)
         .onOpenURL { url in
             if let destination = AppDeepLink.destination(for: url) {
                 selectedTab = destination
             }
         }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                consumeCaptureLaunchRequest()
+            }
+        }
+    }
+
+    private func consumeCaptureLaunchRequest() {
+        guard UserDefaults.standard.bool(forKey: CaptureLaunchRequest.userDefaultsKey) else { return }
+        UserDefaults.standard.set(false, forKey: CaptureLaunchRequest.userDefaultsKey)
+        selectedTab = .capture
     }
 }
 
@@ -35,10 +48,10 @@ private struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Use your existing alarm")
                             .font(.headline)
-                        Text("In Shortcuts, create a personal automation for Alarm → Is Stopped or Snoozed, then open dreamworld://capture.")
+                        Text("Dreamworld installs a Capture Dream App Shortcut automatically. In Shortcuts, create one personal automation for Alarm → Is Stopped or Snoozed, then choose Capture Dream as the action.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Text("Dreamworld does not create or replace your alarm.")
+                        Text("The shortcut is automatic; iOS requires the user to approve the alarm trigger.")
                             .font(.caption)
                             .foregroundStyle(.mint)
                     }

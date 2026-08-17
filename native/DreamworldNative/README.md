@@ -5,13 +5,14 @@ A native iOS 26.1+ proof of concept that opens Dreamworld Capture from a user-co
 ## Product flow
 
 1. The user keeps their existing alarm in Apple Clock.
-2. Once, the user creates a Personal Automation in Shortcuts:
+2. Dreamworld automatically registers a **Capture Dream** App Shortcut at install time.
+3. Once, the user creates a Personal Automation in Shortcuts:
    - Trigger: **Alarm → Is Stopped or Snoozed**
    - Run immediately
-   - Action: **Open URLs** with `dreamworld://capture`
-3. When the alarm is stopped or snoozed, iOS opens Dreamworld directly to Capture.
-4. Capture is immediately ready for speech.
-5. The user taps the prominent microphone control, speaks, and stops to save a local `.m4a` file.
+   - Action: Dreamworld's ready-made **Capture Dream** action
+4. When the alarm is stopped or snoozed, iOS runs Capture Dream and opens Dreamworld directly to Capture.
+5. Capture is immediately ready for speech.
+6. The user taps the prominent microphone control, speaks, and stops to save a local `.m4a` file.
 
 Dreamworld does not ask users to predict which morning will contain a remembered dream, and it does not create or replace their alarm.
 
@@ -21,7 +22,7 @@ An alarm-triggered automation can open Capture, but opening the app is not equiv
 
 ## Apple boundary
 
-Apple does not expose the Clock app's alarm database to third-party apps. Dreamworld therefore cannot silently install this relationship itself. The user must create the Shortcuts personal automation once. The app registers `dreamworld://capture` so that automation reaches the correct destination.
+Apple does not expose the Clock app's alarm database to third-party apps. Dreamworld therefore cannot silently install the alarm-trigger relationship itself. The **Capture Dream** App Shortcut is registered automatically for every install, but iOS requires the user to create and approve the Personal Automation trigger once. The app also retains `dreamworld://capture` as a direct fallback route.
 
 The earlier AlarmKit scheduling experiment remains under `Sources/Alarm/` for reference, but it is not part of the application target or primary navigation.
 
@@ -75,11 +76,12 @@ Core tests cover:
 ## Physical iPhone acceptance test
 
 1. Select a development team and install Dreamworld on an iPhone.
-2. Open `dreamworld://capture` from Safari and confirm Capture opens.
-3. In Shortcuts, create a Personal Automation for **Alarm → Is Stopped or Snoozed**.
-4. Set it to run immediately and open `dreamworld://capture`.
-5. Set any existing Clock alarm two minutes ahead.
-6. Lock the phone and let the alarm fire.
-7. Stop or snooze the alarm.
-8. Confirm Dreamworld opens directly to Capture.
-9. Tap the microphone, speak, stop, and confirm the local save indicator appears.
+2. Open Shortcuts and confirm Dreamworld's **Capture Dream** action is available without importing a shortcut.
+3. Run Capture Dream and confirm the app opens directly to Capture.
+4. Create a Personal Automation for **Alarm → Is Stopped or Snoozed**.
+5. Set it to run immediately and choose **Capture Dream** as the action.
+6. Set any existing Clock alarm two minutes ahead.
+7. Lock the phone and let the alarm fire.
+8. Stop or snooze the alarm.
+9. Confirm Dreamworld opens directly to Capture.
+10. Tap the microphone, speak, stop, and confirm the local save indicator appears.

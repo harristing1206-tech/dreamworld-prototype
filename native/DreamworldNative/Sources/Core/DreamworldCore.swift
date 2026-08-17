@@ -52,6 +52,10 @@ public enum AppDeepLink {
     }
 }
 
+public enum CaptureLaunchRequest {
+    public static let userDefaultsKey = "dreamworld.openCapture"
+}
+
 public enum AlarmAction: Equatable, Sendable {
     case recordDream
 }

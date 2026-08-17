@@ -454,17 +454,17 @@
       <header class="panel-head"><h1 class="panel-title">Settings</h1></header>
       <div class="settings-list">
         <div class="setting-row">
-          <span class="setting-copy"><strong>iOS alarm handoff</strong><small>Open Capture after an existing alarm stops</small></span>
+          <span class="setting-copy"><strong>iOS alarm handoff</strong><small>Capture Dream shortcut included automatically</small></span>
           <button class="setting-action" id="handoffSetupButton" aria-expanded="false" aria-controls="handoffPanel">Set up</button>
         </div>
         <div class="handoff-panel" id="handoffPanel">
-          <p>Dreamworld does not create or replace your alarm. Connect any existing iOS alarm with a personal automation:</p>
+          <p>Dreamworld automatically registers a <strong>Capture Dream</strong> App Shortcut for every install. Apple still requires one-time user approval to connect that shortcut to an alarm trigger:</p>
           <ol class="handoff-steps">
             <li>Open Shortcuts → Automation</li>
             <li>Choose Alarm → Is Stopped or Snoozed, then Run Immediately</li>
-            <li>Choose Open URLs → <code>dreamworld://capture</code></li>
+            <li>Add the ready-made Capture Dream action</li>
           </ol>
-          <div class="handoff-note">Capture opens ready. Microphone begins only after an explicit Record Dream or microphone action.</div>
+          <div class="handoff-note">No Dreamworld alarm schedule. No shortcut import. One iOS-required automation approval connects existing alarms to Capture.</div>
         </div>
         <div class="setting-row"><span>Sound cues</span><button class="toggle" aria-label="Toggle sound cues" aria-pressed="false"></button></div>
         <div class="setting-row"><span>Local audio</span><span>On</span></div>

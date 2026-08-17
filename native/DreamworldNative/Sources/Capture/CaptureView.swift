@@ -1,3 +1,4 @@
+import DreamworldCore
 import SwiftUI
 
 struct CaptureView: View {
@@ -19,7 +20,7 @@ struct CaptureView: View {
                 VStack(spacing: 28) {
                     Spacer()
 
-                    Text(recorder.isRecording ? elapsedText : "What do you remember?")
+                    Text(promptText)
                         .font(recorder.isRecording ? .system(size: 42, weight: .light, design: .monospaced) : .title2)
                         .contentTransition(.numericText())
 
@@ -43,14 +44,9 @@ struct CaptureView: View {
                         }
                     }
                     .accessibilityLabel(recorder.isRecording ? "Stop recording" : "Start recording")
+                    .disabled(isProcessing)
 
-                    if let url = recorder.lastRecordingURL, !recorder.isRecording {
-                        Label("Saved locally: \(url.lastPathComponent)", systemImage: "checkmark.circle.fill")
-                            .font(.footnote)
-                            .foregroundStyle(.mint)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                    }
+                    captureStatus
 
                     if let error = recorder.errorMessage {
                         Text(error)
@@ -69,6 +65,91 @@ struct CaptureView: View {
                     now = date
                 }
             }
+        }
+    }
+
+    private var promptText: String {
+        switch recorder.captureSession.phase {
+        case .ready:
+            return "What do you remember?"
+        case .recording:
+            return elapsedText
+        case .saving:
+            return "Saving locally…"
+        case .transcribing:
+            return "Transcribing locally…"
+        case .transcriptReady:
+            return "Your dream, in words"
+        case .transcriptionFailed:
+            return "Your recording is safe"
+        }
+    }
+
+    private var isProcessing: Bool {
+        switch recorder.captureSession.phase {
+        case .saving, .transcribing:
+            return true
+        default:
+            return false
+        }
+    }
+
+    @ViewBuilder
+    private var captureStatus: some View {
+        switch recorder.captureSession.phase {
+        case .ready, .recording:
+            EmptyView()
+        case .saving:
+            ProgressView("Saving the raw recording…")
+                .tint(.mint)
+        case .transcribing(let audioURL):
+            VStack(spacing: 10) {
+                ProgressView()
+                    .tint(.mint)
+                Text("WhisperKit is creating an initial transcript on this device.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                Text("Audio saved: \(audioURL.lastPathComponent)")
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.mint)
+            }
+            .multilineTextAlignment(.center)
+            .padding(.horizontal)
+        case .transcriptReady(let audioURL, let text):
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Initial transcript", systemImage: "text.quote")
+                    .font(.headline)
+                    .foregroundStyle(.mint)
+                ScrollView {
+                    Text(text)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                }
+                .frame(maxHeight: 180)
+                Text("Raw audio preserved locally · \(audioURL.lastPathComponent)")
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .background(.black.opacity(0.2), in: RoundedRectangle(cornerRadius: 18))
+            .padding(.horizontal)
+        case .transcriptionFailed(let audioURL, let message):
+            VStack(spacing: 12) {
+                Label("Audio saved locally", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.mint)
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.center)
+                Text(audioURL.lastPathComponent)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+                Button("Retry transcription") {
+                    recorder.retryTranscription()
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal)
         }
     }
 

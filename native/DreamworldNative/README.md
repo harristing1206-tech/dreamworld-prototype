@@ -13,6 +13,14 @@ A native iOS 26.1+ proof of concept where Dreamworld owns wake alarms, presents 
 
 Multiple alarms are supported. The Alarms tab reads the current AlarmKit schedule directly, so scheduled times and recurrence remain visible after relaunch.
 
+## Local speech-to-text
+
+Dreamworld integrates the MIT-licensed [`argmaxinc/argmax-oss-swift`](https://github.com/argmaxinc/argmax-oss-swift) package at version 1.1.0 and links only its `WhisperKit` product. After a recording is saved, WhisperKit transcribes that `.m4a` locally with the multilingual `base` model.
+
+Capture keeps these states distinct: **Recording → Saving locally → Transcribing locally → Initial transcript**. The raw audio remains in Dreamworld’s documents directory when transcription succeeds or fails, and a failed transcription can be retried without recording again.
+
+The first transcription downloads the Core ML model from Argmax’s Hugging Face model repository. The recording itself is not uploaded for transcription. A production release can bundle the model to remove the first-use network dependency at the cost of a larger app download.
+
 ## Ringing presentation and slide behavior
 
 AlarmKit is the supported way for an App Store app to deliver a true system alarm that can break through silent mode and Focus after authorization. Apple owns the locked-screen alarm surface and its controls; AlarmKit does not expose an arbitrary custom swipe control there.

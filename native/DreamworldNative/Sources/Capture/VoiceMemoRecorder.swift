@@ -21,9 +21,11 @@ final class VoiceMemoRecorder: NSObject, ObservableObject, @preconcurrency AVAud
     @Published private(set) var isRecording = false
     @Published private(set) var lastRecordingURL: URL?
     @Published private(set) var startedAt: Date?
+    @Published private(set) var captureSession = CaptureSessionState()
     @Published var errorMessage: String?
 
     private var recorder: AVAudioRecorder?
+    private let transcriber: any DreamTranscribing = WhisperDreamTranscriber()
 
     func start() async {
         do {
@@ -54,6 +56,7 @@ final class VoiceMemoRecorder: NSObject, ObservableObject, @preconcurrency AVAud
             self.recorder = recorder
             startedAt = Date()
             isRecording = true
+            captureSession.beginRecording()
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -62,23 +65,48 @@ final class VoiceMemoRecorder: NSObject, ObservableObject, @preconcurrency AVAud
 
     func stop() {
         guard let recorder else { return }
+        captureSession.stopRequested()
+        recorder.delegate = nil
         recorder.stop()
-        lastRecordingURL = recorder.url
+        finishSavedRecording(at: recorder.url)
         self.recorder = nil
         startedAt = nil
         isRecording = false
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
+    func retryTranscription() {
+        guard case .transcriptionFailed(let audioURL, _) = captureSession.phase else { return }
+        captureSession.recordingSaved(at: audioURL)
+        beginTranscription(for: audioURL)
+    }
+
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         isRecording = false
         startedAt = nil
         if flag {
-            lastRecordingURL = recorder.url
+            finishSavedRecording(at: recorder.url)
         } else {
             errorMessage = "The recording ended before it could be saved."
         }
         self.recorder = nil
+    }
+
+    private func finishSavedRecording(at audioURL: URL) {
+        lastRecordingURL = audioURL
+        captureSession.recordingSaved(at: audioURL)
+        beginTranscription(for: audioURL)
+    }
+
+    private func beginTranscription(for audioURL: URL) {
+        Task {
+            do {
+                let text = try await transcriber.transcribe(recordingAt: audioURL)
+                captureSession.transcriptionSucceeded(text: text)
+            } catch {
+                captureSession.transcriptionFailed(message: error.localizedDescription)
+            }
+        }
     }
 
     private func requestMicrophonePermission() async -> Bool {

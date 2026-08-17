@@ -96,3 +96,40 @@ public struct VoiceMemoPathFactory: Sendable {
         return directory.appendingPathComponent(filename, isDirectory: false)
     }
 }
+
+public enum CapturePhase: Equatable, Sendable {
+    case ready
+    case recording
+    case saving
+    case transcribing(audioURL: URL)
+    case transcriptReady(audioURL: URL, text: String)
+    case transcriptionFailed(audioURL: URL, message: String)
+}
+
+public struct CaptureSessionState: Equatable, Sendable {
+    public private(set) var phase: CapturePhase = .ready
+
+    public init() {}
+
+    public mutating func beginRecording() {
+        phase = .recording
+    }
+
+    public mutating func stopRequested() {
+        phase = .saving
+    }
+
+    public mutating func recordingSaved(at audioURL: URL) {
+        phase = .transcribing(audioURL: audioURL)
+    }
+
+    public mutating func transcriptionSucceeded(text: String) {
+        guard case .transcribing(let audioURL) = phase else { return }
+        phase = .transcriptReady(audioURL: audioURL, text: text)
+    }
+
+    public mutating func transcriptionFailed(message: String) {
+        guard case .transcribing(let audioURL) = phase else { return }
+        phase = .transcriptionFailed(audioURL: audioURL, message: message)
+    }
+}

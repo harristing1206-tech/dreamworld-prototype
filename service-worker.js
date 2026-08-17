@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dreamworld-world-v10';
+const CACHE_NAME = 'dreamworld-world-v11';
 const ASSETS = [
   './world.html',
   './manifest.webmanifest',

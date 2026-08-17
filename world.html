@@ -284,7 +284,8 @@
     .ringing-label { margin: 12px 0 0; color: var(--sage); font-size: 15px; }
     .ringing-actions { width: 100%; max-width: 340px; }
     .snooze-alarm { width: 100%; margin-bottom: 18px; }
-    .slide-track { position: relative; height: 66px; border: 1px solid rgba(231,223,197,.28); border-radius: 34px; background: rgba(255,255,255,.05); overflow: hidden; }
+    .slide-track { position: relative; height: 66px; border: 1px solid rgba(231,223,197,.28); border-radius: 34px; background: rgba(255,255,255,.05); overflow: hidden; transition: border-color 180ms ease, background 180ms ease; }
+    .slide-track.armed { border-color: rgba(231,223,197,.7); background: rgba(255,255,255,.1); }
     .slide-track::before { content: "slide to stop"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--sage); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
     .slide-stop { position: absolute; inset: 0; width: 100%; height: 66px; margin: 0; opacity: .98; appearance: none; background: transparent; cursor: grab; }
     .slide-stop::-webkit-slider-runnable-track { height: 66px; background: transparent; }
@@ -754,6 +755,7 @@
       ringingKicker.textContent = 'Dreamworld alarm';
       ringingTime.textContent = formatAlarmTime(alarm.time);
       slideStop.value = 0;
+      slideStop.closest('.slide-track').classList.remove('armed');
       ringingOverlay.classList.remove('stopping');
       ringingOverlay.classList.add('visible');
       if (navigator.vibrate) navigator.vibrate([120, 80, 120]);
@@ -821,10 +823,16 @@
       }
     });
     slideStop.addEventListener('input', () => {
-      if (Number(slideStop.value) >= 92) stopRingingAlarm();
+      slideStop.closest('.slide-track').classList.toggle('armed', Number(slideStop.value) >= 92);
     });
     slideStop.addEventListener('change', () => {
-      if (Number(slideStop.value) < 92) slideStop.value = 0;
+      const completed = Number(slideStop.value) >= 92;
+      slideStop.closest('.slide-track').classList.remove('armed');
+      if (completed) {
+        stopRingingAlarm();
+      } else {
+        slideStop.value = 0;
+      }
     });
     document.getElementById('snoozeAlarmButton').addEventListener('click', snoozeDreamworldAlarm);
     document.querySelectorAll('.toggle').forEach(button => button.addEventListener('click', () => {

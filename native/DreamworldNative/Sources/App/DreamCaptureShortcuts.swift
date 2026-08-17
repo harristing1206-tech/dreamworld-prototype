@@ -5,7 +5,7 @@ import Foundation
 struct OpenDreamCaptureIntent: AppIntent {
     static let title: LocalizedStringResource = "Capture Dream"
     static let description = IntentDescription("Opens Dreamworld directly to voice capture.")
-    static let openAppWhenRun = true
+    static let supportedModes: IntentModes = [.foreground(.immediate)]
 
     @MainActor
     func perform() async throws -> some IntentResult {

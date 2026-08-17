@@ -7,12 +7,13 @@ A native iOS 26.1+ proof of concept that opens Dreamworld Capture from a user-co
 1. The user keeps their existing alarm in Apple Clock.
 2. Dreamworld automatically registers a **Capture Dream** App Shortcut at install time.
 3. Once, the user creates a Personal Automation in Shortcuts:
-   - Trigger: **Alarm → Is Stopped or Snoozed**
+   - Trigger: **Alarm → Is Stopped → Any**
    - Run immediately
    - Action: Dreamworld's ready-made **Capture Dream** action
-4. When the alarm is stopped or snoozed, iOS runs Capture Dream and opens Dreamworld directly to Capture.
-5. Capture is immediately ready for speech.
-6. The user taps the prominent microphone control, speaks, and stops to save a local `.m4a` file.
+4. Optional: repeat the automation with **Is Snoozed → Any**. Apple treats Stopped and Snoozed as separate triggers.
+5. When the configured alarm action occurs, iOS runs Capture Dream and opens Dreamworld directly to Capture.
+6. Capture is immediately ready for speech.
+7. The user taps the prominent microphone control, speaks, and stops to save a local `.m4a` file.
 
 Dreamworld does not ask users to predict which morning will contain a remembered dream, and it does not create or replace their alarm.
 
@@ -78,10 +79,11 @@ Core tests cover:
 1. Select a development team and install Dreamworld on an iPhone.
 2. Open Shortcuts and confirm Dreamworld's **Capture Dream** action is available without importing a shortcut.
 3. Run Capture Dream and confirm the app opens directly to Capture.
-4. Create a Personal Automation for **Alarm → Is Stopped or Snoozed**.
+4. Create a Personal Automation for **Alarm → Is Stopped → Any**.
 5. Set it to run immediately and choose **Capture Dream** as the action.
-6. Set any existing Clock alarm two minutes ahead.
-7. Lock the phone and let the alarm fire.
-8. Stop or snooze the alarm.
-9. Confirm Dreamworld opens directly to Capture.
-10. Tap the microphone, speak, stop, and confirm the local save indicator appears.
+6. Optional: create a second automation for **Is Snoozed → Any**.
+7. Set any existing Clock alarm two minutes ahead.
+8. Lock the phone and let the alarm fire.
+9. Stop the alarm.
+10. Confirm Dreamworld opens directly to Capture.
+11. Tap the microphone, speak, stop, and confirm the local save indicator appears.

@@ -48,10 +48,10 @@ private struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Use your existing alarm")
                             .font(.headline)
-                        Text("Dreamworld installs a Capture Dream App Shortcut automatically. In Shortcuts, create one personal automation for Alarm → Is Stopped or Snoozed, then choose Capture Dream as the action.")
+                        Text("Dreamworld installs a Capture Dream App Shortcut automatically. In Shortcuts, create an Alarm → Is Stopped → Any automation, set it to Run Immediately, and choose Capture Dream as the action.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Text("The shortcut is automatic; iOS requires the user to approve the alarm trigger.")
+                        Text("Optional: repeat once with Is Snoozed. Apple requires each trigger to be approved separately.")
                             .font(.caption)
                             .foregroundStyle(.mint)
                     }

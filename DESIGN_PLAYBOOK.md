@@ -188,7 +188,7 @@ The visual design must emerge from the tested interaction rather than decorate a
 The signed-off product direction is **world-first**:
 
 - After a brief transition, the current dream world is the default home surface.
-- Persistent, restrained navigation provides direct access to World, Dreams, Capture, and Settings.
+- Persistent, restrained navigation provides direct access to World, Dreams, Capture, Alarms, and Settings.
 - Returning users do not need explanatory headlines or product-description copy on the home surface.
 - The retro-game identity should come from the world art, sprite construction, motion, typography, and interaction details—not competing effects or multiple bright accent colors.
 - Use one muted, coherent palette and reserve contrast for current state and primary action.
@@ -423,5 +423,9 @@ This changes the implementation order:
 Do not confuse cosmetic customization with personal meaning. The world becomes personal through accumulated dreams, corrections, user choices, and history—not theme pickers, points, streaks, or generic generated collectibles.
 
 Because people readily anthropomorphize responsive systems, Dreamworld may feel warm and alive but may never imply that its AI understands the user’s psyche. Descriptive patterns, speculative interpretations, user-confirmed meaning, and world representation must remain visibly distinct.
+
+Privacy and machine limits must be visible states, not policy-page claims. Use operational language such as **Microphone off**, **Recording locally**, **Transcribing on this device**, and **Interpretation uncertain**. Do not infer emotion from voice pitch, pauses, dream imagery, or interaction speed.
+
+The persistent world must remain non-needy: no decay, rescue requests, missed-event pressure, or punishment for absence. Give users tools to rename, connect, annotate, hide, merge, reject, and revise world elements so personal meaning emerges through authorship and history.
 
 The detailed evidence map, screen audit, prioritized backlog, experiments, and framework limitations are maintained in [`EMOTIONAL_DESIGN_APPLICATION.md`](EMOTIONAL_DESIGN_APPLICATION.md).

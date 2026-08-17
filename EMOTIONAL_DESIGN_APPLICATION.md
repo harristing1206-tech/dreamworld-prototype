@@ -35,6 +35,8 @@ These are paraphrases of Norman’s claims, not new Dreamworld claims.
 | Technology should add richness and enjoyment, not only task efficiency. | Fun, artistry, and richness in technology (PDF pp. 109–111). | Dreamworld may be expressive and playful after preservation is secure; morning capture should remain behaviorally quiet. |
 | People automatically attribute intentions and emotions to responsive things. | Anthropomorphism and social interpretation (PDF pp. 146–148). | A responsive world will feel alive even without a mascot or conversational persona. That power must not be used to imply psychological understanding. |
 | People can take even simple machine interaction seriously because they are trusting. | ELIZA and over-attribution of intelligence (PDF pp. 201–204). | AI interpretations must be labeled as tentative proposals, never as what the dream “really means.” |
+| Machine affect is useful when it exposes operational priorities and limits rather than imitating human feeling. | Functional machine emotion and system-state expression (PDF pp. 172–179, 189–190). | Express uncertainty, insufficient evidence, and processing limits; never claim the app is worried, proud, sad, or emotionally affected. |
+| Emotion detection is indirect and context-dependent. | Ambiguous physiological and behavioral signals (PDF pp. 195–198). | Do not infer anxiety, trauma, deception, or mood from pitch, pace, pauses, dream imagery, or interaction speed. |
 | Selecting options does not itself create emotional attachment. | Limits of mass customization (PDF pp. 228–231). | A palette picker is not personalization. Attachment should emerge from the user’s accumulated dreams, edits, choices, and history. |
 
 ## 3. Dreamworld audit by emotional level
@@ -108,6 +110,7 @@ The alarm should carry almost no reflective burden. A half-awake user should not
 
 **Design actions**
 - Keep Record as the dominant action; add restrained secondary choices: **Type a fragment**, **No dream remembered**, and **Not now**.
+- Keep privacy and state continuously visible with literal labels: **Microphone off**, **Recording locally**, and **Transcribing on this device**.
 - After audio is safe, show a compact completion state: **Saved locally** with **Done for now** as the primary exit.
 - Make **Review transcript** secondary and defer correction to the later Dreams experience.
 - Preflight or bundle the Whisper model before the first alarm-dependent morning; never surprise the user with a large download after capture.
@@ -143,6 +146,8 @@ Required capabilities:
 
 The native app currently lacks its most important reflective surface: a full Dreams archive.
 
+The signed-off native navigation contract is five persistent destinations: **World, Dreams, Capture, Alarms, and Settings**. Dreams must not remain web-only, and Alarms must not be hidden inside Settings.
+
 Each dream should preserve a visible lineage:
 
 > Raw audio → Initial transcript → Edited account → Summary → Proposed interpretation → User-confirmed meaning → World representation
@@ -166,6 +171,8 @@ Required behavior:
 - world generation can fail without blocking access to the archive;
 - generated elements can be hidden or removed independently;
 - the world remains stable enough to learn spatially.
+- the world never decays, asks for rescue, or implies suffering during absence;
+- users can rename, connect, annotate, hide, merge, reject, and revise elements.
 
 #### Reflective
 
@@ -220,6 +227,8 @@ Norman relays Patrick Jordan’s distinction among bodily, social, psychological
 
 Do not substitute points, streaks, loot, or public comparison for these forms of pleasure. The world may invite play, but it should not turn intimate recall into performance.
 
+Norman distinguishes open-ended play from formal games organized around goals, scores, competition, winners, and losers (PDF p. 140). Dreamworld should support wandering, revisiting, arranging, and discovering without converting recall into a game economy. Persistent-world behavior must create continuity without obligation.
+
 ## 5. Prioritized product backlog
 
 | Priority | Change | Emotional level | Impact | Cost |
@@ -227,12 +236,15 @@ Do not substitute points, streaks, loot, or public comparison for these forms of
 | P0 | Add **Done for now** after durable save; make transcript review secondary. | Behavioral | High | Low |
 | P0 | Preflight model availability before an alarm-dependent first capture. | Behavioral / trust | High | Medium |
 | P0 | Add native **No dream remembered**, **Type a fragment**, and **Not now** paths without penalty. | Behavioral / reflective | High | Medium |
+| P0 | Align native navigation to **World, Dreams, Capture, Alarms, Settings**. | Behavioral | High | Medium |
+| P0 | Make microphone, local processing, uncertainty, and deletion boundaries continuously visible. | Behavioral / trust | Very high | Medium |
 | P0 | Build the native Dreams archive with explicit provenance layers. | Reflective | Very high | High |
 | P0 | Add interruption-safe incremental recording, pause/resume, playback, and recovery. | Behavioral | Very high | High |
 | P1 | Create perceptual continuity from slider glow into Capture Ready. | Visceral | Medium | Medium |
 | P1 | Replace generic Capture styling with the restrained “dawn pocket” state system. | Visceral | Medium | Medium |
 | P1 | Explain every world change and link it to supporting dreams. | Behavioral / reflective | Very high | Medium |
 | P1 | Let landmarks accumulate timelines and user-authored names. | Reflective | High | Medium |
+| P1 | Extend **Preview Ringing Screen** into a safe, skippable rehearsal of the full stop-to-Capture consent boundary. | Behavioral | High | Medium |
 | P1 | Add independent deletion for audio, transcript, interpretation, and world derivatives. | Trust / reflective | Very high | High |
 | P2 | Add longitudinal reflection moments without streaks or forced prompts. | Reflective | Medium | Medium |
 | P2 | Allow emotional-intensity and motion preferences rather than superficial theme customization. | Visceral / behavioral | Medium | Low |

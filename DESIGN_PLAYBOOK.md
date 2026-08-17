@@ -1,7 +1,7 @@
 # Dreamworld Design Playbook
 
-**Status:** Working product standard, version 1  
-**Primary foundation:** Don Norman, *The Design of Everyday Things*, revised edition (2013), read from the user-provided 325-page copy.  
+**Status:** Working product standard, version 2
+**Primary foundations:** Don Norman, *The Design of Everyday Things* (2013) and *Emotional Design*, read from the user-provided full copies.
 **Companion lenses:** Tim Brown, Nigel Cross, Roger Martin, and Sarah Stein Greenberg, based on legally accessible excerpts and author materials until full copies are supplied.
 
 This document converts design theory into product rules, review questions, and testable acceptance criteria. It should change when observation contradicts an assumption.
@@ -399,3 +399,29 @@ Dreamworld should pursue **radical meaning through incremental execution**:
 - **Incremental execution:** dependable capture, graceful absence, transparent AI, careful editing, privacy, continuity, and disciplined omission.
 
 The growing world remains the differentiated hypothesis. Reliable and humane capture is the foundation that must earn the right to build it.
+
+## 15. Emotional design standard
+
+Dreamworld must satisfy Norman’s three levels simultaneously:
+
+- **Visceral:** the first second feels calm, intimate, and coherent with the user’s waking context.
+- **Behavioral:** the immediate job works reliably with low cognitive load, truthful state feedback, and recoverable failure.
+- **Reflective:** the archive and world accumulate personal history without prescribing identity or overstating machine interpretation.
+
+Use the product phrase:
+
+> **A gentle threshold into a world that remembers.**
+
+This changes the implementation order:
+
+1. Make durable save and **Done for now** emotionally complete before asking for transcript review.
+2. Add dignified fragment, text, no-recall, and not-now paths.
+3. Build the provenance-aware native Dreams archive.
+4. Make every world change explainable and source-linked.
+5. Only then extend atmospheric polish across the full experience.
+
+Do not confuse cosmetic customization with personal meaning. The world becomes personal through accumulated dreams, corrections, user choices, and history—not theme pickers, points, streaks, or generic generated collectibles.
+
+Because people readily anthropomorphize responsive systems, Dreamworld may feel warm and alive but may never imply that its AI understands the user’s psyche. Descriptive patterns, speculative interpretations, user-confirmed meaning, and world representation must remain visibly distinct.
+
+The detailed evidence map, screen audit, prioritized backlog, experiments, and framework limitations are maintained in [`EMOTIONAL_DESIGN_APPLICATION.md`](EMOTIONAL_DESIGN_APPLICATION.md).

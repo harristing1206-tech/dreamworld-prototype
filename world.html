@@ -253,9 +253,59 @@
     .settings-list { border-top: 1px solid var(--line); }
     .setting-row { min-height: 62px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); font-size: 14px; }
     .setting-row span:last-child { color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; text-transform: uppercase; }
-    .toggle { width: 44px; height: 26px; padding: 3px; border: 1px solid var(--line); border-radius: 20px; background: var(--deep); cursor: pointer; }
-    .toggle::after { content: ""; display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--sage); transition: transform 180ms ease, background 180ms ease; }
-    .toggle.on::after { transform: translateX(16px); background: var(--paper); }
+
+    .alarm-view { overflow-y: auto; padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
+    .alarm-kicker, .alarm-meta, .alarm-status, .alarm-note, .alarm-day {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .alarm-kicker { color: var(--gold); font-size: 9px; font-weight: 700; }
+    .alarm-lead { margin: -8px 0 24px; color: var(--sage); font-size: 12px; line-height: 1.55; }
+    .alarm-time-block { padding: 22px 0 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .alarm-meta { display: flex; justify-content: space-between; align-items: center; color: var(--sage); font-size: 9px; }
+    .alarm-status { color: var(--gold); font-size: 9px; }
+    .alarm-time-input {
+      width: 100%;
+      margin: 8px 0 4px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--paper);
+      font: 500 58px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: -.06em;
+      color-scheme: dark;
+    }
+    .alarm-time-input::-webkit-calendar-picker-indicator { filter: invert(1); opacity: .55; }
+    .alarm-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin: 20px 0; }
+    .alarm-day { aspect-ratio: 1; min-width: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--deep); color: var(--sage); font-size: 9px; cursor: pointer; }
+    .alarm-day.selected { border-color: var(--paper); background: var(--paper); color: var(--night); }
+    .alarm-actions { display: grid; gap: 10px; }
+    .alarm-note { min-height: 38px; margin: 14px 0 0; color: var(--sage); font-size: 8px; line-height: 1.55; }
+    .alarm-note strong { color: var(--gold); font-weight: 700; }
+
+    .alarm-overlay {
+      position: absolute;
+      z-index: 60;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(4,8,14,.84);
+      backdrop-filter: blur(14px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 180ms ease, visibility 180ms ease;
+    }
+    .alarm-overlay.visible { opacity: 1; visibility: visible; }
+    .alarm-card { width: min(100%, 340px); padding: 26px 22px 20px; border: 1px solid rgba(231,223,197,.36); background: #141b25; text-align: center; box-shadow: 0 24px 80px rgba(0,0,0,.5); }
+    .alarm-card .alarm-kicker { display: block; margin-bottom: 18px; }
+    .ring-time { margin: 0; font: 500 52px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.06em; }
+    .ring-title { margin: 10px 0 4px; font-size: 18px; font-weight: 650; }
+    .ring-detail { margin: 0 0 26px; color: var(--sage); font-size: 11px; }
+    .ring-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ring-actions button { min-height: 54px; border: 1px solid var(--line); background: var(--deep); color: var(--paper); cursor: pointer; }
+    .ring-actions .record-dream { background: var(--paper); border-color: var(--paper); color: var(--night); font-weight: 700; }
 
     .nav {
       position: absolute;
@@ -295,9 +345,9 @@
     .icon-dreams::before { top: 6px; } .icon-dreams::after { top: 12px; }
     .icon-capture { border: 2px solid currentColor; border-radius: 50%; }
     .icon-capture::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: currentColor; }
-    .icon-settings::before, .icon-settings::after { content: ""; position: absolute; left: 1px; right: 1px; border-top: 2px solid currentColor; }
-    .icon-settings::before { top: 6px; box-shadow: 0 9px 0 currentColor; }
-    .icon-settings::after { width: 5px; height: 5px; top: 3px; left: 5px; border: 2px solid currentColor; border-radius: 50%; background: var(--night); box-shadow: 8px 9px 0 -1px var(--night), 8px 9px 0 1px currentColor; }
+    .icon-alarm { border: 2px solid currentColor; border-radius: 50%; }
+    .icon-alarm::before { content: ""; position: absolute; left: 9px; top: 4px; width: 2px; height: 7px; background: currentColor; transform-origin: 1px 7px; transform: rotate(-18deg); }
+    .icon-alarm::after { content: ""; position: absolute; left: 9px; top: 9px; width: 6px; border-top: 2px solid currentColor; transform: rotate(25deg); transform-origin: left center; }
 
     @keyframes boot-away {
       0% { opacity: 1; clip-path: inset(0 0 0 0); }
@@ -441,21 +491,51 @@
       </div>
     </section>
 
-    <section class="view panel-view" id="settingsView" data-view="settings">
-      <header class="panel-head"><h1 class="panel-title">Settings</h1></header>
-      <div class="settings-list">
-        <div class="setting-row"><span>Wake alarm</span><button class="toggle on" aria-label="Toggle wake alarm" aria-pressed="true"></button></div>
-        <div class="setting-row"><span>Sound cues</span><button class="toggle" aria-label="Toggle sound cues" aria-pressed="false"></button></div>
-        <div class="setting-row"><span>Local audio</span><span>On</span></div>
-        <div class="setting-row"><span>Analysis timing</span><span>Later</span></div>
+    <section class="view panel-view alarm-view" id="alarmView" data-view="alarm">
+      <header class="panel-head">
+        <div><span class="alarm-kicker">Wake &amp; Capture</span><h1 class="panel-title">Dream Alarm</h1></div>
+        <span class="alarm-status" id="alarmStatus">Not scheduled</span>
+      </header>
+      <p class="alarm-lead">Wake through Apple’s system alarm, then enter Capture before the dream fades.</p>
+      <div class="alarm-time-block">
+        <div class="alarm-meta"><span>Wake time</span><span>iOS 26.1+</span></div>
+        <input class="alarm-time-input" id="alarmTime" type="time" value="07:30" aria-label="Wake time" />
+        <div class="alarm-meta"><span id="repeatSummary">Once</span><span>AlarmKit · Native</span></div>
       </div>
+      <div class="alarm-days" aria-label="Repeat days">
+        <button class="alarm-day" data-day="Sun" aria-pressed="false">S</button>
+        <button class="alarm-day" data-day="Mon" aria-pressed="false">M</button>
+        <button class="alarm-day" data-day="Tue" aria-pressed="false">T</button>
+        <button class="alarm-day" data-day="Wed" aria-pressed="false">W</button>
+        <button class="alarm-day" data-day="Thu" aria-pressed="false">T</button>
+        <button class="alarm-day" data-day="Fri" aria-pressed="false">F</button>
+        <button class="alarm-day" data-day="Sat" aria-pressed="false">S</button>
+      </div>
+      <div class="alarm-actions">
+        <button class="action-button primary" id="scheduleAlarmButton">Schedule preview</button>
+        <button class="action-button" id="previewAlarmButton" disabled>Preview alarm action</button>
+      </div>
+      <p class="alarm-note" id="alarmNote"><strong>Flow preview.</strong> This web surface cannot schedule or wake an iPhone. The native Dreamworld build uses AlarmKit for the real system alarm.</p>
     </section>
+
+    <div class="alarm-overlay" id="alarmOverlay" role="dialog" aria-modal="true" aria-labelledby="ringTitle">
+      <div class="alarm-card">
+        <span class="alarm-kicker">Dreamworld · System alarm preview</span>
+        <p class="ring-time" id="ringTime">7:30</p>
+        <h2 class="ring-title" id="ringTitle">Wake &amp; Capture</h2>
+        <p class="ring-detail">Your dream may fade quickly.</p>
+        <div class="ring-actions">
+          <button id="stopAlarmButton">Stop</button>
+          <button class="record-dream" id="recordDreamButton">Record Dream</button>
+        </div>
+      </div>
+    </div>
 
     <nav class="nav" aria-label="Primary navigation">
       <button class="nav-button" data-go="world" aria-selected="true"><span class="nav-icon icon-world"></span><span class="nav-label">World</span></button>
       <button class="nav-button" data-go="dreams" aria-selected="false"><span class="nav-icon icon-dreams"></span><span class="nav-label">Dreams</span></button>
       <button class="nav-button" data-go="capture" aria-selected="false"><span class="nav-icon icon-capture"></span><span class="nav-label">Capture</span></button>
-      <button class="nav-button" data-go="settings" aria-selected="false"><span class="nav-icon icon-settings"></span><span class="nav-label">Settings</span></button>
+      <button class="nav-button" data-go="alarm" aria-selected="false"><span class="nav-icon icon-alarm"></span><span class="nav-label">Alarm</span></button>
     </nav>
   </main>
 
@@ -468,6 +548,14 @@
     const captureError = document.getElementById('captureError');
     const capturePlayback = document.getElementById('capturePlayback');
     const saveButton = document.getElementById('saveButton');
+    const alarmTime = document.getElementById('alarmTime');
+    const alarmStatus = document.getElementById('alarmStatus');
+    const alarmNote = document.getElementById('alarmNote');
+    const repeatSummary = document.getElementById('repeatSummary');
+    const alarmOverlay = document.getElementById('alarmOverlay');
+    const ringTime = document.getElementById('ringTime');
+    const previewAlarmButton = document.getElementById('previewAlarmButton');
+    const alarmDayButtons = [...document.querySelectorAll('.alarm-day')];
 
     let mediaRecorder = null;
     let mediaStream = null;
@@ -591,6 +679,76 @@
       window.setTimeout(() => openView('world'), 450);
     }
 
+    function formatAlarmTime(value) {
+      const [hourText, minuteText] = value.split(':');
+      const hour = Number(hourText);
+      const suffix = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour % 12 || 12;
+      return `${displayHour}:${minuteText} ${suffix}`;
+    }
+
+    function selectedAlarmDays() {
+      return alarmDayButtons.filter(button => button.classList.contains('selected')).map(button => button.dataset.day);
+    }
+
+    function updateRepeatSummary() {
+      const days = selectedAlarmDays();
+      repeatSummary.textContent = days.length ? days.join(' · ') : 'Once';
+    }
+
+    function applyAlarmPreviewState(config) {
+      if (!config) return;
+      alarmTime.value = config.time || '07:30';
+      alarmDayButtons.forEach(button => {
+        const selected = (config.days || []).includes(button.dataset.day);
+        button.classList.toggle('selected', selected);
+        button.setAttribute('aria-pressed', String(selected));
+      });
+      updateRepeatSummary();
+      alarmStatus.textContent = 'Active';
+      ringTime.textContent = formatAlarmTime(alarmTime.value);
+      previewAlarmButton.disabled = false;
+      document.getElementById('scheduleAlarmButton').textContent = 'Update preview';
+    }
+
+    function scheduleAlarmPreview() {
+      const config = { time: alarmTime.value || '07:30', days: selectedAlarmDays() };
+      localStorage.setItem('dreamworld:wakeCapturePreview', JSON.stringify(config));
+      applyAlarmPreviewState(config);
+      alarmNote.innerHTML = '<strong>Preview scheduled.</strong> Use “Preview alarm action” to test Stop versus Record Dream. A physical iPhone uses the native AlarmKit build.';
+      if (navigator.vibrate) navigator.vibrate(30);
+    }
+
+    function showAlarmPreview() {
+      ringTime.textContent = formatAlarmTime(alarmTime.value || '07:30');
+      alarmOverlay.classList.add('visible');
+      document.getElementById('stopAlarmButton').focus();
+    }
+
+    function stopAlarmPreview() {
+      alarmOverlay.classList.remove('visible');
+      alarmStatus.textContent = 'Stopped';
+      alarmNote.innerHTML = '<strong>Alarm stopped.</strong> No capture was created.';
+    }
+
+    function recordFromAlarmPreview() {
+      alarmOverlay.classList.remove('visible');
+      captureState.textContent = 'Opened from wake alarm';
+      captureTimer.textContent = '00:00';
+      captureError.textContent = '';
+      openView('capture');
+      window.setTimeout(() => micButton.focus(), 120);
+    }
+
+    function restoreAlarmPreview() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('dreamworld:wakeCapturePreview'));
+        if (saved?.time) applyAlarmPreviewState(saved);
+      } catch (_) {
+        localStorage.removeItem('dreamworld:wakeCapturePreview');
+      }
+    }
+
     document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => openView(button.dataset.go)));
     document.querySelectorAll('.hotspot').forEach(button => button.addEventListener('click', () => {
       document.getElementById('placeName').textContent = button.dataset.place;
@@ -598,14 +756,21 @@
       document.getElementById('worldSheet').classList.add('visible');
     }));
     document.getElementById('sheetClose').addEventListener('click', () => document.getElementById('worldSheet').classList.remove('visible'));
-    document.querySelectorAll('.toggle').forEach(button => button.addEventListener('click', () => {
-      const on = button.classList.toggle('on');
-      button.setAttribute('aria-pressed', String(on));
+    alarmDayButtons.forEach(button => button.addEventListener('click', () => {
+      const selected = button.classList.toggle('selected');
+      button.setAttribute('aria-pressed', String(selected));
+      updateRepeatSummary();
     }));
     document.querySelectorAll('.dream-row').forEach(link => link.addEventListener('click', event => event.preventDefault()));
     micButton.addEventListener('click', toggleRecording);
     saveButton.addEventListener('click', saveDream);
     document.getElementById('noDreamButton').addEventListener('click', logNoDream);
+    document.getElementById('scheduleAlarmButton').addEventListener('click', scheduleAlarmPreview);
+    previewAlarmButton.addEventListener('click', showAlarmPreview);
+    document.getElementById('stopAlarmButton').addEventListener('click', stopAlarmPreview);
+    document.getElementById('recordDreamButton').addEventListener('click', recordFromAlarmPreview);
+    alarmOverlay.addEventListener('click', event => { if (event.target === alarmOverlay) stopAlarmPreview(); });
+    restoreAlarmPreview();
     applyTimePhase();
     window.setInterval(applyTimePhase, 60000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) applyTimePhase(); });

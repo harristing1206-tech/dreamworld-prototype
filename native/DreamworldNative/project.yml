@@ -1,0 +1,58 @@
+name: DreamworldNative
+options:
+  bundleIdPrefix: tech.harristing1206
+  deploymentTarget:
+    iOS: "26.1"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: ""
+targets:
+  DreamworldCore:
+    type: library.static
+    platform: iOS
+    sources:
+      - path: Sources/Core
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: tech.harristing1206.dreamworld.core
+  DreamworldCoreTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/CoreTests
+    dependencies:
+      - target: DreamworldCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: tech.harristing1206.dreamworld.coretests
+  Dreamworld:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/App
+      - path: Sources/Alarm
+      - path: Sources/Capture
+    dependencies:
+      - target: DreamworldCore
+    info:
+      path: Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Dreamworld
+        UILaunchScreen: {}
+        NSAlarmKitUsageDescription: Dreamworld uses alarms you schedule to help you capture dreams immediately after waking.
+        NSMicrophoneUsageDescription: Dreamworld records voice memos only when you choose to capture a dream.
+        UIBackgroundModes: []
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: tech.harristing1206.dreamworld
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+schemes:
+  Dreamworld:
+    build:
+      targets:
+        Dreamworld: all
+        DreamworldCore: all
+    test:
+      targets:
+        - DreamworldCoreTests

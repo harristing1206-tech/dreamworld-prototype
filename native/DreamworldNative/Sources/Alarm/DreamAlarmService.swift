@@ -1,0 +1,122 @@
+@preconcurrency import AlarmKit
+import AppIntents
+import Foundation
+import SwiftUI
+
+struct DreamAlarmMetadata: AlarmMetadata {
+    let destination: String
+}
+
+struct OpenDreamCaptureIntent: LiveActivityIntent {
+    static let routeKey = "DreamworldOpenCapture"
+    static let title: LocalizedStringResource = "Record Dream"
+    static let description = IntentDescription("Opens Dreamworld directly into voice capture.")
+    static let openAppWhenRun = true
+
+    @Parameter(title: "Alarm ID")
+    var alarmID: String
+
+    init(alarmID: String) {
+        self.alarmID = alarmID
+    }
+
+    init() {
+        alarmID = ""
+    }
+
+    func perform() async throws -> some IntentResult {
+        UserDefaults.standard.set(true, forKey: Self.routeKey)
+        return .result()
+    }
+}
+
+@MainActor
+final class DreamAlarmService: ObservableObject {
+    enum ServiceError: LocalizedError {
+        case authorizationDenied
+
+        var errorDescription: String? {
+            "Alarm permission is required to schedule a Dreamworld wake alarm."
+        }
+    }
+
+    @Published private(set) var scheduledAlarms: [Alarm] = []
+    @Published private(set) var authorizationState = AlarmManager.shared.authorizationState
+
+    private let manager = AlarmManager.shared
+    private var updatesTask: Task<Void, Never>?
+
+    init() {
+        observeAlarmUpdates()
+    }
+
+    deinit {
+        updatesTask?.cancel()
+    }
+
+    func requestAuthorization() async throws {
+        let state = try await manager.requestAuthorization()
+        authorizationState = state
+        guard state == .authorized else {
+            throw ServiceError.authorizationDenied
+        }
+    }
+
+    @discardableResult
+    func scheduleWakeAlarm(
+        hour: Int,
+        minute: Int,
+        weekdays: Set<Locale.Weekday>
+    ) async throws -> UUID {
+        if manager.authorizationState != .authorized {
+            try await requestAuthorization()
+        }
+
+        let id = UUID()
+        let time = Alarm.Schedule.Relative.Time(hour: hour, minute: minute)
+        let recurrence: Alarm.Schedule.Relative.Recurrence = weekdays.isEmpty
+            ? .never
+            : .weekly(Array(weekdays))
+        let schedule: Alarm.Schedule = .relative(.init(time: time, repeats: recurrence))
+
+        let recordButton = AlarmButton(
+            text: "Record Dream",
+            textColor: .white,
+            systemImageName: "waveform.circle.fill"
+        )
+        let alert = AlarmPresentation.Alert(
+            title: "Dreamworld",
+            secondaryButton: recordButton,
+            secondaryButtonBehavior: .custom
+        )
+        let attributes = AlarmAttributes<DreamAlarmMetadata>(
+            presentation: AlarmPresentation(alert: alert),
+            metadata: DreamAlarmMetadata(destination: "capture"),
+            tintColor: Color(red: 0.58, green: 0.68, blue: 0.63)
+        )
+        let configuration = AlarmManager.AlarmConfiguration<DreamAlarmMetadata>(
+            countdownDuration: nil,
+            schedule: schedule,
+            attributes: attributes,
+            secondaryIntent: OpenDreamCaptureIntent(alarmID: id.uuidString)
+        )
+
+        _ = try await manager.schedule(id: id, configuration: configuration)
+        return id
+    }
+
+    func cancelAlarm(id: UUID) throws {
+        try manager.cancel(id: id)
+    }
+
+    private func observeAlarmUpdates() {
+        updatesTask = Task { [weak self] in
+            guard let self else { return }
+            for await alarms in manager.alarmUpdates {
+                guard !Task.isCancelled else { return }
+                scheduledAlarms = alarms
+                authorizationState = manager.authorizationState
+            }
+        }
+    }
+}

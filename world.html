@@ -253,16 +253,43 @@
     .settings-list { border-top: 1px solid var(--line); }
     .setting-row { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
     .setting-row > span:last-child { color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; text-transform: uppercase; }
-    .setting-copy strong { display: block; font-size: 14px; font-weight: 550; }
-    .setting-copy small { display: block; margin-top: 5px; color: var(--sage); font-size: 10px; line-height: 1.35; }
-    .setting-action { min-width: 76px; min-height: 36px; border: 1px solid var(--line); background: var(--deep); color: var(--paper); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
-    .handoff-panel { display: none; padding: 18px 0 20px; border-bottom: 1px solid var(--line); }
-    .handoff-panel.visible { display: block; }
-    .handoff-panel p { margin: 0 0 14px; color: var(--sage); font-size: 11px; line-height: 1.5; }
-    .handoff-steps { margin: 0 0 18px; padding-left: 20px; color: var(--paper); font-size: 11px; line-height: 1.75; }
-    .handoff-steps code { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; }
-    .handoff-note { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 8px; letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; }
-    .handoff-test { width: 100%; margin-top: 18px; }
+
+    .alarms-view { overflow-y: auto; padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
+    .alarm-list { border-top: 1px solid var(--line); }
+    .alarm-row { min-height: 92px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); }
+    .alarm-time { display: block; font: 500 33px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.05em; }
+    .alarm-detail { display: block; margin-top: 8px; color: var(--sage); font: 700 8px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
+    .alarm-row-actions { display: flex; align-items: center; gap: 9px; }
+    .alarm-preview-button { width: 38px; height: 38px; border: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; }
+    .alarm-empty { padding: 34px 0; border-bottom: 1px solid var(--line); color: var(--sage); font-size: 12px; line-height: 1.5; }
+    .alarm-editor { display: none; padding: 20px 0 24px; border-bottom: 1px solid var(--line); }
+    .alarm-editor.visible { display: block; }
+    .alarm-editor label { display: block; margin-bottom: 8px; color: var(--sage); font: 700 8px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; }
+    .alarm-editor input[type="time"] { width: 100%; min-height: 72px; margin-bottom: 18px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--paper); color-scheme: dark; font: 500 44px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .alarm-repeat { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-bottom: 18px; }
+    .alarm-day { aspect-ratio: 1; border: 1px solid var(--line); border-radius: 50%; background: var(--deep); color: var(--sage); font: 700 8px/1 ui-monospace, SFMono-Regular, Menlo, monospace; cursor: pointer; }
+    .alarm-day.selected { background: var(--paper); border-color: var(--paper); color: var(--night); }
+    .alarm-editor-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .alarm-platform-note { margin: 18px 0 0; color: var(--sage); font-size: 10px; line-height: 1.5; }
+
+    .ringing-overlay { position: absolute; z-index: 70; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: max(74px, env(safe-area-inset-top)) 24px calc(52px + env(safe-area-inset-bottom)); background: radial-gradient(circle at 50% 28%, #24313d 0, #101722 44%, #090e17 100%); opacity: 0; visibility: hidden; transition: opacity 180ms ease, visibility 180ms ease; }
+    .ringing-overlay.visible { opacity: 1; visibility: visible; }
+    .ringing-kicker { color: var(--gold); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .16em; text-transform: uppercase; }
+    .ringing-center { text-align: center; }
+    .ringing-icon { position: relative; width: 68px; height: 68px; margin: 0 auto 28px; border: 2px solid var(--paper); border-radius: 50%; }
+    .ringing-icon::before { content: ""; position: absolute; left: 31px; top: 14px; width: 2px; height: 21px; background: var(--paper); transform-origin: bottom; transform: rotate(-18deg); }
+    .ringing-icon::after { content: ""; position: absolute; left: 32px; top: 33px; width: 17px; border-top: 2px solid var(--paper); transform: rotate(28deg); transform-origin: left; }
+    .ringing-time { margin: 0; font: 500 62px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.07em; }
+    .ringing-label { margin: 12px 0 0; color: var(--sage); font-size: 15px; }
+    .ringing-actions { width: 100%; max-width: 340px; }
+    .record-from-alarm { width: 100%; margin-bottom: 18px; }
+    .slide-track { position: relative; height: 66px; border: 1px solid rgba(231,223,197,.28); border-radius: 34px; background: rgba(255,255,255,.05); overflow: hidden; }
+    .slide-track::before { content: "slide to stop"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--sage); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
+    .slide-stop { position: absolute; inset: 0; width: 100%; height: 66px; margin: 0; opacity: .98; appearance: none; background: transparent; cursor: grab; }
+    .slide-stop::-webkit-slider-runnable-track { height: 66px; background: transparent; }
+    .slide-stop::-webkit-slider-thumb { appearance: none; width: 58px; height: 58px; margin-top: 4px; border: 0; border-radius: 50%; background: var(--paper); box-shadow: 0 0 0 1px rgba(13,19,33,.2); }
+    .ringing-footnote { margin-top: 12px; color: #65746f; font: 700 7px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+
     .toggle { width: 44px; height: 26px; padding: 3px; border: 1px solid var(--line); border-radius: 20px; background: var(--deep); cursor: pointer; }
     .toggle::after { content: ""; display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--sage); transition: transform 180ms ease, background 180ms ease; }
     .toggle.on::after { transform: translateX(16px); background: var(--paper); }
@@ -276,7 +303,7 @@
       height: calc(78px + env(safe-area-inset-bottom));
       padding: 8px 8px env(safe-area-inset-bottom);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       border-top: 1px solid var(--line);
       background: rgba(13,19,33,.94);
       backdrop-filter: blur(12px);
@@ -305,6 +332,9 @@
     .icon-dreams::before { top: 6px; } .icon-dreams::after { top: 12px; }
     .icon-capture { border: 2px solid currentColor; border-radius: 50%; }
     .icon-capture::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: currentColor; }
+    .icon-alarm { border: 2px solid currentColor; border-radius: 50%; }
+    .icon-alarm::before { content: ""; position: absolute; left: 9px; top: 4px; width: 2px; height: 7px; background: currentColor; transform-origin: 1px 7px; transform: rotate(-18deg); }
+    .icon-alarm::after { content: ""; position: absolute; left: 9px; top: 9px; width: 6px; border-top: 2px solid currentColor; transform: rotate(25deg); transform-origin: left center; }
     .icon-settings::before, .icon-settings::after { content: ""; position: absolute; left: 1px; right: 1px; border-top: 2px solid currentColor; }
     .icon-settings::before { top: 6px; box-shadow: 0 9px 0 currentColor; }
     .icon-settings::after { width: 5px; height: 5px; top: 3px; left: 5px; border: 2px solid currentColor; border-radius: 50%; background: var(--night); box-shadow: 8px 9px 0 -1px var(--night), 8px 9px 0 1px currentColor; }
@@ -451,33 +481,63 @@
       </div>
     </section>
 
+    <section class="view panel-view alarms-view" id="alarmsView" data-view="alarms">
+      <header class="panel-head"><h1 class="panel-title">Alarms</h1><button class="panel-action" id="addAlarmButton" aria-label="Add an alarm">＋</button></header>
+      <div class="alarm-editor" id="alarmEditor">
+        <label for="newAlarmTime">Alarm time</label>
+        <input id="newAlarmTime" type="time" value="07:30" />
+        <label>Repeat</label>
+        <div class="alarm-repeat" aria-label="Repeat days">
+          <button class="alarm-day" data-alarm-day="Sun" aria-pressed="false">S</button>
+          <button class="alarm-day" data-alarm-day="Mon" aria-pressed="false">M</button>
+          <button class="alarm-day" data-alarm-day="Tue" aria-pressed="false">T</button>
+          <button class="alarm-day" data-alarm-day="Wed" aria-pressed="false">W</button>
+          <button class="alarm-day" data-alarm-day="Thu" aria-pressed="false">T</button>
+          <button class="alarm-day" data-alarm-day="Fri" aria-pressed="false">F</button>
+          <button class="alarm-day" data-alarm-day="Sat" aria-pressed="false">S</button>
+        </div>
+        <div class="alarm-editor-actions">
+          <button class="action-button" id="cancelAlarmButton">Cancel</button>
+          <button class="action-button primary" id="saveAlarmButton">Add alarm</button>
+        </div>
+      </div>
+      <div class="alarm-list" id="alarmList" aria-live="polite"></div>
+      <p class="alarm-platform-note">The real iPhone build schedules Dreamworld-owned system alarms with AlarmKit. The slider below is an in-app interaction prototype; Apple controls the locked-screen alarm controls.</p>
+    </section>
+
     <section class="view panel-view" id="settingsView" data-view="settings">
       <header class="panel-head"><h1 class="panel-title">Settings</h1></header>
       <div class="settings-list">
-        <div class="setting-row">
-          <span class="setting-copy"><strong>iOS alarm handoff</strong><small>Capture Dream shortcut included automatically</small></span>
-          <button class="setting-action" id="handoffSetupButton" aria-expanded="false" aria-controls="handoffPanel">Set up</button>
-        </div>
-        <div class="handoff-panel" id="handoffPanel">
-          <p>Dreamworld automatically registers a <strong>Capture Dream</strong> App Shortcut for every install. Apple requires one-time approval to connect it to each alarm behavior:</p>
-          <ol class="handoff-steps">
-            <li>Open Shortcuts → Automation → Alarm</li>
-            <li>Choose Is Stopped → Any → Run Immediately</li>
-            <li>Add the ready-made Capture Dream action</li>
-          </ol>
-          <div class="handoff-note">Optional: repeat once with Is Snoozed. Stopped and Snoozed are separate iOS triggers.</div>
-          <button class="action-button primary handoff-test" id="testCaptureDreamButton">Test Capture Dream</button>
-        </div>
+        <div class="setting-row"><span>System alarm delivery</span><span>AlarmKit</span></div>
+        <div class="setting-row"><span>Locked-screen controls</span><span>Apple system</span></div>
+        <div class="setting-row"><span>In-app slide preview</span><span>On</span></div>
         <div class="setting-row"><span>Sound cues</span><button class="toggle" aria-label="Toggle sound cues" aria-pressed="false"></button></div>
         <div class="setting-row"><span>Local audio</span><span>On</span></div>
         <div class="setting-row"><span>Analysis timing</span><span>Later</span></div>
       </div>
     </section>
 
+    <div class="ringing-overlay" id="ringingOverlay" role="dialog" aria-modal="true" aria-labelledby="ringingTime">
+      <span class="ringing-kicker">Dreamworld alarm</span>
+      <div class="ringing-center">
+        <div class="ringing-icon" aria-hidden="true"></div>
+        <h2 class="ringing-time" id="ringingTime">7:30 AM</h2>
+        <p class="ringing-label">Wake &amp; capture</p>
+      </div>
+      <div class="ringing-actions">
+        <button class="action-button primary record-from-alarm" id="recordFromAlarmButton">Record Dream</button>
+        <div class="slide-track">
+          <input class="slide-stop" id="slideStop" type="range" min="0" max="100" value="0" aria-label="Slide to stop alarm" />
+        </div>
+        <div class="ringing-footnote">In-app gesture prototype · iOS owns the system alarm controls</div>
+      </div>
+    </div>
+
     <nav class="nav" aria-label="Primary navigation">
       <button class="nav-button" data-go="world" aria-selected="true"><span class="nav-icon icon-world"></span><span class="nav-label">World</span></button>
       <button class="nav-button" data-go="dreams" aria-selected="false"><span class="nav-icon icon-dreams"></span><span class="nav-label">Dreams</span></button>
       <button class="nav-button" data-go="capture" aria-selected="false"><span class="nav-icon icon-capture"></span><span class="nav-label">Capture</span></button>
+      <button class="nav-button" data-go="alarms" aria-selected="false"><span class="nav-icon icon-alarm"></span><span class="nav-label">Alarms</span></button>
       <button class="nav-button" data-go="settings" aria-selected="false"><span class="nav-icon icon-settings"></span><span class="nav-label">Settings</span></button>
     </nav>
   </main>
@@ -491,6 +551,13 @@
     const captureError = document.getElementById('captureError');
     const capturePlayback = document.getElementById('capturePlayback');
     const saveButton = document.getElementById('saveButton');
+    const alarmList = document.getElementById('alarmList');
+    const alarmEditor = document.getElementById('alarmEditor');
+    const newAlarmTime = document.getElementById('newAlarmTime');
+    const alarmDayButtons = [...document.querySelectorAll('[data-alarm-day]')];
+    const ringingOverlay = document.getElementById('ringingOverlay');
+    const ringingTime = document.getElementById('ringingTime');
+    const slideStop = document.getElementById('slideStop');
 
     let mediaRecorder = null;
     let mediaStream = null;
@@ -499,6 +566,7 @@
     let startedAt = 0;
     let audioUrl = null;
     let hasCapture = false;
+    let alarms = [];
 
     function getTimePhase(hour) {
       if (hour >= 5 && hour < 6) return { id: 'blue-hour', label: 'Blue hour' };
@@ -614,12 +682,91 @@
       window.setTimeout(() => openView('world'), 450);
     }
 
-    function simulateCaptureDreamHandoff() {
-      captureState.textContent = 'Opened by Capture Dream';
+    function formatAlarmTime(value) {
+      const [hourText, minuteText] = value.split(':');
+      const hour = Number(hourText);
+      const suffix = hour >= 12 ? 'PM' : 'AM';
+      return `${hour % 12 || 12}:${minuteText} ${suffix}`;
+    }
+
+    function loadAlarms() {
+      try {
+        const stored = JSON.parse(localStorage.getItem('dreamworld:alarms') || 'null');
+        if (Array.isArray(stored)) {
+          alarms = stored.filter(alarm => /^([01]\d|2[0-3]):[0-5]\d$/.test(alarm.time)).map(alarm => ({
+            id: String(alarm.id),
+            time: alarm.time,
+            days: Array.isArray(alarm.days) ? alarm.days.filter(day => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].includes(day)) : [],
+            enabled: alarm.enabled !== false
+          }));
+        }
+      } catch (_) {
+        localStorage.removeItem('dreamworld:alarms');
+      }
+      if (!alarms.length) alarms = [{ id: 'starter', time: '07:30', days: ['Mon','Tue','Wed','Thu','Fri'], enabled: true }];
+      persistAlarms();
+      renderAlarms();
+    }
+
+    function persistAlarms() {
+      localStorage.setItem('dreamworld:alarms', JSON.stringify(alarms));
+    }
+
+    function renderAlarms() {
+      if (!alarms.length) {
+        alarmList.innerHTML = '<div class="alarm-empty">No alarms yet. Add a wake time when you want Dreamworld ready for capture.</div>';
+        return;
+      }
+      alarmList.innerHTML = alarms.map(alarm => `
+        <div class="alarm-row" data-alarm-id="${alarm.id}">
+          <div><span class="alarm-time">${formatAlarmTime(alarm.time)}</span><span class="alarm-detail">${alarm.days.length ? alarm.days.join(' · ') : 'Once'} · Dreamworld</span></div>
+          <div class="alarm-row-actions">
+            <button class="alarm-preview-button" data-preview-alarm="${alarm.id}" aria-label="Preview ${formatAlarmTime(alarm.time)} alarm">▶</button>
+            <button class="toggle ${alarm.enabled ? 'on' : ''}" data-toggle-alarm="${alarm.id}" aria-label="Toggle ${formatAlarmTime(alarm.time)} alarm" aria-pressed="${alarm.enabled}"></button>
+          </div>
+        </div>`).join('');
+    }
+
+    function resetAlarmEditor() {
+      alarmEditor.classList.remove('visible');
+      alarmDayButtons.forEach(button => {
+        button.classList.remove('selected');
+        button.setAttribute('aria-pressed', 'false');
+      });
+    }
+
+    function addAlarm() {
+      const time = newAlarmTime.value;
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return;
+      const days = alarmDayButtons.filter(button => button.classList.contains('selected')).map(button => button.dataset.alarmDay);
+      alarms.push({ id: String(Date.now()), time, days, enabled: true });
+      persistAlarms();
+      renderAlarms();
+      resetAlarmEditor();
+      if (navigator.vibrate) navigator.vibrate(30);
+    }
+
+    function showRingingAlarm(id) {
+      const alarm = alarms.find(item => item.id === id);
+      if (!alarm) return;
+      ringingTime.textContent = formatAlarmTime(alarm.time);
+      slideStop.value = 0;
+      ringingOverlay.classList.add('visible');
+      if (navigator.vibrate) navigator.vibrate([120, 80, 120]);
+    }
+
+    function stopRingingAlarm() {
+      ringingOverlay.classList.remove('visible');
+      slideStop.value = 0;
+      openView('alarms');
+    }
+
+    function recordFromDreamworldAlarm() {
+      ringingOverlay.classList.remove('visible');
+      slideStop.value = 0;
+      captureState.textContent = 'Opened from Dreamworld alarm';
       captureTimer.textContent = '00:00';
       captureError.textContent = '';
-      capturePlayback.style.display = 'none';
-      saveButton.disabled = true;
       openView('capture');
       window.setTimeout(() => micButton.focus(), 120);
     }
@@ -631,12 +778,35 @@
       document.getElementById('worldSheet').classList.add('visible');
     }));
     document.getElementById('sheetClose').addEventListener('click', () => document.getElementById('worldSheet').classList.remove('visible'));
-    document.getElementById('handoffSetupButton').addEventListener('click', event => {
-      const panel = document.getElementById('handoffPanel');
-      const visible = panel.classList.toggle('visible');
-      event.currentTarget.setAttribute('aria-expanded', String(visible));
-      event.currentTarget.textContent = visible ? 'Hide' : 'Set up';
+    document.getElementById('addAlarmButton').addEventListener('click', () => alarmEditor.classList.toggle('visible'));
+    document.getElementById('cancelAlarmButton').addEventListener('click', resetAlarmEditor);
+    document.getElementById('saveAlarmButton').addEventListener('click', addAlarm);
+    alarmDayButtons.forEach(button => button.addEventListener('click', () => {
+      const selected = button.classList.toggle('selected');
+      button.setAttribute('aria-pressed', String(selected));
+    }));
+    alarmList.addEventListener('click', event => {
+      const preview = event.target.closest('[data-preview-alarm]');
+      if (preview) {
+        showRingingAlarm(preview.dataset.previewAlarm);
+        return;
+      }
+      const toggle = event.target.closest('[data-toggle-alarm]');
+      if (toggle) {
+        const alarm = alarms.find(item => item.id === toggle.dataset.toggleAlarm);
+        if (!alarm) return;
+        alarm.enabled = !alarm.enabled;
+        persistAlarms();
+        renderAlarms();
+      }
     });
+    slideStop.addEventListener('input', () => {
+      if (Number(slideStop.value) >= 92) stopRingingAlarm();
+    });
+    slideStop.addEventListener('change', () => {
+      if (Number(slideStop.value) < 92) slideStop.value = 0;
+    });
+    document.getElementById('recordFromAlarmButton').addEventListener('click', recordFromDreamworldAlarm);
     document.querySelectorAll('.toggle').forEach(button => button.addEventListener('click', () => {
       const on = button.classList.toggle('on');
       button.setAttribute('aria-pressed', String(on));
@@ -645,7 +815,7 @@
     micButton.addEventListener('click', toggleRecording);
     saveButton.addEventListener('click', saveDream);
     document.getElementById('noDreamButton').addEventListener('click', logNoDream);
-    document.getElementById('testCaptureDreamButton').addEventListener('click', simulateCaptureDreamHandoff);
+    loadAlarms();
     applyTimePhase();
     window.setInterval(applyTimePhase, 60000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) applyTimePhase(); });

@@ -250,6 +250,101 @@
     .capture-error { min-height: 36px; max-width: 300px; margin-top: 16px; color: #c99088; font-size: 12px; line-height: 1.4; text-align: center; }
     .capture-playback { display: none; width: min(100%, 320px); margin-top: 18px; }
 
+    .dialogue-overlay {
+      position: absolute;
+      z-index: 60;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      background: #07101a;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 220ms ease, transform 220ms ease, visibility 220ms;
+    }
+    .dialogue-overlay.visible { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+    .dialogue-status {
+      min-height: calc(42px + env(safe-area-inset-top));
+      padding: env(safe-area-inset-top) 18px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #424d49;
+      background: #09141d;
+      color: var(--paper);
+      font: 800 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .dialogue-status-dot { width: 7px; height: 7px; background: #5bc2a7; border-radius: 50%; }
+    .dialogue-status-note { margin-left: auto; color: var(--gold); font-size: 8px; }
+    .dialogue-scene {
+      position: relative;
+      flex: 1;
+      min-height: 280px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(6,16,27,.04), rgba(29,52,50,.72)),
+        linear-gradient(180deg, #0a1725 0%, #13272c 62%, #1d2b25 100%);
+    }
+    .dialogue-scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .75;
+      background-image:
+        linear-gradient(#d8cfad 0 0), linear-gradient(#8ea096 0 0), linear-gradient(#b69a63 0 0),
+        linear-gradient(#d8cfad 0 0), linear-gradient(#8ea096 0 0), linear-gradient(#b69a63 0 0);
+      background-repeat: no-repeat;
+      background-size: 3px 3px, 2px 2px, 3px 3px, 2px 2px, 3px 3px, 2px 2px;
+      background-position: 10% 15%, 23% 28%, 36% 12%, 58% 24%, 70% 15%, 91% 28%;
+    }
+    .dialogue-moon { position: absolute; top: 17%; right: 14%; width: 44px; height: 44px; background: #d8cfad; border-radius: 50%; }
+    .dialogue-moon::after { content: ""; position: absolute; width: 38px; height: 38px; left: -7px; top: -4px; background: #0a1725; border-radius: 50%; }
+    .dialogue-ground { position: absolute; left: 11%; right: 11%; bottom: 22px; height: 68px; border-radius: 50%; background: rgba(48,67,59,.75); }
+    .dialogue-path { position: absolute; left: 42%; bottom: 26px; width: 16%; height: 2px; background: rgba(182,154,99,.48); }
+    .pixel-person {
+      position: absolute;
+      bottom: 34px;
+      width: 58px;
+      height: 94px;
+      filter: drop-shadow(0 8px 8px rgba(0,0,0,.25));
+      animation: dialogue-breathe 1.45s ease-in-out infinite alternate;
+    }
+    .pixel-person.dreamer { left: 20%; --body-color: #335f5d; --accent-color: #c2a15c; }
+    .pixel-person.listener { right: 20%; --body-color: #4a405f; --accent-color: #7d9489; transform: scaleX(-1); animation-delay: 200ms; }
+    .pixel-person .pixel-head { position: absolute; left: 15px; top: 0; width: 28px; height: 26px; background: #3b4643; }
+    .pixel-person .pixel-eye { position: absolute; right: 6px; top: 10px; width: 5px; height: 5px; background: var(--accent-color); }
+    .pixel-person .pixel-hat { position: absolute; left: 10px; top: -7px; width: 38px; height: 7px; background: var(--accent-color); }
+    .pixel-person.listener .pixel-hat { left: 3px; top: -8px; width: 52px; height: 18px; opacity: .65; }
+    .pixel-person .pixel-body { position: absolute; left: 8px; top: 26px; width: 42px; height: 43px; background: var(--body-color); }
+    .pixel-person.listener .pixel-body { left: 6px; width: 46px; }
+    .pixel-person .pixel-leg { position: absolute; top: 69px; width: 13px; height: 24px; background: var(--body-color); opacity: .92; }
+    .pixel-person .pixel-leg.one { left: 10px; } .pixel-person .pixel-leg.two { right: 10px; }
+    .dialogue-listening { position: absolute; left: 50%; bottom: 106px; transform: translateX(-50%); display: flex; gap: 7px; }
+    .dialogue-listening span { width: 4px; height: 4px; background: var(--gold); animation: dialogue-dot 800ms ease-in-out infinite alternate; }
+    .dialogue-listening span:nth-child(2) { animation-delay: 160ms; } .dialogue-listening span:nth-child(3) { animation-delay: 320ms; }
+    .dialogue-box { margin: 0 10px max(8px, env(safe-area-inset-bottom)); border: 2px solid #8f8057; background: #0e171c; color: var(--paper); }
+    .dialogue-main { min-height: 166px; padding: 18px; display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: start; }
+    .dialogue-portrait { position: relative; width: 72px; height: 72px; overflow: hidden; border: 2px solid #646e62; background: #091119; }
+    .dialogue-portrait .pixel-person { left: 7px; bottom: -34px; transform: scale(.72); transform-origin: top left; animation: none; }
+    .dialogue-copy { min-width: 0; }
+    .dialogue-speaker { margin: 1px 0 10px; color: var(--gold); font: 900 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .15em; text-transform: uppercase; }
+    .dialogue-text { max-height: 146px; overflow-y: auto; color: var(--paper); font-size: 16px; line-height: 1.45; }
+    .dialogue-text.secondary { color: #bdc4b6; font-size: 14px; }
+    .dialogue-footer { min-height: 54px; padding: 0 18px; display: flex; align-items: center; border-top: 1px solid #46504b; }
+    .dialogue-progress { display: flex; align-items: center; gap: 10px; color: #9caf9e; font: 800 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .11em; text-transform: uppercase; }
+    .dialogue-bars { display: flex; gap: 3px; align-items: center; height: 20px; }
+    .dialogue-bars span { width: 3px; height: 6px; background: #5bc2a7; animation: dialogue-bar 700ms ease-in-out infinite alternate; }
+    .dialogue-bars span:nth-child(2) { height: 15px; animation-delay: 100ms; } .dialogue-bars span:nth-child(3) { height: 11px; animation-delay: 200ms; } .dialogue-bars span:nth-child(4) { height: 18px; animation-delay: 300ms; }
+    .dialogue-finish { width: 100%; min-height: 54px; display: none; align-items: center; justify-content: space-between; border: 0; background: transparent; color: var(--paper); font: 900 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; cursor: pointer; }
+    .dialogue-overlay.ready .dialogue-progress { display: none; }
+    .dialogue-overlay.ready .dialogue-finish { display: flex; }
+    @keyframes dialogue-breathe { to { translate: 0 -2px; } }
+    @keyframes dialogue-dot { to { opacity: .28; } }
+    @keyframes dialogue-bar { to { transform: scaleY(.45); opacity: .5; } }
+
     .settings-list { border-top: 1px solid var(--line); }
     .setting-row { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
     .setting-row > span:last-child { color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; text-transform: uppercase; }
@@ -480,7 +575,7 @@
       <audio class="capture-playback" id="capturePlayback" controls></audio>
       <div class="capture-error" id="captureError" role="alert"></div>
       <div class="capture-actions">
-        <button class="action-button primary" id="saveButton" disabled>Save dream</button>
+        <button class="action-button primary" id="saveButton" disabled>Log dream</button>
         <button class="action-button" id="noDreamButton">No dream remembered</button>
       </div>
     </section>
@@ -521,6 +616,44 @@
       </div>
     </section>
 
+    <section class="dialogue-overlay" id="dialogueOverlay" role="dialog" aria-modal="true" aria-labelledby="dialogueSpeaker" aria-live="polite">
+      <div class="dialogue-status">
+        <span class="dialogue-status-dot"></span>
+        <span id="dialogueStatus">Preparing dialogue</span>
+        <span class="dialogue-status-note">Live PWA · visual prototype</span>
+      </div>
+      <div class="dialogue-scene" aria-hidden="true">
+        <span class="dialogue-moon"></span>
+        <span class="dialogue-ground"></span>
+        <span class="dialogue-path"></span>
+        <div class="pixel-person dreamer">
+          <span class="pixel-hat"></span><span class="pixel-head"><span class="pixel-eye"></span></span><span class="pixel-body"></span><span class="pixel-leg one"></span><span class="pixel-leg two"></span>
+        </div>
+        <div class="dialogue-listening"><span></span><span></span><span></span></div>
+        <div class="pixel-person listener">
+          <span class="pixel-hat"></span><span class="pixel-head"><span class="pixel-eye"></span></span><span class="pixel-body"></span><span class="pixel-leg one"></span><span class="pixel-leg two"></span>
+        </div>
+      </div>
+      <div class="dialogue-box">
+        <div class="dialogue-main">
+          <div class="dialogue-portrait" aria-hidden="true">
+            <div class="pixel-person dreamer"><span class="pixel-hat"></span><span class="pixel-head"><span class="pixel-eye"></span></span><span class="pixel-body"></span><span class="pixel-leg one"></span><span class="pixel-leg two"></span></div>
+          </div>
+          <div class="dialogue-copy">
+            <div class="dialogue-speaker" id="dialogueSpeaker">You · Dream log</div>
+            <div class="dialogue-text secondary" id="dialogueText">The live PWA is preparing the approved dialogue scene. Native Dreamworld performs the private on-device transcription.</div>
+          </div>
+        </div>
+        <div class="dialogue-footer">
+          <div class="dialogue-progress" id="dialogueProgress">
+            <span class="dialogue-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            Preparing visual prototype
+          </div>
+          <button type="button" class="dialogue-finish" id="dialogueFinish">Finish logging <span aria-hidden="true">⌄</span></button>
+        </div>
+      </div>
+    </section>
+
     <div class="ringing-overlay" id="ringingOverlay" role="dialog" aria-modal="true" aria-labelledby="ringingTime">
       <span class="ringing-kicker" id="ringingKicker">Dreamworld alarm</span>
       <div class="ringing-center">
@@ -546,6 +679,7 @@
     </nav>
   </main>
 
+  <script src="./dialogue-state.js"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -563,6 +697,12 @@
     const ringingKicker = document.getElementById('ringingKicker');
     const ringingTime = document.getElementById('ringingTime');
     const slideStop = document.getElementById('slideStop');
+    const dialogueOverlay = document.getElementById('dialogueOverlay');
+    const dialogueStatus = document.getElementById('dialogueStatus');
+    const dialogueSpeaker = document.getElementById('dialogueSpeaker');
+    const dialogueText = document.getElementById('dialogueText');
+    const dialogueFinish = document.getElementById('dialogueFinish');
+    const dialogueFlow = DreamDialogueFlow.createDreamDialogueFlow();
 
     let mediaRecorder = null;
     let mediaStream = null;
@@ -611,8 +751,9 @@
       stopTracks();
       micButton.classList.remove('recording');
       micButton.setAttribute('aria-label', 'Start another recording');
-      captureState.textContent = 'Ready to save';
+      captureState.textContent = 'Recording saved';
       hasCapture = true;
+      dialogueFlow.saveDraft();
       saveButton.disabled = false;
 
       if (chunks.length) {
@@ -628,6 +769,7 @@
       captureError.textContent = '';
       chunks = [];
       hasCapture = false;
+      dialogueFlow.reset();
       saveButton.disabled = true;
       capturePlayback.style.display = 'none';
 
@@ -672,13 +814,37 @@
       else startRecording();
     }
 
-    function saveDream() {
-      if (!hasCapture) return;
-      localStorage.setItem('dreamworld:worldFirstLastDream', new Date().toISOString());
-      captureState.textContent = 'Saved';
+    function logDream() {
+      if (!hasCapture || !dialogueFlow.logDream()) return;
       saveButton.disabled = true;
+      dialogueOverlay.classList.remove('ready');
+      dialogueOverlay.classList.add('visible');
+      dialogueStatus.textContent = 'Preparing dialogue';
+      dialogueSpeaker.textContent = 'You · Dream log';
+      dialogueText.classList.add('secondary');
+      dialogueText.textContent = 'The live PWA is preparing the approved dialogue scene. Native Dreamworld performs the private on-device transcription.';
+      if (navigator.vibrate) navigator.vibrate(30);
+
+      window.setTimeout(() => {
+        const sampleTranscript = 'I was walking beside a dark lake under a gold moon. Across the water, a small light moved between the trees, and I knew it was waiting for me.';
+        if (!dialogueFlow.completeTranscript(sampleTranscript)) return;
+        dialogueStatus.textContent = 'Prototype transcript ready';
+        dialogueSpeaker.textContent = 'You · Prototype transcript';
+        dialogueText.classList.remove('secondary');
+        dialogueText.textContent = sampleTranscript;
+        dialogueOverlay.classList.add('ready');
+        dialogueFinish.focus();
+      }, 1100);
+    }
+
+    function finishDialogue() {
+      if (!dialogueFlow.finishDialogue()) return;
+      localStorage.setItem('dreamworld:worldFirstLastDream', new Date().toISOString());
+      dialogueOverlay.classList.remove('visible', 'ready');
+      captureState.textContent = 'Dream logged';
+      hasCapture = false;
       if (navigator.vibrate) navigator.vibrate([30, 30, 60]);
-      window.setTimeout(() => openView('world'), 500);
+      window.setTimeout(() => openView('dreams'), 220);
     }
 
     function logNoDream() {
@@ -850,10 +1016,17 @@
     }));
     document.querySelectorAll('.dream-row').forEach(link => link.addEventListener('click', event => event.preventDefault()));
     micButton.addEventListener('click', toggleRecording);
-    saveButton.addEventListener('click', saveDream);
+    saveButton.addEventListener('click', logDream);
+    dialogueFinish.addEventListener('click', finishDialogue);
     document.getElementById('noDreamButton').addEventListener('click', logNoDream);
     loadAlarms();
     applyTimePhase();
+    if (new URLSearchParams(window.location.search).get('dialogue') === 'preview') {
+      openView('capture');
+      hasCapture = true;
+      dialogueFlow.saveDraft();
+      logDream();
+    }
     window.setInterval(applyTimePhase, 60000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) applyTimePhase(); });
     window.DreamworldDayCycle = { getTimePhase, applyTimePhase };

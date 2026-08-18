@@ -3,7 +3,7 @@ import Foundation
 import XCTest
 
 final class CaptureSessionStateTests: XCTestCase {
-    func testSavedRecordingBeginsTranscriptionForThatAudioFile() {
+    func testSavedRecordingWaitsForExplicitLogDecision() {
         let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
         var session = CaptureSessionState()
 
@@ -11,6 +11,25 @@ final class CaptureSessionStateTests: XCTestCase {
         session.stopRequested()
         session.recordingSaved(at: audioURL)
 
+        XCTAssertEqual(session.phase, .savedDraft(audioURL: audioURL))
+    }
+
+    func testLogDreamBeginsTranscriptionForSavedDraft() {
+        let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
+        var session = CaptureSessionState()
+        session.recordingSaved(at: audioURL)
+
+        XCTAssertTrue(session.logDream())
+        XCTAssertEqual(session.phase, .transcribing(audioURL: audioURL))
+    }
+
+    func testLogDreamCanBeginOnlyOnce() {
+        let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
+        var session = CaptureSessionState()
+        session.recordingSaved(at: audioURL)
+
+        XCTAssertTrue(session.logDream())
+        XCTAssertFalse(session.logDream())
         XCTAssertEqual(session.phase, .transcribing(audioURL: audioURL))
     }
 
@@ -18,6 +37,7 @@ final class CaptureSessionStateTests: XCTestCase {
         let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
         var session = CaptureSessionState()
         session.recordingSaved(at: audioURL)
+        XCTAssertTrue(session.logDream())
 
         session.transcriptionSucceeded(text: "I was walking beside a dark lake.")
 
@@ -34,6 +54,7 @@ final class CaptureSessionStateTests: XCTestCase {
         let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
         var session = CaptureSessionState()
         session.recordingSaved(at: audioURL)
+        XCTAssertTrue(session.logDream())
 
         session.transcriptionFailed(message: "The language model could not be loaded.")
 
@@ -43,6 +64,33 @@ final class CaptureSessionStateTests: XCTestCase {
                 audioURL: audioURL,
                 message: "The language model could not be loaded."
             )
+        )
+    }
+
+    func testRetryRestartsFailedTranscriptionInSameSession() {
+        let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
+        var session = CaptureSessionState()
+        session.recordingSaved(at: audioURL)
+        XCTAssertTrue(session.logDream())
+        session.transcriptionFailed(message: "The language model could not be loaded.")
+
+        XCTAssertTrue(session.retryTranscription())
+        XCTAssertFalse(session.retryTranscription())
+        XCTAssertEqual(session.phase, .transcribing(audioURL: audioURL))
+    }
+
+    func testFinishedDialogueCannotBePresentedAgainForSameDream() {
+        let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
+        var session = CaptureSessionState()
+        session.recordingSaved(at: audioURL)
+        XCTAssertTrue(session.logDream())
+        session.transcriptionSucceeded(text: "I crossed a quiet field.")
+
+        XCTAssertTrue(session.finishDialogue())
+        XCTAssertFalse(session.finishDialogue())
+        XCTAssertEqual(
+            session.phase,
+            .logged(audioURL: audioURL, text: "I crossed a quiet field.")
         )
     }
 }

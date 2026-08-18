@@ -9,17 +9,24 @@ A native iOS 26.1+ proof of concept where Dreamworld owns wake alarms, presents 
 3. Dreamworld requests AlarmKit authorization the first time and schedules a Dreamworld-owned system alarm.
 4. When it fires, iOS presents Apple’s system alarm surface with Dreamworld branding, **Snooze**, and the system stop control.
 5. Snooze starts a nine-minute countdown. Stopping the alarm opens the Capture tab, ready for an explicit microphone tap.
-6. The user speaks, stops, and saves a local `.m4a` voice memo.
+6. The user speaks and stops. Dreamworld saves a local `.m4a` recording but does not transcribe it yet.
+7. The user explicitly chooses **Log dream**. Only then does the one-time dialogue transcription scene open and WhisperKit begin.
 
 Multiple alarms are supported. The Alarms tab reads the current AlarmKit schedule directly, so scheduled times and recurrence remain visible after relaunch.
 
 ## Local speech-to-text
 
-Dreamworld integrates the MIT-licensed [`argmaxinc/argmax-oss-swift`](https://github.com/argmaxinc/argmax-oss-swift) package at version 1.1.0 and links only its `WhisperKit` product. After a recording is saved, WhisperKit transcribes that `.m4a` locally with the multilingual `base` model.
+Dreamworld integrates the MIT-licensed [`argmaxinc/argmax-oss-swift`](https://github.com/argmaxinc/argmax-oss-swift) package at version 1.1.0 and links only its `WhisperKit` product. After a recording is saved **and the user chooses Log dream**, WhisperKit transcribes that `.m4a` locally with the multilingual `base` model.
 
-Capture keeps these states distinct: **Recording → Saving locally → Transcribing locally → Initial transcript**. The raw audio remains in Dreamworld’s documents directory when transcription succeeds or fails, and a failed transcription can be retried without recording again.
+Capture keeps these states distinct: **Recording → Saving locally → Saved draft → Transcribing locally → Initial transcript → Logged**. Saving never starts WhisperKit. The explicit Log dream transition is idempotent, so repeated taps cannot create duplicate transcription jobs. The raw audio remains in Dreamworld’s documents directory when transcription succeeds or fails, and a failed transcription can be retried inside the same scene without recording again.
 
 The first transcription downloads the Core ML model from Argmax’s Hugging Face model repository. The recording itself is not uploaded for transcription. A production release can bundle the model to remove the first-use network dependency at the cost of a larger app download.
+
+## Dialogue transcription scene
+
+The transcription surface uses an original video-game dialogue composition inspired by—not copied from—the supplied RPG references. Two anonymous pixel silhouettes establish the interaction before final character artwork is chosen: the user’s dreamer faces a listening Dreamworld presence in a quiet night clearing, while a bordered dialogue panel attributes the eventual transcript to **YOU · DREAM LOG**.
+
+During processing, the scene shows only truthful operational language: **Listening back**, **Raw audio safe**, and **Transcribing on this device**. It does not fabricate partial words or imply that the mascot understands the dream. WhisperKit’s result appears together when ready. Finishing the dialogue advances the capture session to a terminal Logged phase, so the same dialogue is not presented again for that recording. Reduced Motion disables the ambient character and listening loops.
 
 ## Ringing presentation and slide behavior
 
@@ -77,6 +84,9 @@ Core tests cover:
 - Wake-time validation
 - Local `.m4a` recording paths
 - Unique recording filenames
+- Saved-draft behavior before explicit logging
+- One-time, idempotent Log dream transition
+- Same-scene retry and one-time dialogue completion
 
 ## Physical iPhone acceptance test
 
@@ -87,5 +97,7 @@ Core tests cover:
 5. Lock the phone and let the alarm fire.
 6. Confirm Apple’s system alarm presentation displays Dreamworld, **Snooze**, and the system stop control.
 7. Stop the alarm and confirm Dreamworld opens Capture only after the stop action completes.
-8. Tap the microphone, speak, stop, and confirm the local save indicator appears.
-9. Separately open **Preview Ringing Screen** and confirm Slide to Stop commits only when the finger is lifted beyond the threshold; releasing early resets it.
+8. Tap the microphone, speak, stop, and confirm the local saved-draft indicator appears without transcription starting.
+9. Tap **Log dream** and confirm the dialogue transcription scene opens once, shows local-processing status, and eventually presents the transcript.
+10. Finish logging, return to Capture, and confirm the same dialogue does not reopen for that recording.
+11. Separately open **Preview Ringing Screen** and confirm Slide to Stop commits only when the finger is lifted beyond the threshold; releasing early resets it.

@@ -77,8 +77,18 @@ final class VoiceMemoRecorder: NSObject, ObservableObject, @preconcurrency AVAud
 
     func retryTranscription() {
         guard case .transcriptionFailed(let audioURL, _) = captureSession.phase else { return }
-        captureSession.recordingSaved(at: audioURL)
+        guard captureSession.retryTranscription() else { return }
         beginTranscription(for: audioURL)
+    }
+
+    func logDream() {
+        guard case .savedDraft(let audioURL) = captureSession.phase else { return }
+        guard captureSession.logDream() else { return }
+        beginTranscription(for: audioURL)
+    }
+
+    func finishDialogue() {
+        captureSession.finishDialogue()
     }
 
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
@@ -95,7 +105,6 @@ final class VoiceMemoRecorder: NSObject, ObservableObject, @preconcurrency AVAud
     private func finishSavedRecording(at audioURL: URL) {
         lastRecordingURL = audioURL
         captureSession.recordingSaved(at: audioURL)
-        beginTranscription(for: audioURL)
     }
 
     private func beginTranscription(for audioURL: URL) {

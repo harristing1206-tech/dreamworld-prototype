@@ -101,9 +101,11 @@ public enum CapturePhase: Equatable, Sendable {
     case ready
     case recording
     case saving
+    case savedDraft(audioURL: URL)
     case transcribing(audioURL: URL)
     case transcriptReady(audioURL: URL, text: String)
     case transcriptionFailed(audioURL: URL, message: String)
+    case logged(audioURL: URL, text: String)
 }
 
 public struct CaptureSessionState: Equatable, Sendable {
@@ -120,7 +122,21 @@ public struct CaptureSessionState: Equatable, Sendable {
     }
 
     public mutating func recordingSaved(at audioURL: URL) {
+        phase = .savedDraft(audioURL: audioURL)
+    }
+
+    @discardableResult
+    public mutating func logDream() -> Bool {
+        guard case .savedDraft(let audioURL) = phase else { return false }
         phase = .transcribing(audioURL: audioURL)
+        return true
+    }
+
+    @discardableResult
+    public mutating func retryTranscription() -> Bool {
+        guard case .transcriptionFailed(let audioURL, _) = phase else { return false }
+        phase = .transcribing(audioURL: audioURL)
+        return true
     }
 
     public mutating func transcriptionSucceeded(text: String) {
@@ -131,5 +147,12 @@ public struct CaptureSessionState: Equatable, Sendable {
     public mutating func transcriptionFailed(message: String) {
         guard case .transcribing(let audioURL) = phase else { return }
         phase = .transcriptionFailed(audioURL: audioURL, message: message)
+    }
+
+    @discardableResult
+    public mutating func finishDialogue() -> Bool {
+        guard case .transcriptReady(let audioURL, let text) = phase else { return false }
+        phase = .logged(audioURL: audioURL, text: text)
+        return true
     }
 }

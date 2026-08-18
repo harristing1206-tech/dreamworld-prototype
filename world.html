@@ -338,9 +338,11 @@
     .dialogue-bars { display: flex; gap: 3px; align-items: center; height: 20px; }
     .dialogue-bars span { width: 3px; height: 6px; background: #5bc2a7; animation: dialogue-bar 700ms ease-in-out infinite alternate; }
     .dialogue-bars span:nth-child(2) { height: 15px; animation-delay: 100ms; } .dialogue-bars span:nth-child(3) { height: 11px; animation-delay: 200ms; } .dialogue-bars span:nth-child(4) { height: 18px; animation-delay: 300ms; }
-    .dialogue-finish { width: 100%; min-height: 54px; display: none; align-items: center; justify-content: space-between; border: 0; background: transparent; color: var(--paper); font: 900 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; cursor: pointer; }
+    .dialogue-finish, .dialogue-retry { width: 100%; min-height: 54px; display: none; align-items: center; justify-content: space-between; border: 0; background: transparent; color: var(--paper); font: 900 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; cursor: pointer; }
     .dialogue-overlay.ready .dialogue-progress { display: none; }
     .dialogue-overlay.ready .dialogue-finish { display: flex; }
+    .dialogue-overlay.failed .dialogue-progress { display: none; }
+    .dialogue-overlay.failed .dialogue-retry { display: flex; }
     @keyframes dialogue-breathe { to { translate: 0 -2px; } }
     @keyframes dialogue-dot { to { opacity: .28; } }
     @keyframes dialogue-bar { to { transform: scaleY(.45); opacity: .5; } }
@@ -620,7 +622,7 @@
       <div class="dialogue-status">
         <span class="dialogue-status-dot"></span>
         <span id="dialogueStatus">Preparing dialogue</span>
-        <span class="dialogue-status-note">Live PWA · visual prototype</span>
+        <span class="dialogue-status-note">Local Whisper · private</span>
       </div>
       <div class="dialogue-scene" aria-hidden="true">
         <span class="dialogue-moon"></span>
@@ -641,15 +643,16 @@
           </div>
           <div class="dialogue-copy">
             <div class="dialogue-speaker" id="dialogueSpeaker">You · Dream log</div>
-            <div class="dialogue-text secondary" id="dialogueText">The live PWA is preparing the approved dialogue scene. Native Dreamworld performs the private on-device transcription.</div>
+            <div class="dialogue-text secondary" id="dialogueText">Preparing your saved recording for local transcription.</div>
           </div>
         </div>
         <div class="dialogue-footer">
           <div class="dialogue-progress" id="dialogueProgress">
             <span class="dialogue-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-            Preparing visual prototype
+            <span id="dialogueProgressText">Preparing local transcription</span>
           </div>
           <button type="button" class="dialogue-finish" id="dialogueFinish">Finish logging <span aria-hidden="true">⌄</span></button>
+          <button type="button" class="dialogue-retry" id="dialogueRetry">Retry transcription <span aria-hidden="true">↻</span></button>
         </div>
       </div>
     </section>
@@ -680,6 +683,7 @@
   </main>
 
   <script src="./dialogue-state.js"></script>
+  <script src="./browser-transcriber.js"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -701,7 +705,9 @@
     const dialogueStatus = document.getElementById('dialogueStatus');
     const dialogueSpeaker = document.getElementById('dialogueSpeaker');
     const dialogueText = document.getElementById('dialogueText');
+    const dialogueProgressText = document.getElementById('dialogueProgressText');
     const dialogueFinish = document.getElementById('dialogueFinish');
+    const dialogueRetry = document.getElementById('dialogueRetry');
     const dialogueFlow = DreamDialogueFlow.createDreamDialogueFlow();
 
     let mediaRecorder = null;
@@ -710,6 +716,8 @@
     let timer = null;
     let startedAt = 0;
     let audioUrl = null;
+    let recordedBlob = null;
+    let browserTranscriber = null;
     let hasCapture = false;
     let alarms = [];
 
@@ -751,23 +759,34 @@
       stopTracks();
       micButton.classList.remove('recording');
       micButton.setAttribute('aria-label', 'Start another recording');
+
+      if (!chunks.length) {
+        recordedBlob = null;
+        hasCapture = false;
+        dialogueFlow.reset();
+        saveButton.disabled = true;
+        captureState.textContent = 'No audio captured';
+        captureError.textContent = 'This browser did not produce an audio recording. Please try again in Safari or the native Dreamworld app.';
+        return;
+      }
+
+      const blob = new Blob(chunks, { type: mediaRecorder?.mimeType || 'audio/mp4' });
+      recordedBlob = blob;
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      audioUrl = URL.createObjectURL(blob);
+      capturePlayback.src = audioUrl;
+      capturePlayback.style.display = 'block';
+      captureError.textContent = '';
       captureState.textContent = 'Recording saved';
       hasCapture = true;
       dialogueFlow.saveDraft();
       saveButton.disabled = false;
-
-      if (chunks.length) {
-        const blob = new Blob(chunks, { type: mediaRecorder?.mimeType || 'audio/mp4' });
-        if (audioUrl) URL.revokeObjectURL(audioUrl);
-        audioUrl = URL.createObjectURL(blob);
-        capturePlayback.src = audioUrl;
-        capturePlayback.style.display = 'block';
-      }
     }
 
     async function startRecording() {
       captureError.textContent = '';
       chunks = [];
+      recordedBlob = null;
       hasCapture = false;
       dialogueFlow.reset();
       saveButton.disabled = true;
@@ -814,33 +833,77 @@
       else startRecording();
     }
 
-    function logDream() {
-      if (!hasCapture || !dialogueFlow.logDream()) return;
-      saveButton.disabled = true;
-      dialogueOverlay.classList.remove('ready');
-      dialogueOverlay.classList.add('visible');
-      dialogueStatus.textContent = 'Preparing dialogue';
-      dialogueSpeaker.textContent = 'You · Dream log';
-      dialogueText.classList.add('secondary');
-      dialogueText.textContent = 'The live PWA is preparing the approved dialogue scene. Native Dreamworld performs the private on-device transcription.';
-      if (navigator.vibrate) navigator.vibrate(30);
+    function updateTranscriptionProgress(event) {
+      if (event.status === 'decoding') {
+        dialogueStatus.textContent = 'Preparing audio';
+        dialogueProgressText.textContent = 'Decoding your saved recording';
+        dialogueText.textContent = 'Your recording is staying in this browser while Dreamworld prepares it for Whisper.';
+      } else if (event.status === 'loading-model') {
+        dialogueStatus.textContent = 'Loading local Whisper';
+        dialogueProgressText.textContent = 'First use downloads the private speech model';
+        dialogueText.textContent = 'The first transcription downloads about 41 MB of model files. Later dreams reuse the browser cache.';
+      } else if (event.status === 'model-progress' && Number.isFinite(event.progress)) {
+        const percent = Math.max(0, Math.min(100, Math.round(event.progress)));
+        dialogueProgressText.textContent = `Downloading local model · ${percent}%`;
+      } else if (event.status === 'transcribing') {
+        dialogueStatus.textContent = 'Transcribing on this device';
+        dialogueProgressText.textContent = 'Listening back locally';
+        dialogueText.textContent = 'Your character is telling the dream. The words will appear together when the local transcript is ready.';
+      }
+    }
 
-      window.setTimeout(() => {
-        const sampleTranscript = 'I was walking beside a dark lake under a gold moon. Across the water, a small light moved between the trees, and I knew it was waiting for me.';
-        if (!dialogueFlow.completeTranscript(sampleTranscript)) return;
-        dialogueStatus.textContent = 'Prototype transcript ready';
-        dialogueSpeaker.textContent = 'You · Prototype transcript';
+    async function transcribeSavedRecording() {
+      try {
+        browserTranscriber ||= BrowserDreamTranscriber.createBrowserDreamTranscriber();
+        const transcript = await browserTranscriber.transcribe(recordedBlob, updateTranscriptionProgress);
+        if (!dialogueFlow.completeTranscript(transcript)) return;
+        dialogueStatus.textContent = 'Transcript ready';
+        dialogueSpeaker.textContent = 'You · Dream log';
         dialogueText.classList.remove('secondary');
-        dialogueText.textContent = sampleTranscript;
+        dialogueText.textContent = transcript;
         dialogueOverlay.classList.add('ready');
         dialogueFinish.focus();
-      }, 1100);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Local transcription failed.';
+        if (!dialogueFlow.failTranscription(message)) return;
+        dialogueOverlay.classList.remove('ready');
+        dialogueOverlay.classList.add('failed');
+        dialogueStatus.textContent = 'Recording still safe';
+        dialogueSpeaker.textContent = 'Dreamworld · Local transcription';
+        dialogueText.classList.add('secondary');
+        dialogueText.textContent = `${message} Your saved recording is unchanged and can be retried.`;
+        dialogueRetry.focus();
+      }
+    }
+
+    function showTranscriptionScene() {
+      saveButton.disabled = true;
+      dialogueOverlay.classList.remove('ready', 'failed');
+      dialogueOverlay.classList.add('visible');
+      dialogueStatus.textContent = 'Preparing audio';
+      dialogueProgressText.textContent = 'Starting local Whisper';
+      dialogueSpeaker.textContent = 'You · Dream log';
+      dialogueText.classList.add('secondary');
+      dialogueText.textContent = 'Preparing your saved recording for local transcription.';
+      if (navigator.vibrate) navigator.vibrate(30);
+      transcribeSavedRecording();
+    }
+
+    function logDream() {
+      if (!hasCapture || !recordedBlob || !dialogueFlow.logDream()) return;
+      showTranscriptionScene();
+    }
+
+    function retryDialogueTranscription() {
+      if (!recordedBlob || !dialogueFlow.retryTranscription()) return;
+      showTranscriptionScene();
     }
 
     function finishDialogue() {
       if (!dialogueFlow.finishDialogue()) return;
       localStorage.setItem('dreamworld:worldFirstLastDream', new Date().toISOString());
-      dialogueOverlay.classList.remove('visible', 'ready');
+      localStorage.setItem('dreamworld:lastTranscript', dialogueFlow.transcript);
+      dialogueOverlay.classList.remove('visible', 'ready', 'failed');
       captureState.textContent = 'Dream logged';
       hasCapture = false;
       if (navigator.vibrate) navigator.vibrate([30, 30, 60]);
@@ -1018,14 +1081,12 @@
     micButton.addEventListener('click', toggleRecording);
     saveButton.addEventListener('click', logDream);
     dialogueFinish.addEventListener('click', finishDialogue);
+    dialogueRetry.addEventListener('click', retryDialogueTranscription);
     document.getElementById('noDreamButton').addEventListener('click', logNoDream);
     loadAlarms();
     applyTimePhase();
     if (new URLSearchParams(window.location.search).get('dialogue') === 'preview') {
       openView('capture');
-      hasCapture = true;
-      dialogueFlow.saveDraft();
-      logDream();
     }
     window.setInterval(applyTimePhase, 60000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) applyTimePhase(); });

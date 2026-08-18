@@ -23,4 +23,13 @@ flow.reset();
 assert.equal(flow.phase, 'ready');
 assert.equal(flow.transcript, '');
 
+assert.equal(flow.saveDraft(), true);
+assert.equal(flow.logDream(), true);
+assert.equal(flow.failTranscription('Model download failed.'), true);
+assert.equal(flow.phase, 'transcriptionFailed');
+assert.equal(flow.error, 'Model download failed.');
+assert.equal(flow.retryTranscription(), true);
+assert.equal(flow.retryTranscription(), false, 'retry can restart only a failed transcription');
+assert.equal(flow.phase, 'transcribing');
+
 console.log('live dialogue state tests passed');

@@ -6,10 +6,12 @@
   function createDreamDialogueFlow() {
     let phase = 'ready';
     let transcript = '';
+    let error = '';
 
     return {
       get phase() { return phase; },
       get transcript() { return transcript; },
+      get error() { return error; },
 
       saveDraft() {
         if (phase !== 'ready') return false;
@@ -26,7 +28,22 @@
       completeTranscript(text) {
         if (phase !== 'transcribing') return false;
         transcript = String(text || '').trim();
+        error = '';
         phase = 'transcriptReady';
+        return true;
+      },
+
+      failTranscription(message) {
+        if (phase !== 'transcribing') return false;
+        error = String(message || 'Local transcription failed.');
+        phase = 'transcriptionFailed';
+        return true;
+      },
+
+      retryTranscription() {
+        if (phase !== 'transcriptionFailed') return false;
+        error = '';
+        phase = 'transcribing';
         return true;
       },
 
@@ -39,6 +56,7 @@
       reset() {
         phase = 'ready';
         transcript = '';
+        error = '';
       }
     };
   }

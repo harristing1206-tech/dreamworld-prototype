@@ -1,7 +1,9 @@
-const CACHE_NAME = 'dreamworld-world-v13';
+const CACHE_NAME = 'dreamworld-world-v14';
 const ASSETS = [
   './world.html',
   './dialogue-state.js',
+  './browser-transcriber.js',
+  './transcription-worker.js',
   './manifest.webmanifest',
   './icon-180.png',
   './icon-512.png'

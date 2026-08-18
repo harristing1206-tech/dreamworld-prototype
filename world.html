@@ -350,6 +350,11 @@
     .settings-list { border-top: 1px solid var(--line); }
     .setting-row { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
     .setting-row > span:last-child { color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; text-transform: uppercase; }
+    .setting-model { padding: 18px 0 20px; border-bottom: 1px solid var(--line); }
+    .setting-model label { display: block; margin-bottom: 10px; font-size: 14px; }
+    .setting-model select { width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: 0; background: var(--deep); color: var(--paper); color-scheme: dark; font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .setting-model-note { min-height: 48px; margin: 10px 0 0; color: var(--sage); font-size: 11px; line-height: 1.45; }
+    .settings-view { overflow-y: auto; padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
 
     .alarms-view { overflow-y: auto; padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
     .alarm-list { border-top: 1px solid var(--line); }
@@ -606,7 +611,7 @@
       <p class="alarm-platform-note">The real iPhone build schedules Dreamworld-owned system alarms with AlarmKit. The slider below is an in-app interaction prototype; Apple controls the locked-screen alarm controls.</p>
     </section>
 
-    <section class="view panel-view" id="settingsView" data-view="settings">
+    <section class="view panel-view settings-view" id="settingsView" data-view="settings">
       <header class="panel-head"><h1 class="panel-title">Settings</h1></header>
       <div class="settings-list">
         <div class="setting-row"><span>System alarm delivery</span><span>AlarmKit</span></div>
@@ -614,6 +619,18 @@
         <div class="setting-row"><span>In-app slide preview</span><span>On</span></div>
         <div class="setting-row"><span>Sound cues</span><button class="toggle" aria-label="Toggle sound cues" aria-pressed="false"></button></div>
         <div class="setting-row"><span>Local audio</span><span>On</span></div>
+        <div class="setting-model">
+          <label for="transcriptionModel">Transcription model</label>
+          <select id="transcriptionModel">
+            <option value="Xenova/whisper-tiny">Tiny · Multilingual · 39.0 MiB</option>
+            <option value="Xenova/whisper-tiny.en">Tiny · English · 39.0 MiB</option>
+            <option value="Xenova/whisper-base">Base · Multilingual · 73.3 MiB</option>
+            <option value="Xenova/whisper-base.en">Base · English · 73.3 MiB</option>
+            <option value="Xenova/whisper-small">Small · Multilingual · 237.6 MiB</option>
+            <option value="Xenova/whisper-small.en">Small · English · 237.6 MiB</option>
+          </select>
+          <p class="setting-model-note" id="transcriptionModelNote"></p>
+        </div>
         <div class="setting-row"><span>Analysis timing</span><span>Later</span></div>
       </div>
     </section>
@@ -622,7 +639,7 @@
       <div class="dialogue-status">
         <span class="dialogue-status-dot"></span>
         <span id="dialogueStatus">Preparing dialogue</span>
-        <span class="dialogue-status-note">Local Whisper · private</span>
+        <span class="dialogue-status-note" id="dialogueModelNote">Local Whisper · private</span>
       </div>
       <div class="dialogue-scene" aria-hidden="true">
         <span class="dialogue-moon"></span>
@@ -703,12 +720,25 @@
     const slideStop = document.getElementById('slideStop');
     const dialogueOverlay = document.getElementById('dialogueOverlay');
     const dialogueStatus = document.getElementById('dialogueStatus');
+    const dialogueModelNote = document.getElementById('dialogueModelNote');
     const dialogueSpeaker = document.getElementById('dialogueSpeaker');
     const dialogueText = document.getElementById('dialogueText');
     const dialogueProgressText = document.getElementById('dialogueProgressText');
     const dialogueFinish = document.getElementById('dialogueFinish');
     const dialogueRetry = document.getElementById('dialogueRetry');
+    const transcriptionModelSelect = document.getElementById('transcriptionModel');
+    const transcriptionModelNote = document.getElementById('transcriptionModelNote');
     const dialogueFlow = DreamDialogueFlow.createDreamDialogueFlow();
+
+    const TRANSCRIPTION_MODEL_KEY = 'dreamworld:transcriptionModel';
+    const TRANSCRIPTION_MODELS = {
+      'Xenova/whisper-tiny': { shortLabel: 'Tiny · Multi', size: '39.0 MiB', note: 'Fastest multilingual baseline. Lowest expected accuracy.' },
+      'Xenova/whisper-tiny.en': { shortLabel: 'Tiny · English', size: '39.0 MiB', note: 'Fast English baseline. Tests whether language detection is hurting accuracy.' },
+      'Xenova/whisper-base': { shortLabel: 'Base · Multi', size: '73.3 MiB', note: 'Recommended when a dream may contain more than one language.' },
+      'Xenova/whisper-base.en': { shortLabel: 'Base · English', size: '73.3 MiB', note: 'Recommended English balance of accuracy, memory, and speed.' },
+      'Xenova/whisper-small': { shortLabel: 'Small · Multi', size: '237.6 MiB', note: 'Higher-accuracy multilingual test. May be slow or unstable in iPhone Safari.' },
+      'Xenova/whisper-small.en': { shortLabel: 'Small · English', size: '237.6 MiB', note: 'Highest English accuracy test. May exceed Safari memory limits.' }
+    };
 
     let mediaRecorder = null;
     let mediaStream = null;
@@ -718,6 +748,8 @@
     let audioUrl = null;
     let recordedBlob = null;
     let browserTranscriber = null;
+    let selectedTranscriptionModelID = 'Xenova/whisper-tiny';
+    let activeTranscriptionModelID = 'Xenova/whisper-tiny';
     let hasCapture = false;
     let alarms = [];
 
@@ -736,6 +768,27 @@
       const phase = getTimePhase(date.getHours() + date.getMinutes() / 60);
       document.getElementById('app').dataset.phase = phase.id;
       document.getElementById('worldPhase').textContent = `${phase.label} · 2 places`;
+    }
+
+    function renderTranscriptionModelSetting() {
+      const model = TRANSCRIPTION_MODELS[selectedTranscriptionModelID];
+      transcriptionModelSelect.value = selectedTranscriptionModelID;
+      transcriptionModelNote.textContent = `${model.note} First use downloads ${model.size}; later runs reuse the browser cache.`;
+      dialogueModelNote.textContent = `${model.shortLabel} · private`;
+    }
+
+    function loadTranscriptionModelSetting() {
+      const stored = localStorage.getItem(TRANSCRIPTION_MODEL_KEY);
+      selectedTranscriptionModelID = TRANSCRIPTION_MODELS[stored] ? stored : 'Xenova/whisper-tiny';
+      renderTranscriptionModelSetting();
+    }
+
+    function changeTranscriptionModel() {
+      const nextModelID = transcriptionModelSelect.value;
+      if (!TRANSCRIPTION_MODELS[nextModelID]) return;
+      selectedTranscriptionModelID = nextModelID;
+      localStorage.setItem(TRANSCRIPTION_MODEL_KEY, selectedTranscriptionModelID);
+      renderTranscriptionModelSetting();
     }
 
     function openView(name) {
@@ -834,6 +887,9 @@
     }
 
     function updateTranscriptionProgress(event) {
+      const modelID = event.modelID || activeTranscriptionModelID;
+      const model = TRANSCRIPTION_MODELS[modelID] || TRANSCRIPTION_MODELS['Xenova/whisper-tiny'];
+      dialogueModelNote.textContent = `${model.shortLabel} · private`;
       if (event.status === 'decoding') {
         dialogueStatus.textContent = 'Preparing audio';
         dialogueProgressText.textContent = 'Decoding your saved recording';
@@ -841,7 +897,7 @@
       } else if (event.status === 'loading-model') {
         dialogueStatus.textContent = 'Loading local Whisper';
         dialogueProgressText.textContent = 'First use downloads the private speech model';
-        dialogueText.textContent = 'The first transcription downloads about 41 MB of model files. Later dreams reuse the browser cache.';
+        dialogueText.textContent = `First use downloads ${model.size} for ${model.shortLabel}. Later dreams reuse the browser cache.`;
       } else if (event.status === 'model-progress' && Number.isFinite(event.progress)) {
         const percent = Math.max(0, Math.min(100, Math.round(event.progress)));
         dialogueProgressText.textContent = `Downloading local model · ${percent}%`;
@@ -855,7 +911,7 @@
     async function transcribeSavedRecording() {
       try {
         browserTranscriber ||= BrowserDreamTranscriber.createBrowserDreamTranscriber();
-        const transcript = await browserTranscriber.transcribe(recordedBlob, updateTranscriptionProgress);
+        const transcript = await browserTranscriber.transcribe(recordedBlob, updateTranscriptionProgress, { modelID: activeTranscriptionModelID });
         if (!dialogueFlow.completeTranscript(transcript)) return;
         dialogueStatus.textContent = 'Transcript ready';
         dialogueSpeaker.textContent = 'You · Dream log';
@@ -877,10 +933,13 @@
     }
 
     function showTranscriptionScene() {
+      activeTranscriptionModelID = selectedTranscriptionModelID;
+      const model = TRANSCRIPTION_MODELS[activeTranscriptionModelID];
       saveButton.disabled = true;
       dialogueOverlay.classList.remove('ready', 'failed');
       dialogueOverlay.classList.add('visible');
       dialogueStatus.textContent = 'Preparing audio';
+      dialogueModelNote.textContent = `${model.shortLabel} · private`;
       dialogueProgressText.textContent = 'Starting local Whisper';
       dialogueSpeaker.textContent = 'You · Dream log';
       dialogueText.classList.add('secondary');
@@ -903,6 +962,7 @@
       if (!dialogueFlow.finishDialogue()) return;
       localStorage.setItem('dreamworld:worldFirstLastDream', new Date().toISOString());
       localStorage.setItem('dreamworld:lastTranscript', dialogueFlow.transcript);
+      localStorage.setItem('dreamworld:lastTranscriptModel', activeTranscriptionModelID);
       dialogueOverlay.classList.remove('visible', 'ready', 'failed');
       captureState.textContent = 'Dream logged';
       hasCapture = false;
@@ -1082,8 +1142,10 @@
     saveButton.addEventListener('click', logDream);
     dialogueFinish.addEventListener('click', finishDialogue);
     dialogueRetry.addEventListener('click', retryDialogueTranscription);
+    transcriptionModelSelect.addEventListener('change', changeTranscriptionModel);
     document.getElementById('noDreamButton').addEventListener('click', logNoDream);
     loadAlarms();
+    loadTranscriptionModelSetting();
     applyTimePhase();
     if (new URLSearchParams(window.location.search).get('dialogue') === 'preview') {
       openView('capture');

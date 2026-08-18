@@ -72,12 +72,12 @@
     });
 
     return {
-      transcribe(audio, onProgress) {
+      transcribe(audio, onProgress, options = {}) {
         const id = nextID;
         nextID += 1;
         return new Promise((resolve, reject) => {
           pending.set(id, { resolve, reject, onProgress });
-          worker.postMessage({ type: 'transcribe', id, audio }, [audio.buffer]);
+          worker.postMessage({ type: 'transcribe', id, audio, modelID: options.modelID }, [audio.buffer]);
         });
       }
     };
@@ -88,14 +88,14 @@
     const workerClient = options.workerClient || createTranscriptionWorkerClient(options.workerURL);
 
     return {
-      async transcribe(recordingBlob, onProgress) {
+      async transcribe(recordingBlob, onProgress, options = {}) {
         if (!recordingBlob) throw new Error('A saved recording is required before transcription.');
         onProgress?.({ status: 'decoding' });
         const audio = await decoder(recordingBlob);
         if (!(audio instanceof Float32Array) || audio.length === 0) {
           throw new Error('The saved recording did not contain decodable audio.');
         }
-        const text = String(await workerClient.transcribe(audio, onProgress) || '').trim();
+        const text = String(await workerClient.transcribe(audio, onProgress, options) || '').trim();
         if (!text) throw new Error('No speech was found in the recording.');
         return text;
       }

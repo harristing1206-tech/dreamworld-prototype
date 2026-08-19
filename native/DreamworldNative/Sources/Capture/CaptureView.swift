@@ -13,6 +13,7 @@ struct CaptureView: View {
                 if let phase = dialoguePhase {
                     DreamDialogueTranscriptionView(
                         phase: phase,
+                        provenance: recorder.captureSession.transcriptProvenance,
                         onRetry: recorder.retryTranscription,
                         onFinish: recorder.finishDialogue
                     )

@@ -3,6 +3,7 @@ import SwiftUI
 
 struct DreamDialogueTranscriptionView: View {
     let phase: CapturePhase
+    let provenance: TranscriptionProvenance?
     let onRetry: () -> Void
     let onFinish: () -> Void
 
@@ -40,10 +41,16 @@ struct DreamDialogueTranscriptionView: View {
                 .font(.system(size: 10, weight: .bold, design: .monospaced))
                 .tracking(1.4)
             Spacer()
-            Text("RAW AUDIO SAFE")
-                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                .tracking(1.1)
-                .foregroundStyle(Color(red: 0.73, green: 0.67, blue: 0.48))
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(provenanceLabel)
+                    .font(.system(size: 8, weight: .bold, design: .monospaced))
+                    .tracking(0.8)
+                    .foregroundStyle(Color(red: 0.64, green: 0.71, blue: 0.63))
+                Text("RAW AUDIO SAFE")
+                    .font(.system(size: 8, weight: .bold, design: .monospaced))
+                    .tracking(0.9)
+                    .foregroundStyle(Color(red: 0.73, green: 0.67, blue: 0.48))
+            }
         }
         .padding(.horizontal, 18)
         .frame(height: 42)
@@ -253,6 +260,11 @@ struct DreamDialogueTranscriptionView: View {
         default:
             return .gray
         }
+    }
+
+    private var provenanceLabel: String {
+        guard let provenance else { return "APPLE SPEECH · ON DEVICE" }
+        return "\(provenance.provider) · \(provenance.processing.rawValue)".uppercased()
     }
 
     private var accessibilitySummary: String {

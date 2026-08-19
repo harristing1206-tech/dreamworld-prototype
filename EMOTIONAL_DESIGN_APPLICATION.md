@@ -100,12 +100,12 @@ The alarm should carry almost no reflective burden. A half-awake user should not
 **Working now**
 - Ready, Recording, Saving, Transcribing, Transcript Ready, and recoverable failure are distinct.
 - Raw `.m4a` audio is retained through transcription success and failure.
-- WhisperKit transcription is local after model download.
+- Apple Speech transcription is on-device after the system-managed locale asset is installed.
 
 **Gaps**
 - Native Capture lacks visible alternatives for a fragment, typed note, no recall, or “not now.”
 - It lacks pause/resume and interruption recovery.
-- The first model download may delay the first transcription at the most vulnerable moment.
+- The first Apple speech-asset download may delay the first transcription at the most vulnerable moment.
 - The full transcript appears immediately, potentially turning a successful capture into an editing task while the user is still groggy.
 
 **Design actions**
@@ -113,7 +113,7 @@ The alarm should carry almost no reflective burden. A half-awake user should not
 - Keep privacy and state continuously visible with literal labels: **Microphone off**, **Recording locally**, and **Transcribing on this device**.
 - After audio is safe, show a compact completion state: **Saved locally** with **Done for now** as the primary exit.
 - Make **Review transcript** secondary and defer correction to the later Dreams experience.
-- Preflight or bundle the Whisper model before the first alarm-dependent morning; never surprise the user with a large download after capture.
+- Preflight the Apple Speech locale asset before the first alarm-dependent morning; never surprise the user with a model download after capture.
 - Add pause, interruption preservation, playback, and retry before treating Capture as reliable.
 
 #### Reflective

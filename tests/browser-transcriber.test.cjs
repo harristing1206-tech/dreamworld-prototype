@@ -44,6 +44,19 @@ const workerClient = {
   }
   assert.match(html, /dreamworld:transcriptionModel/);
   assert.match(worker, /modelID\.endsWith\('\.en'\)/, 'English-only models must omit multilingual generation options');
+  assert.match(html, /<textarea[^>]+id="dreamTextInput"/);
+  assert.match(html, /Use Wispr Flow keyboard/);
+  assert.match(html, /Keyboard text · provider not detectable/);
+  assert.match(html, /Experimental local transcription/);
+  assert.match(html, /dialogueFlow\.saveTextDraft\(dreamTextInput\.value/);
+  assert.match(html, /dreamworld:textDraft/);
+  assert.match(html, /DreamDialogueFlow\.createSafeStorage/);
+  assert.match(html, /appStorage\.set\(TEXT_DRAFT_KEY/);
+  assert.match(html, /appStorage\.remove\(TEXT_DRAFT_KEY/);
+  assert.match(html, /Clear or log your text draft before starting an experimental recording/);
+  assert.match(html, /dreamTextInput\.disabled = locked/);
+  assert.match(html, /wisprFocusButton\.disabled = locked/);
+  assert.match(html, /DreamDialogueFlow\.resolveCaptureSource/);
 
   console.log('browser transcription wiring tests passed');
 })().catch(error => {

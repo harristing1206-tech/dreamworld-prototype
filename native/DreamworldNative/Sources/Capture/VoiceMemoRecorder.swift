@@ -25,7 +25,7 @@ final class VoiceMemoRecorder: NSObject, ObservableObject, @preconcurrency AVAud
     @Published var errorMessage: String?
 
     private var recorder: AVAudioRecorder?
-    private let transcriber: any DreamTranscribing = WhisperDreamTranscriber()
+    private let transcriber: any DreamTranscribing = AppleSpeechDreamTranscriber()
 
     func start() async {
         do {
@@ -110,8 +110,11 @@ final class VoiceMemoRecorder: NSObject, ObservableObject, @preconcurrency AVAud
     private func beginTranscription(for audioURL: URL) {
         Task {
             do {
-                let text = try await transcriber.transcribe(recordingAt: audioURL)
-                captureSession.transcriptionSucceeded(text: text)
+                let result = try await transcriber.transcribe(recordingAt: audioURL)
+                captureSession.transcriptionSucceeded(
+                    text: result.text,
+                    provenance: result.provenance
+                )
             } catch {
                 captureSession.transcriptionFailed(message: error.localizedDescription)
             }

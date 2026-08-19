@@ -108,12 +108,31 @@ public enum CapturePhase: Equatable, Sendable {
     case logged(audioURL: URL, text: String)
 }
 
+public struct TranscriptionProvenance: Equatable, Sendable {
+    public enum Processing: String, Equatable, Sendable {
+        case onDevice
+        case cloud
+    }
+
+    public let provider: String
+    public let model: String
+    public let processing: Processing
+
+    public init(provider: String, model: String, processing: Processing) {
+        self.provider = provider
+        self.model = model
+        self.processing = processing
+    }
+}
+
 public struct CaptureSessionState: Equatable, Sendable {
     public private(set) var phase: CapturePhase = .ready
+    public private(set) var transcriptProvenance: TranscriptionProvenance?
 
     public init() {}
 
     public mutating func beginRecording() {
+        transcriptProvenance = nil
         phase = .recording
     }
 
@@ -122,6 +141,7 @@ public struct CaptureSessionState: Equatable, Sendable {
     }
 
     public mutating func recordingSaved(at audioURL: URL) {
+        transcriptProvenance = nil
         phase = .savedDraft(audioURL: audioURL)
     }
 
@@ -139,8 +159,12 @@ public struct CaptureSessionState: Equatable, Sendable {
         return true
     }
 
-    public mutating func transcriptionSucceeded(text: String) {
+    public mutating func transcriptionSucceeded(
+        text: String,
+        provenance: TranscriptionProvenance? = nil
+    ) {
         guard case .transcribing(let audioURL) = phase else { return }
+        transcriptProvenance = provenance
         phase = .transcriptReady(audioURL: audioURL, text: text)
     }
 

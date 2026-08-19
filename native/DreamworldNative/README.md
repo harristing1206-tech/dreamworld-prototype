@@ -10,23 +10,23 @@ A native iOS 26.1+ proof of concept where Dreamworld owns wake alarms, presents 
 4. When it fires, iOS presents Apple’s system alarm surface with Dreamworld branding, **Snooze**, and the system stop control.
 5. Snooze starts a nine-minute countdown. Stopping the alarm opens the Capture tab, ready for an explicit microphone tap.
 6. The user speaks and stops. Dreamworld saves a local `.m4a` recording but does not transcribe it yet.
-7. The user explicitly chooses **Log dream**. Only then does the one-time dialogue transcription scene open and WhisperKit begin.
+7. The user explicitly chooses **Log dream**. Only then does the one-time dialogue transcription scene open and Apple Speech begin on-device analysis.
 
 Multiple alarms are supported. The Alarms tab reads the current AlarmKit schedule directly, so scheduled times and recurrence remain visible after relaunch.
 
 ## Local speech-to-text
 
-Dreamworld integrates the MIT-licensed [`argmaxinc/argmax-oss-swift`](https://github.com/argmaxinc/argmax-oss-swift) package at version 1.1.0 and links only its `WhisperKit` product. After a recording is saved **and the user chooses Log dream**, WhisperKit transcribes that `.m4a` locally with the multilingual `base` model.
+Dreamworld uses Apple’s iOS 26 Speech framework. After a recording is saved **and the user chooses Log dream**, `SpeechAnalyzer` reads the preserved `.m4a` and `SpeechTranscriber` performs general-purpose transcription with a system-managed locale asset. If the newer transcriber does not support the current locale/device, Dreamworld falls back to `DictationTranscriber` with the long-dictation preset.
 
-Capture keeps these states distinct: **Recording → Saving locally → Saved draft → Transcribing locally → Initial transcript → Logged**. Saving never starts WhisperKit. The explicit Log dream transition is idempotent, so repeated taps cannot create duplicate transcription jobs. The raw audio remains in Dreamworld’s documents directory when transcription succeeds or fails, and a failed transcription can be retried inside the same scene without recording again.
+Capture keeps these states distinct: **Recording → Saving locally → Saved draft → Transcribing locally → Initial transcript → Logged**. Saving never starts speech analysis. The explicit Log dream transition is idempotent, so repeated taps cannot create duplicate transcription jobs. The raw audio remains in Dreamworld’s documents directory when transcription succeeds or fails, and a failed transcription creates fresh Apple Speech objects against the same recording on retry.
 
-The first transcription downloads the Core ML model from Argmax’s Hugging Face model repository. The recording itself is not uploaded for transcription. A production release can bundle the model to remove the first-use network dependency at the cost of a larger app download.
+The first use of a locale may download a speech asset from Apple. `AssetInventory` installs and retains that system-managed model; the recorded dream itself is not uploaded for transcription. The dialogue stores and displays provider, engine/locale, and on-device provenance with the initial transcript.
 
 ## Dialogue transcription scene
 
 The transcription surface uses an original video-game dialogue composition inspired by—not copied from—the supplied RPG references. Two anonymous pixel silhouettes establish the interaction before final character artwork is chosen: the user’s dreamer faces a listening Dreamworld presence in a quiet night clearing, while a bordered dialogue panel attributes the eventual transcript to **YOU · DREAM LOG**.
 
-During processing, the scene shows only truthful operational language: **Listening back**, **Raw audio safe**, and **Transcribing on this device**. It does not fabricate partial words or imply that the mascot understands the dream. WhisperKit’s result appears together when ready. Finishing the dialogue advances the capture session to a terminal Logged phase, so the same dialogue is not presented again for that recording. Reduced Motion disables the ambient character and listening loops.
+During processing, the scene shows only truthful operational language: **Listening back**, **Raw audio safe**, **Apple Speech · On device**, and **Transcribing on this device**. It does not fabricate partial words or imply that the mascot understands the dream. Apple Speech’s finalized result appears together when ready. Finishing the dialogue advances the capture session to a terminal Logged phase, so the same dialogue is not presented again for that recording. Reduced Motion disables the ambient character and listening loops.
 
 ## Ringing presentation and slide behavior
 

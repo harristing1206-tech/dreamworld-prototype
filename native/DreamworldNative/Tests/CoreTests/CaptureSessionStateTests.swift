@@ -50,6 +50,25 @@ final class CaptureSessionStateTests: XCTestCase {
         )
     }
 
+    func testAppleSpeechProvenanceSurvivesDialogueCompletion() {
+        let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
+        let provenance = TranscriptionProvenance(
+            provider: "Apple Speech",
+            model: "System Dictation",
+            processing: .onDevice
+        )
+        var session = CaptureSessionState()
+        session.recordingSaved(at: audioURL)
+        XCTAssertTrue(session.logDream())
+
+        session.transcriptionSucceeded(text: "A glass staircase.", provenance: provenance)
+        XCTAssertEqual(session.transcriptProvenance, provenance)
+
+        XCTAssertTrue(session.finishDialogue())
+        XCTAssertEqual(session.transcriptProvenance, provenance)
+        XCTAssertEqual(session.phase, .logged(audioURL: audioURL, text: "A glass staircase."))
+    }
+
     func testFailedTranscriptionKeepsAudioAvailableForRetry() {
         let audioURL = URL(fileURLWithPath: "/tmp/dream.m4a")
         var session = CaptureSessionState()

@@ -30,7 +30,7 @@
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    button, input { font: inherit; }
+    button, input, textarea, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; }
     button:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
 
@@ -223,8 +223,22 @@
     .sample-tag { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 
     .capture-view { display: none; }
-    .capture-view.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: max(32px, env(safe-area-inset-top)) 24px 30px; }
+    .capture-view.active { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: max(32px, env(safe-area-inset-top)) 24px calc(34px + env(safe-area-inset-bottom)); overflow-y: auto; }
     .capture-state { color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .capture-title { margin: 14px 0 6px; font-size: 25px; letter-spacing: -.03em; }
+    .capture-intro { max-width: 330px; margin: 0 0 20px; color: var(--sage); font-size: 13px; line-height: 1.45; text-align: center; }
+    .capture-text-card { width: 100%; max-width: 350px; }
+    .capture-text-input { width: 100%; min-height: 154px; resize: vertical; padding: 14px; border: 1px solid rgba(231,223,197,.28); border-radius: 0; background: var(--deep); color: var(--paper); line-height: 1.5; }
+    .capture-text-input::placeholder { color: rgba(142,160,150,.72); }
+    .capture-text-input:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .wispr-focus { width: 100%; margin-top: 10px; }
+    .capture-guidance { min-height: 36px; margin: 9px 0 0; color: var(--sage); font-size: 11px; line-height: 1.4; text-align: center; }
+    .experimental-capture { width: 100%; max-width: 350px; margin-top: 22px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .experimental-capture summary { min-height: 50px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--sage); font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .experimental-capture summary::after { content: "+"; color: var(--paper); font-size: 17px; }
+    .experimental-capture[open] summary::after { content: "−"; }
+    .experimental-capture-body { display: flex; flex-direction: column; align-items: center; padding: 2px 0 20px; }
+    .experimental-capture-copy { margin: 0; color: var(--sage); font-size: 11px; line-height: 1.45; text-align: center; }
     .mic-button {
       position: relative;
       width: 132px;
@@ -243,7 +257,7 @@
     .mic-icon::after { content: ""; position: absolute; width: 34px; height: 24px; left: -9px; top: 18px; border: 3px solid currentColor; border-top: 0; border-radius: 0 0 18px 18px; }
     .mic-icon::before { content: ""; position: absolute; width: 3px; height: 13px; left: 7px; top: 40px; background: currentColor; box-shadow: -7px 10px 0 0 currentColor, 0 10px 0 0 currentColor, 7px 10px 0 0 currentColor; }
     .capture-timer { min-height: 34px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 26px; font-weight: 500; letter-spacing: .08em; }
-    .capture-actions { width: 100%; max-width: 310px; display: grid; gap: 10px; margin-top: 34px; }
+    .capture-actions { width: 100%; max-width: 350px; display: grid; gap: 10px; margin-top: 18px; }
     .action-button { min-height: 52px; border: 1px solid var(--line); background: var(--deep); color: var(--paper); cursor: pointer; }
     .action-button.primary { background: var(--paper); color: var(--night); border-color: var(--paper); font-weight: 650; }
     .action-button:disabled { opacity: .35; cursor: default; }
@@ -576,15 +590,28 @@
     </section>
 
     <section class="view capture-view" id="captureView" data-view="capture">
-      <span class="capture-state" id="captureState">Ready</span>
-      <button class="mic-button" id="micButton" aria-label="Start recording"><span class="mic-icon" aria-hidden="true"></span></button>
-      <div class="capture-timer" id="captureTimer">00:00</div>
-      <audio class="capture-playback" id="capturePlayback" controls></audio>
-      <div class="capture-error" id="captureError" role="alert"></div>
+      <span class="capture-state" id="captureState">Keyboard ready</span>
+      <h1 class="capture-title">What do you remember?</h1>
+      <p class="capture-intro">Type, use Apple Dictation, or dictate with a third-party keyboard. An unfinished draft stays in this browser; Log dream stores the text you approve.</p>
+      <div class="capture-text-card">
+        <textarea class="capture-text-input" id="dreamTextInput" placeholder="A staircase rose from the ocean…" aria-label="Dream transcript"></textarea>
+        <button class="action-button wispr-focus" id="wisprFocusButton">Use Wispr Flow keyboard</button>
+        <p class="capture-guidance" id="captureGuidance">Tap above, switch to the Flow keyboard with the globe key, then use its microphone. Dreamworld cannot activate a third-party keyboard for you.</p>
+      </div>
       <div class="capture-actions">
         <button class="action-button primary" id="saveButton" disabled>Log dream</button>
         <button class="action-button" id="noDreamButton">No dream remembered</button>
       </div>
+      <details class="experimental-capture" id="experimentalCapture">
+        <summary>Experimental local transcription</summary>
+        <div class="experimental-capture-body">
+          <p class="experimental-capture-copy">Records locally and runs browser Whisper after you tap Log dream. Accuracy varies and this is not the production transcription path.</p>
+          <button class="mic-button" id="micButton" aria-label="Start experimental recording"><span class="mic-icon" aria-hidden="true"></span></button>
+          <div class="capture-timer" id="captureTimer">00:00</div>
+          <audio class="capture-playback" id="capturePlayback" controls></audio>
+          <div class="capture-error" id="captureError" role="alert"></div>
+        </div>
+      </details>
     </section>
 
     <section class="view panel-view alarms-view" id="alarmsView" data-view="alarms">
@@ -620,7 +647,7 @@
         <div class="setting-row"><span>Sound cues</span><button class="toggle" aria-label="Toggle sound cues" aria-pressed="false"></button></div>
         <div class="setting-row"><span>Local audio</span><span>On</span></div>
         <div class="setting-model">
-          <label for="transcriptionModel">Transcription model</label>
+          <label for="transcriptionModel">Experimental browser model</label>
           <select id="transcriptionModel">
             <option value="Xenova/whisper-tiny">Tiny · Multilingual · 39.0 MiB</option>
             <option value="Xenova/whisper-tiny.en">Tiny · English · 39.0 MiB</option>
@@ -630,6 +657,7 @@
             <option value="Xenova/whisper-small.en">Small · English · 237.6 MiB</option>
           </select>
           <p class="setting-model-note" id="transcriptionModelNote"></p>
+          <p class="setting-model-note">Only used from Experimental local transcription in Capture. Keyboard text does not use this model.</p>
         </div>
         <div class="setting-row"><span>Analysis timing</span><span>Later</span></div>
       </div>
@@ -639,7 +667,7 @@
       <div class="dialogue-status">
         <span class="dialogue-status-dot"></span>
         <span id="dialogueStatus">Preparing dialogue</span>
-        <span class="dialogue-status-note" id="dialogueModelNote">Local Whisper · private</span>
+        <span class="dialogue-status-note" id="dialogueModelNote">Input provenance</span>
       </div>
       <div class="dialogue-scene" aria-hidden="true">
         <span class="dialogue-moon"></span>
@@ -710,6 +738,10 @@
     const captureError = document.getElementById('captureError');
     const capturePlayback = document.getElementById('capturePlayback');
     const saveButton = document.getElementById('saveButton');
+    const noDreamButton = document.getElementById('noDreamButton');
+    const dreamTextInput = document.getElementById('dreamTextInput');
+    const wisprFocusButton = document.getElementById('wisprFocusButton');
+    const captureGuidance = document.getElementById('captureGuidance');
     const alarmList = document.getElementById('alarmList');
     const alarmEditor = document.getElementById('alarmEditor');
     const newAlarmTime = document.getElementById('newAlarmTime');
@@ -729,8 +761,12 @@
     const transcriptionModelSelect = document.getElementById('transcriptionModel');
     const transcriptionModelNote = document.getElementById('transcriptionModelNote');
     const dialogueFlow = DreamDialogueFlow.createDreamDialogueFlow();
+    let durableStorage = null;
+    try { durableStorage = window.localStorage; } catch (_) {}
+    const appStorage = DreamDialogueFlow.createSafeStorage(durableStorage);
 
     const TRANSCRIPTION_MODEL_KEY = 'dreamworld:transcriptionModel';
+    const TEXT_DRAFT_KEY = 'dreamworld:textDraft';
     const TRANSCRIPTION_MODELS = {
       'Xenova/whisper-tiny': { shortLabel: 'Tiny · Multi', size: '39.0 MiB', note: 'Fastest multilingual baseline. Lowest expected accuracy.' },
       'Xenova/whisper-tiny.en': { shortLabel: 'Tiny · English', size: '39.0 MiB', note: 'Fast English baseline. Tests whether language detection is hurting accuracy.' },
@@ -778,7 +814,7 @@
     }
 
     function loadTranscriptionModelSetting() {
-      const stored = localStorage.getItem(TRANSCRIPTION_MODEL_KEY);
+      const stored = appStorage.get(TRANSCRIPTION_MODEL_KEY);
       selectedTranscriptionModelID = TRANSCRIPTION_MODELS[stored] ? stored : 'Xenova/whisper-tiny';
       renderTranscriptionModelSetting();
     }
@@ -787,13 +823,43 @@
       const nextModelID = transcriptionModelSelect.value;
       if (!TRANSCRIPTION_MODELS[nextModelID]) return;
       selectedTranscriptionModelID = nextModelID;
-      localStorage.setItem(TRANSCRIPTION_MODEL_KEY, selectedTranscriptionModelID);
+      appStorage.set(TRANSCRIPTION_MODEL_KEY, selectedTranscriptionModelID);
       renderTranscriptionModelSetting();
     }
 
     function openView(name) {
       views.forEach(view => view.classList.toggle('active', view.dataset.view === name));
       navButtons.forEach(button => button.setAttribute('aria-selected', String(button.dataset.go === name)));
+    }
+
+    function setTextDraftLocked(locked) {
+      dreamTextInput.disabled = locked;
+      wisprFocusButton.disabled = locked;
+      noDreamButton.disabled = locked;
+    }
+
+    function updateCaptureAvailability() {
+      const hasTextDraft = dreamTextInput.value.trim().length > 0;
+      const recording = micButton.classList.contains('recording');
+      saveButton.disabled = recording || (!hasTextDraft && !hasCapture);
+      if (!recording && hasTextDraft) captureState.textContent = 'Text draft ready';
+      else if (!recording && !hasCapture) captureState.textContent = 'Keyboard ready';
+    }
+
+    function persistTextDraft() {
+      if (dreamTextInput.value.trim()) appStorage.set(TEXT_DRAFT_KEY, dreamTextInput.value);
+      else appStorage.remove(TEXT_DRAFT_KEY);
+      updateCaptureAvailability();
+    }
+
+    function loadTextDraft() {
+      dreamTextInput.value = appStorage.get(TEXT_DRAFT_KEY) || '';
+      updateCaptureAvailability();
+    }
+
+    function focusWisprKeyboard() {
+      dreamTextInput.focus();
+      captureGuidance.textContent = 'Use the globe key to select Flow, then tap the Flow microphone. Wispr processes speech in its own cloud service; Dreamworld receives the inserted text.';
     }
 
     function updateTimer() {
@@ -817,9 +883,10 @@
         recordedBlob = null;
         hasCapture = false;
         dialogueFlow.reset();
-        saveButton.disabled = true;
+        setTextDraftLocked(false);
         captureState.textContent = 'No audio captured';
         captureError.textContent = 'This browser did not produce an audio recording. Please try again in Safari or the native Dreamworld app.';
+        updateCaptureAvailability();
         return;
       }
 
@@ -833,10 +900,17 @@
       captureState.textContent = 'Recording saved';
       hasCapture = true;
       dialogueFlow.saveDraft();
-      saveButton.disabled = false;
+      updateCaptureAvailability();
     }
 
     async function startRecording() {
+      if (dreamTextInput.value.trim()) {
+        captureState.textContent = 'Text draft ready';
+        captureError.textContent = 'Clear or log your text draft before starting an experimental recording.';
+        dreamTextInput.focus();
+        return;
+      }
+      setTextDraftLocked(true);
       captureError.textContent = '';
       chunks = [];
       recordedBlob = null;
@@ -870,6 +944,7 @@
         captureState.textContent = 'Microphone off';
         captureError.textContent = 'Microphone access is off. Enable it in Safari settings and try again.';
         stopTracks();
+        setTextDraftLocked(false);
       }
     }
 
@@ -948,8 +1023,39 @@
       transcribeSavedRecording();
     }
 
+    function showTextDialogue() {
+      saveButton.disabled = true;
+      dialogueOverlay.classList.remove('failed');
+      dialogueOverlay.classList.add('visible', 'ready');
+      dialogueStatus.textContent = 'Draft ready';
+      dialogueModelNote.textContent = 'Keyboard text · provider not detectable';
+      dialogueProgressText.textContent = 'No Dreamworld transcription';
+      dialogueSpeaker.textContent = 'You · Dream draft';
+      dialogueText.classList.remove('secondary');
+      dialogueText.textContent = dialogueFlow.transcript;
+      dialogueFinish.focus();
+    }
+
     function logDream() {
-      if (!hasCapture || !recordedBlob || !dialogueFlow.logDream()) return;
+      let source;
+      try {
+        source = DreamDialogueFlow.resolveCaptureSource({
+          textDraft: dreamTextInput.value,
+          hasAudio: hasCapture && Boolean(recordedBlob)
+        });
+      } catch (error) {
+        captureState.textContent = 'Choose one draft';
+        captureError.textContent = error instanceof Error ? error.message : 'Choose either the text draft or saved audio before logging.';
+        return;
+      }
+
+      if (source === 'text') {
+        dialogueFlow.reset();
+        if (!dialogueFlow.saveTextDraft(dreamTextInput.value, 'keyboard-text-unverified-provider')) return;
+        showTextDialogue();
+        return;
+      }
+      if (source !== 'audio' || !dialogueFlow.logDream()) return;
       showTranscriptionScene();
     }
 
@@ -960,18 +1066,24 @@
 
     function finishDialogue() {
       if (!dialogueFlow.finishDialogue()) return;
-      localStorage.setItem('dreamworld:worldFirstLastDream', new Date().toISOString());
-      localStorage.setItem('dreamworld:lastTranscript', dialogueFlow.transcript);
-      localStorage.setItem('dreamworld:lastTranscriptModel', activeTranscriptionModelID);
+      appStorage.set('dreamworld:worldFirstLastDream', new Date().toISOString());
+      appStorage.set('dreamworld:lastTranscript', dialogueFlow.transcript);
+      appStorage.set('dreamworld:lastTranscriptSource', dialogueFlow.source || 'unknown');
+      if (dialogueFlow.source === 'browser-local-whisper') appStorage.set('dreamworld:lastTranscriptModel', activeTranscriptionModelID);
+      else appStorage.remove('dreamworld:lastTranscriptModel');
       dialogueOverlay.classList.remove('visible', 'ready', 'failed');
       captureState.textContent = 'Dream logged';
       hasCapture = false;
+      dreamTextInput.value = '';
+      appStorage.remove(TEXT_DRAFT_KEY);
+      setTextDraftLocked(false);
       if (navigator.vibrate) navigator.vibrate([30, 30, 60]);
       window.setTimeout(() => openView('dreams'), 220);
     }
 
     function logNoDream() {
-      localStorage.setItem('dreamworld:worldFirstNoRecall', new Date().toISOString());
+      if (hasCapture || micButton.classList.contains('recording')) return;
+      appStorage.set('dreamworld:worldFirstNoRecall', new Date().toISOString());
       captureState.textContent = 'Logged';
       window.setTimeout(() => openView('world'), 450);
     }
@@ -985,7 +1097,7 @@
 
     function loadAlarms() {
       try {
-        const stored = JSON.parse(localStorage.getItem('dreamworld:alarms') || 'null');
+        const stored = JSON.parse(appStorage.get('dreamworld:alarms') || 'null');
         if (Array.isArray(stored)) {
           alarms = stored.filter(alarm => /^([01]\d|2[0-3]):[0-5]\d$/.test(alarm.time)).map(alarm => ({
             id: String(alarm.id),
@@ -995,7 +1107,7 @@
           }));
         }
       } catch (_) {
-        localStorage.removeItem('dreamworld:alarms');
+        appStorage.remove('dreamworld:alarms');
       }
       if (!alarms.length) alarms = [{ id: 'starter', time: '07:30', days: ['Mon','Tue','Wed','Thu','Fri'], enabled: true }];
       persistAlarms();
@@ -1003,7 +1115,7 @@
     }
 
     function persistAlarms() {
-      localStorage.setItem('dreamworld:alarms', JSON.stringify(alarms));
+      appStorage.set('dreamworld:alarms', JSON.stringify(alarms));
     }
 
     function renderAlarms() {
@@ -1061,7 +1173,7 @@
       captureTimer.textContent = '00:00';
       captureError.textContent = '';
       capturePlayback.style.display = 'none';
-      saveButton.disabled = true;
+      updateCaptureAvailability();
       openView('capture');
       ringingOverlay.classList.add('stopping');
       if (navigator.vibrate) navigator.vibrate([35, 45, 70]);
@@ -1069,7 +1181,7 @@
         ringingOverlay.classList.remove('visible', 'stopping');
         slideStop.value = 0;
         ringingKicker.textContent = 'Dreamworld alarm';
-        micButton.focus();
+        dreamTextInput.focus();
       }, 560);
     }
 
@@ -1139,13 +1251,16 @@
     }));
     document.querySelectorAll('.dream-row').forEach(link => link.addEventListener('click', event => event.preventDefault()));
     micButton.addEventListener('click', toggleRecording);
+    dreamTextInput.addEventListener('input', persistTextDraft);
+    wisprFocusButton.addEventListener('click', focusWisprKeyboard);
     saveButton.addEventListener('click', logDream);
     dialogueFinish.addEventListener('click', finishDialogue);
     dialogueRetry.addEventListener('click', retryDialogueTranscription);
     transcriptionModelSelect.addEventListener('change', changeTranscriptionModel);
-    document.getElementById('noDreamButton').addEventListener('click', logNoDream);
+    noDreamButton.addEventListener('click', logNoDream);
     loadAlarms();
     loadTranscriptionModelSetting();
+    loadTextDraft();
     applyTimePhase();
     if (new URLSearchParams(window.location.search).get('dialogue') === 'preview') {
       openView('capture');

@@ -24,6 +24,7 @@
     }
 
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html, body { margin: 0; min-height: 100%; background: var(--night); color: var(--paper); }
     body {
       min-height: 100dvh;
@@ -159,8 +160,8 @@
     .hotspot {
       position: absolute;
       z-index: 5;
-      width: 34px;
-      height: 34px;
+      width: 44px;
+      height: 44px;
       border: 0;
       border-radius: 50%;
       background: transparent;
@@ -169,11 +170,11 @@
     .hotspot::before, .hotspot::after {
       content: "";
       position: absolute;
-      inset: 10px;
+      inset: 15px;
       border: 1px solid rgba(231,223,197,.8);
       border-radius: 50%;
     }
-    .hotspot::after { inset: 4px; opacity: .3; animation: ring 2.2s ease-out infinite; }
+    .hotspot::after { inset: 9px; opacity: .3; animation: ring 2.2s ease-out infinite; }
     .hotspot-arch { left: 49%; top: 47%; }
     .hotspot-tree { left: 25%; top: 56%; }
 
@@ -197,14 +198,15 @@
     .world-sheet.visible { transform: translateY(0); }
     .world-sheet small { display: block; color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
     .world-sheet strong { display: block; margin-top: 4px; font-size: 15px; font-weight: 600; }
-    .sheet-close { width: 36px; height: 36px; border: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; }
+    .sheet-close { width: 44px; height: 44px; border: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; }
 
     .panel-view { padding: max(28px, env(safe-area-inset-top)) 18px 28px; }
     .panel-head { min-height: 44px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
     .panel-title { margin: 0; font-size: 23px; font-weight: 650; letter-spacing: -.03em; }
-    .panel-action { min-width: 40px; height: 40px; border: 1px solid var(--line); background: var(--deep); color: var(--paper); cursor: pointer; }
+    .panel-action { min-width: 44px; height: 44px; border: 1px solid var(--line); background: var(--deep); color: var(--paper); cursor: pointer; }
 
     .dream-list { display: grid; border-top: 1px solid var(--line); }
+    .dream-history { display: contents; }
     .dream-row {
       min-height: 82px;
       display: grid;
@@ -221,6 +223,35 @@
     .dream-copy small { display: block; margin-top: 5px; color: var(--sage); font-size: 11px; }
     .dream-arrow { color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
     .sample-tag { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+    button.dream-row { width: 100%; padding: 0; background: transparent; text-align: left; cursor: pointer; }
+    button.dream-row[hidden] { display: none !important; }
+    .analysis-view { overflow-y: auto; padding: max(24px, env(safe-area-inset-top)) 18px calc(110px + env(safe-area-inset-bottom)); }
+    .analysis-head { align-items: flex-start; justify-content: flex-start; gap: 13px; margin-bottom: 26px; }
+    .analysis-back { flex: 0 0 44px; width: 44px; height: 44px; border: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; }
+    .analysis-heading { min-width: 0; padding-top: 2px; }
+    .analysis-kicker { display: block; margin-bottom: 7px; color: var(--sage); font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .13em; text-transform: uppercase; }
+    .analysis-transcript { margin-bottom: 14px; padding: 16px; border: 1px solid var(--line); background: rgba(20,29,43,.62); }
+    .analysis-label { display: block; margin-bottom: 11px; color: var(--sage); font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .13em; text-transform: uppercase; }
+    .analysis-transcript p { margin: 0; color: var(--paper); font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
+    .analysis-source { margin: 12px 0 0; color: var(--sage); font-size: 11px; line-height: 1.4; }
+    .character-response { position: relative; margin-bottom: 16px; padding: 20px; overflow: hidden; border: 1px solid rgba(182,154,99,.5); background: linear-gradient(145deg, rgba(62,91,87,.3), rgba(20,29,43,.9) 62%); }
+    .character-response::after { content: ""; position: absolute; width: 110px; height: 110px; right: -62px; top: -62px; border: 1px solid rgba(231,223,197,.15); border-radius: 50%; }
+    .character-identity { display: flex; align-items: center; gap: 11px; margin-bottom: 16px; }
+    .character-mark { position: relative; flex: 0 0 34px; width: 34px; height: 34px; border: 1px solid var(--gold); border-radius: 50%; }
+    .character-mark::before { content: ""; position: absolute; width: 15px; height: 15px; top: 7px; left: 7px; border-right: 4px solid var(--paper); border-bottom: 4px solid var(--paper); transform: rotate(-45deg); }
+    .character-name { display: block; color: var(--paper); font-size: 15px; font-weight: 650; }
+    .character-role { display: block; margin-top: 3px; color: var(--gold); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; }
+    .character-copy { position: relative; z-index: 1; margin: 0; color: var(--paper); font-size: 17px; line-height: 1.65; white-space: pre-wrap; }
+    .analysis-safety { margin: 16px 0 0; color: var(--sage); font-size: 11px; line-height: 1.45; }
+    .analysis-more { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .analysis-more summary { min-height: 52px; display: flex; align-items: center; justify-content: space-between; color: var(--sage); cursor: pointer; font-size: 13px; }
+    .analysis-more summary::after { content: "+"; color: var(--paper); font-size: 18px; }
+    .analysis-more[open] summary::after { content: "−"; }
+    .analysis-more-body { padding: 2px 0 16px; }
+    .analysis-storage-note, .analysis-status { margin: 0 0 12px; color: var(--sage); font-size: 12px; line-height: 1.5; }
+    .analysis-delete { width: 100%; min-height: 44px; border: 1px solid var(--danger); background: transparent; color: #d5aaa4; cursor: pointer; }
+    .analysis-delete:disabled { opacity: .42; cursor: default; }
+    .analysis-undo { width: 100%; min-height: 44px; margin-top: 9px; border: 1px solid var(--paper); background: transparent; color: var(--paper); cursor: pointer; }
 
     .capture-view { display: none; }
     .capture-view.active { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: max(32px, env(safe-area-inset-top)) 24px calc(34px + env(safe-area-inset-bottom)); overflow-y: auto; }
@@ -231,9 +262,10 @@
     .capture-text-input { width: 100%; min-height: 154px; resize: vertical; padding: 14px; border: 1px solid rgba(231,223,197,.28); border-radius: 0; background: var(--deep); color: var(--paper); line-height: 1.5; }
     .capture-text-input::placeholder { color: rgba(142,160,150,.72); }
     .capture-text-input:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
-    .wispr-focus { width: 100%; margin-top: 10px; }
-    .capture-guidance { min-height: 36px; margin: 9px 0 0; color: var(--sage); font-size: 11px; line-height: 1.4; text-align: center; }
-    .experimental-capture { width: 100%; max-width: 350px; margin-top: 22px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .wispr-focus { width: 100%; margin: 0 0 10px; }
+    .capture-guidance { margin: 0 0 18px; color: var(--sage); font-size: 11px; line-height: 1.45; text-align: center; }
+    .capture-skip { min-height: 44px; border: 0; background: transparent; color: var(--sage); cursor: pointer; }
+    .experimental-capture { width: 100%; max-width: 350px; margin-top: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
     .experimental-capture summary { min-height: 50px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--sage); font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .experimental-capture summary::after { content: "+"; color: var(--paper); font-size: 17px; }
     .experimental-capture[open] summary::after { content: "−"; }
@@ -575,37 +607,78 @@
 
     <section class="view panel-view" id="dreamsView" data-view="dreams">
       <header class="panel-head"><h1 class="panel-title">Dreams</h1><button class="panel-action" data-go="capture" aria-label="Record a dream">＋</button></header>
-      <div class="dream-list">
-        <a class="dream-row" href="#" aria-label="Sample dream entry">
+      <div class="dream-list" id="dreamList">
+        <button class="dream-row" id="latestDreamRow" data-open-analysis="latest" aria-label="Open latest logged dream analysis" hidden>
+          <span class="dream-thumb"></span>
+          <span class="dream-copy"><strong>Latest dream</strong><small id="latestDreamMeta">Logged locally</small></span>
+          <span><span class="sample-tag">Yours</span><span class="dream-arrow"> ›</span></span>
+        </button>
+        <div class="dream-history" id="loggedDreamHistory"></div>
+        <button class="dream-row" data-open-analysis="ocean-house" aria-label="Open Ocean House sample analysis">
           <span class="dream-thumb"></span>
           <span class="dream-copy"><strong>Ocean House</strong><small>Sample entry · 0:48</small></span>
           <span><span class="sample-tag">Sample</span><span class="dream-arrow"> ›</span></span>
-        </a>
-        <a class="dream-row" href="#" aria-label="Sample dream entry">
+        </button>
+        <button class="dream-row" data-open-analysis="quiet-gate" aria-label="Open The Quiet Gate sample analysis">
           <span class="dream-thumb"></span>
           <span class="dream-copy"><strong>The Quiet Gate</strong><small>Sample entry · 1:12</small></span>
           <span><span class="sample-tag">Sample</span><span class="dream-arrow"> ›</span></span>
-        </a>
+        </button>
       </div>
+    </section>
+
+    <section class="view panel-view analysis-view" id="analysisView" data-view="analysis" aria-labelledby="analysisTitle">
+      <header class="panel-head analysis-head">
+        <button class="analysis-back" id="analysisBack" aria-label="Back to dreams">←</button>
+        <div class="analysis-heading"><span class="analysis-kicker" id="analysisEntryKind">Your dream</span><h1 class="panel-title" id="analysisTitle">Ocean House</h1></div>
+      </header>
+
+      <section class="analysis-transcript" aria-labelledby="analysisTranscriptLabel">
+        <span class="analysis-label" id="analysisTranscriptLabel">Transcript</span>
+        <p id="analysisTranscript"></p>
+        <p class="analysis-source" id="analysisEvidenceSource">Sample text · not your history</p>
+      </section>
+
+      <article class="character-response" aria-labelledby="analysisCharacterName">
+        <div class="character-identity">
+          <span class="character-mark" aria-hidden="true"></span>
+          <span><strong class="character-name" id="analysisCharacterName">The Listener</strong><small class="character-role">Reflection</small></span>
+        </div>
+        <p class="character-copy" id="analysisCharacterResponse" aria-live="polite"></p>
+        <p class="analysis-safety">A reflection, not a diagnosis or prediction. You decide what fits.</p>
+      </article>
+
+      <details class="analysis-more">
+        <summary>Privacy &amp; reflection controls</summary>
+        <div class="analysis-more-body">
+          <p class="analysis-storage-note" id="analysisStorageDisclosure">Storage status for this transcript and response appears below.</p>
+          <button class="analysis-delete" id="analysisDeleteReflection">Delete this reflection</button>
+          <button class="analysis-undo" id="analysisRegenerateResponse" hidden>Create response again</button>
+          <button class="analysis-undo" id="analysisUndoDelete" hidden>Undo deletion</button>
+          <button class="analysis-undo" id="analysisKeepUndo" hidden>Keep Undo available</button>
+          <button class="analysis-delete" id="analysisFinishDeletion" hidden>Finish deletion now</button>
+          <p class="analysis-status" id="analysisStorageStatus" aria-live="polite"></p>
+        </div>
+      </details>
     </section>
 
     <section class="view capture-view" id="captureView" data-view="capture">
       <span class="capture-state" id="captureState">Keyboard ready</span>
       <h1 class="capture-title">What do you remember?</h1>
-      <p class="capture-intro">Type, use Apple Dictation, or dictate with a third-party keyboard. An unfinished draft stays in this browser; Log dream stores the text you approve.</p>
+      <p class="capture-intro">Speak or type before it fades.</p>
       <div class="capture-text-card">
         <textarea class="capture-text-input" id="dreamTextInput" placeholder="A staircase rose from the ocean…" aria-label="Dream transcript"></textarea>
-        <button class="action-button wispr-focus" id="wisprFocusButton">Use Wispr Flow keyboard</button>
-        <p class="capture-guidance" id="captureGuidance">Tap above, switch to the Flow keyboard with the globe key, then use its microphone. Dreamworld cannot activate a third-party keyboard for you.</p>
       </div>
       <div class="capture-actions">
         <button class="action-button primary" id="saveButton" disabled>Log dream</button>
-        <button class="action-button" id="noDreamButton">No dream remembered</button>
+        <button id="noDreamButton" class="capture-skip">No dream remembered</button>
       </div>
       <details class="experimental-capture" id="experimentalCapture">
-        <summary>Experimental local transcription</summary>
+        <summary>Voice &amp; transcription options</summary>
         <div class="experimental-capture-body">
-          <p class="experimental-capture-copy">Records locally and runs browser Whisper after you tap Log dream. Accuracy varies and this is not the production transcription path.</p>
+          <button class="action-button wispr-focus" id="wisprFocusButton">Use Wispr Flow keyboard</button>
+          <p class="capture-guidance" id="captureGuidance">Focus the transcript field, switch keyboards with the globe key, then use the Flow microphone. Dreamworld cannot activate a third-party keyboard for you.</p>
+          <p class="experimental-capture-copy">Or record locally with experimental browser Whisper. It runs after you tap Log dream; accuracy varies.</p>
           <button class="mic-button" id="micButton" aria-label="Start experimental recording"><span class="mic-icon" aria-hidden="true"></span></button>
           <div class="capture-timer" id="captureTimer">00:00</div>
           <audio class="capture-playback" id="capturePlayback" controls></audio>
@@ -727,8 +800,9 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js"></script>
-  <script src="./browser-transcriber.js"></script>
+  <script src="./dialogue-state.js?v=21"></script>
+  <script src="./analysis-state.js?v=21"></script>
+  <script src="./browser-transcriber.js?v=21"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -760,6 +834,25 @@
     const dialogueRetry = document.getElementById('dialogueRetry');
     const transcriptionModelSelect = document.getElementById('transcriptionModel');
     const transcriptionModelNote = document.getElementById('transcriptionModelNote');
+    const dreamList = document.getElementById('dreamList');
+    const latestDreamRow = document.getElementById('latestDreamRow');
+    const latestDreamMeta = document.getElementById('latestDreamMeta');
+    const loggedDreamHistory = document.getElementById('loggedDreamHistory');
+    const analysisView = document.getElementById('analysisView');
+    const analysisBack = document.getElementById('analysisBack');
+    const analysisEntryKind = document.getElementById('analysisEntryKind');
+    const analysisTitle = document.getElementById('analysisTitle');
+    const analysisEvidenceSource = document.getElementById('analysisEvidenceSource');
+    const analysisTranscript = document.getElementById('analysisTranscript');
+    const analysisCharacterName = document.getElementById('analysisCharacterName');
+    const analysisCharacterResponse = document.getElementById('analysisCharacterResponse');
+    const analysisStorageDisclosure = document.getElementById('analysisStorageDisclosure');
+    const analysisStorageStatus = document.getElementById('analysisStorageStatus');
+    const analysisDeleteReflection = document.getElementById('analysisDeleteReflection');
+    const analysisRegenerateResponse = document.getElementById('analysisRegenerateResponse');
+    const analysisUndoDelete = document.getElementById('analysisUndoDelete');
+    const analysisKeepUndo = document.getElementById('analysisKeepUndo');
+    const analysisFinishDeletion = document.getElementById('analysisFinishDeletion');
     const dialogueFlow = DreamDialogueFlow.createDreamDialogueFlow();
     let durableStorage = null;
     try { durableStorage = window.localStorage; } catch (_) {}
@@ -767,6 +860,7 @@
 
     const TRANSCRIPTION_MODEL_KEY = 'dreamworld:transcriptionModel';
     const TEXT_DRAFT_KEY = 'dreamworld:textDraft';
+    const DREAM_RECORD_PREFIX = 'dreamworld:dream:';
     const TRANSCRIPTION_MODELS = {
       'Xenova/whisper-tiny': { shortLabel: 'Tiny · Multi', size: '39.0 MiB', note: 'Fastest multilingual baseline. Lowest expected accuracy.' },
       'Xenova/whisper-tiny.en': { shortLabel: 'Tiny · English', size: '39.0 MiB', note: 'Fast English baseline. Tests whether language detection is hurting accuracy.' },
@@ -774,6 +868,16 @@
       'Xenova/whisper-base.en': { shortLabel: 'Base · English', size: '73.3 MiB', note: 'Recommended English balance of accuracy, memory, and speed.' },
       'Xenova/whisper-small': { shortLabel: 'Small · Multi', size: '237.6 MiB', note: 'Higher-accuracy multilingual test. May be slow or unstable in iPhone Safari.' },
       'Xenova/whisper-small.en': { shortLabel: 'Small · English', size: '237.6 MiB', note: 'Highest English accuracy test. May exceed Safari memory limits.' }
+    };
+    const SAMPLE_ANALYSIS_DREAMS = {
+      'ocean-house': {
+        id: 'ocean-house', title: 'Ocean House', source: 'sample-content', kind: 'Sample reflection',
+        transcript: 'I crossed a dark ocean toward a house with every window lit. When I reached the door, I realized the house was moving farther away.'
+      },
+      'quiet-gate': {
+        id: 'quiet-gate', title: 'The Quiet Gate', source: 'sample-content', kind: 'Sample reflection',
+        transcript: 'I stood before a stone gate in a silent field. I could hear someone on the other side, but whenever I tried to call out, no sound came.'
+      }
     };
 
     let mediaRecorder = null;
@@ -788,6 +892,15 @@
     let activeTranscriptionModelID = 'Xenova/whisper-tiny';
     let hasCapture = false;
     let alarms = [];
+    let analysisSession = null;
+    let activeAnalysisDreamID = '';
+    let analysisStorageKey = '';
+    let lastAnalysisTrigger = null;
+    let pendingDeletedAnalysis = null;
+    let analysisDeletionNotice = null;
+    let undoWindowHeld = false;
+    let pendingDialogueRecord = null;
+    let deleteUndoTimer = null;
 
     function getTimePhase(hour) {
       if (hour >= 5 && hour < 6) return { id: 'blue-hour', label: 'Blue hour' };
@@ -830,6 +943,413 @@
     function openView(name) {
       views.forEach(view => view.classList.toggle('active', view.dataset.view === name));
       navButtons.forEach(button => button.setAttribute('aria-selected', String(button.dataset.go === name)));
+    }
+
+    function createDreamID() {
+      if (window.crypto?.randomUUID) return `dream-${window.crypto.randomUUID()}`;
+      return `dream-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    function legacyDreamID(record) {
+      const identity = `${record.loggedAt || ''}\u0000${record.source || ''}\u0000${record.transcript || ''}`;
+      let hash = 2166136261;
+      for (let index = 0; index < identity.length; index += 1) {
+        hash ^= identity.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return `legacy-dream-${(hash >>> 0).toString(36)}`;
+    }
+
+    function normalizeDreamRecord(record, { legacy = false } = {}) {
+      if (!record || typeof record !== 'object' || Array.isArray(record)) return null;
+      const transcript = typeof record.transcript === 'string' ? record.transcript.trim() : '';
+      if (!transcript) return null;
+      const schemaVersion = record.schemaVersion ?? (legacy ? 1 : null);
+      if (schemaVersion !== 1) return null;
+      const parsedDate = typeof record.loggedAt === 'string' ? Date.parse(record.loggedAt) : Number.NaN;
+      const loggedAt = Number.isNaN(parsedDate)
+        ? (legacy ? new Date(0).toISOString() : null)
+        : new Date(parsedDate).toISOString();
+      if (!loggedAt) return null;
+      const source = typeof record.source === 'string' && record.source.trim()
+        ? record.source.trim()
+        : (legacy ? 'unknown' : null);
+      if (!source) return null;
+      if (record.model !== undefined && typeof record.model !== 'string') return null;
+      const title = typeof record.title === 'string' && record.title.trim()
+        ? record.title.trim()
+        : (legacy ? 'Recorded dream' : null);
+      if (!title) return null;
+      const normalized = {
+        schemaVersion,
+        id: typeof record.id === 'string' ? record.id : '',
+        loggedAt,
+        title,
+        transcript,
+        source,
+        model: record.model || ''
+      };
+      normalized.id ||= legacyDreamID(normalized);
+      if (!/^(?:dream|legacy-dream)-[a-z0-9-]{1,120}$/i.test(normalized.id)) return null;
+      return normalized;
+    }
+
+    function dreamRecordsEquivalent(left, right) {
+      return Boolean(left && right)
+        && left.schemaVersion === right.schemaVersion
+        && left.id === right.id
+        && left.loggedAt === right.loggedAt
+        && left.title === right.title
+        && left.transcript === right.transcript
+        && left.source === right.source
+        && left.model === right.model;
+    }
+
+    function readStoredDreamRecord(key) {
+      try {
+        const record = normalizeDreamRecord(JSON.parse(appStorage.getDurable(key) || 'null'));
+        return record && key === `${DREAM_RECORD_PREFIX}${record.id}` ? record : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function persistDreamRecordCreateOnly(inputRecord, { legacy = false } = {}) {
+      let record = normalizeDreamRecord(inputRecord, { legacy });
+      if (!record) return { record: inputRecord, storedDurably: false };
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        const key = `${DREAM_RECORD_PREFIX}${record.id}`;
+        const durableRaw = appStorage.getDurable(key);
+        if (durableRaw === null) {
+          const storedDurably = appStorage.set(key, JSON.stringify(record));
+          return { record, storedDurably };
+        }
+        const existing = readStoredDreamRecord(key);
+        if (dreamRecordsEquivalent(existing, record)) return { record: existing, storedDurably: true };
+        record = { ...record, id: createDreamID() };
+      }
+      return { record, storedDurably: false };
+    }
+
+    function loadDreamLibrary() {
+      return appStorage.keys(DREAM_RECORD_PREFIX)
+        .map(key => readStoredDreamRecord(key))
+        .filter(Boolean)
+        .sort((left, right) => Date.parse(left.loggedAt) - Date.parse(right.loggedAt) || left.id.localeCompare(right.id));
+    }
+
+    function getLegacyLatestDreamRecord() {
+      try {
+        const stored = normalizeDreamRecord(JSON.parse(appStorage.get('dreamworld:lastDream') || 'null'), { legacy: true });
+        if (stored) return stored;
+      } catch (_) {}
+      const transcript = appStorage.get('dreamworld:lastTranscript');
+      if (!transcript) return null;
+      return normalizeDreamRecord({
+        transcript,
+        loggedAt: appStorage.get('dreamworld:worldFirstLastDream'),
+        source: appStorage.get('dreamworld:lastTranscriptSource') || 'unknown',
+        model: appStorage.get('dreamworld:lastTranscriptModel') || '',
+        title: 'Recorded dream'
+      }, { legacy: true });
+    }
+
+    function resolveLatestDreamRecord(library) {
+      return library.at(-1) || getLegacyLatestDreamRecord();
+    }
+
+    function dreamDateLabel(record) {
+      const date = record.loggedAt ? new Date(record.loggedAt) : null;
+      return date && !Number.isNaN(date.valueOf())
+        ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'Date unavailable';
+    }
+
+    function renderLatestDreamRow() {
+      const library = loadDreamLibrary();
+      const record = resolveLatestDreamRecord(library);
+      latestDreamRow.hidden = !record;
+      loggedDreamHistory.replaceChildren();
+      if (!record) return;
+      const recordKey = `${DREAM_RECORD_PREFIX}${record.id}`;
+      const pageOnly = library.some(candidate => candidate.id === record.id)
+        ? !appStorage.isDurable(recordKey)
+        : !(appStorage.isDurable('dreamworld:lastDream') || appStorage.isDurable('dreamworld:lastTranscript'));
+      latestDreamMeta.textContent = pageOnly ? `Open page only · ${dreamDateLabel(record)}` : `Logged ${dreamDateLabel(record)}`;
+      library.filter(candidate => candidate.id !== record.id).reverse().forEach(historical => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'dream-row';
+        button.dataset.openAnalysis = historical.id;
+        button.setAttribute('aria-label', `Open recorded dream from ${dreamDateLabel(historical)}`);
+        const thumb = document.createElement('span');
+        thumb.className = 'dream-thumb';
+        const copy = document.createElement('span');
+        copy.className = 'dream-copy';
+        const title = document.createElement('strong');
+        title.textContent = historical.title;
+        const meta = document.createElement('small');
+        meta.textContent = dreamDateLabel(historical);
+        copy.append(title, meta);
+        const marker = document.createElement('span');
+        const yours = document.createElement('span');
+        yours.className = 'sample-tag';
+        yours.textContent = 'Yours';
+        const arrow = document.createElement('span');
+        arrow.className = 'dream-arrow';
+        arrow.textContent = ' ›';
+        marker.append(yours, arrow);
+        button.append(thumb, copy, marker);
+        loggedDreamHistory.append(button);
+      });
+    }
+
+    function getAnalysisDream(dreamID) {
+      const sample = SAMPLE_ANALYSIS_DREAMS[dreamID];
+      if (sample) return sample;
+      const library = loadDreamLibrary();
+      const fallback = dreamID === 'latest' ? null : getLegacyLatestDreamRecord();
+      const record = dreamID === 'latest'
+        ? resolveLatestDreamRecord(library)
+        : library.find(candidate => candidate.id === dreamID) || (fallback?.id === dreamID ? fallback : null);
+      if (!record) return null;
+      return {
+        id: record.id, title: record.title, transcript: record.transcript,
+        source: record.source || 'unknown',
+        kind: 'Your recorded account'
+      };
+    }
+
+    function loadSavedAnalysisState(key) {
+      try {
+        return JSON.parse(appStorage.get(key) || 'null');
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function persistAnalysisState() {
+      if (!analysisSession || !analysisStorageKey) return false;
+      return appStorage.set(analysisStorageKey, JSON.stringify(analysisSession.snapshot()));
+    }
+
+    function pendingDeletionStatus() {
+      if (!pendingDeletedAnalysis) return '';
+      return pendingDeletedAnalysis.removedDurably
+        ? `Undo deletion of “${pendingDeletedAnalysis.title}” within 10 seconds. Its original dream account remains.`
+        : `Permanent deletion of “${pendingDeletedAnalysis.title}” was blocked by browser storage. It is hidden only in this open page; use Undo or clear this site’s storage.`;
+    }
+
+    function captureAnalysisFocus(element) {
+      if (!(element instanceof HTMLElement) || !element.id) return null;
+      return { type: 'id', value: element.id };
+    }
+
+    function restoreAnalysisFocus(reference) {
+      if (!reference || reference.type !== 'id') return;
+      document.getElementById(reference.value)?.focus();
+    }
+
+    function openAnalysis(dreamID) {
+      const dream = getAnalysisDream(dreamID);
+      if (!dream) return;
+      resetAnalysisDeleteConfirmation();
+      analysisUndoDelete.hidden = !pendingDeletedAnalysis;
+      analysisUndoDelete.textContent = pendingDeletedAnalysis
+        ? `Undo deletion of ${pendingDeletedAnalysis.title}`
+        : 'Undo deletion';
+      analysisKeepUndo.hidden = !pendingDeletedAnalysis || undoWindowHeld;
+      analysisFinishDeletion.hidden = !pendingDeletedAnalysis || !undoWindowHeld;
+      activeAnalysisDreamID = dream.id;
+      analysisStorageKey = `dreamworld:analysis:${activeAnalysisDreamID}`;
+      const savedState = loadSavedAnalysisState(analysisStorageKey);
+      const responseWasDeleted = savedState?.schemaVersion === 1
+        && savedState.deleted === true
+        && savedState.dreamID === dream.id;
+      analysisDeleteReflection.hidden = responseWasDeleted;
+      analysisDeleteReflection.disabled = Boolean(pendingDeletedAnalysis);
+      analysisRegenerateResponse.hidden = !responseWasDeleted || Boolean(pendingDeletedAnalysis);
+      analysisEntryKind.textContent = dream.source === 'sample-content' ? 'Sample dream' : 'Your dream';
+      analysisTitle.textContent = dream.title;
+      analysisEvidenceSource.textContent = dream.source === 'sample-content' ? 'Sample text · not your history' : `Your transcript · ${dream.source}`;
+      analysisTranscript.textContent = dream.transcript;
+      analysisCharacterName.textContent = DreamAnalysis.CHARACTER_NAME;
+
+      if (responseWasDeleted) {
+        analysisSession = null;
+        analysisCharacterResponse.textContent = 'This response was deleted. Your transcript is still available, and you can explicitly create a new response from the privacy controls.';
+        analysisStorageDisclosure.textContent = 'The saved response has been deleted. The original dream transcript remains in your local dream history.';
+        analysisStorageStatus.textContent = pendingDeletionStatus()
+          || analysisDeletionNotice?.message
+          || 'The saved response was deleted and will not be recreated automatically.';
+      } else {
+        analysisSession = DreamAnalysis.createAnalysisSession({
+          dreamID: dream.id,
+          title: dream.title,
+          transcript: dream.transcript,
+          transcriptSource: dream.source,
+          savedState
+        });
+        const state = analysisSession.snapshot();
+        const deletionTargetsThisResponse = pendingDeletedAnalysis?.key === analysisStorageKey;
+        const storedDurably = deletionTargetsThisResponse ? true : persistAnalysisState();
+        analysisCharacterName.textContent = state.characterResponse.speaker;
+        analysisCharacterResponse.textContent = state.characterResponse.text;
+        analysisStorageDisclosure.textContent = dream.source === 'sample-content'
+          ? 'This is sample content, not your dream history. Its generated response may be cached in this browser.'
+          : storedDurably
+            ? 'Your transcript remains in local dream history, and this response is saved in this browser without encryption.'
+            : 'Your transcript remains available, but this response could not be saved in browser storage.';
+        analysisStorageStatus.textContent = pendingDeletionStatus()
+          || analysisDeletionNotice?.message
+          || (storedDurably ? '' : 'This response is available only in the open page because browser storage is unavailable.');
+      }
+      analysisView.scrollTop = 0;
+      openView('analysis');
+      analysisBack.focus();
+    }
+
+    function resetAnalysisDeleteConfirmation() {
+      analysisDeleteReflection.dataset.confirmDelete = 'false';
+      analysisDeleteReflection.textContent = 'Delete this reflection';
+    }
+
+    function restoreDeletedAnalysisSnapshot(deleted) {
+      const snapshotRaw = JSON.stringify(deleted.snapshot);
+      const durableRaw = appStorage.getDurable(deleted.key);
+      if (durableRaw !== null && durableRaw !== snapshotRaw && durableRaw !== deleted.tombstoneRaw) {
+        return {
+          conflict: true,
+          restoredDurably: appStorage.set(deleted.key, durableRaw)
+        };
+      }
+      return {
+        conflict: false,
+        restoredDurably: appStorage.set(deleted.key, snapshotRaw)
+      };
+    }
+
+    function finalizePendingAnalysisDeletion({ manually = false } = {}) {
+      if (!pendingDeletedAnalysis) return;
+      const undoHadFocus = document.activeElement === analysisUndoDelete;
+      const priorFocus = captureAnalysisFocus(document.activeElement);
+      const expiredDeletion = pendingDeletedAnalysis;
+      const deletedAnalysisWasVisible = analysisView.classList.contains('active') && activeAnalysisDreamID === expiredDeletion.dreamID;
+      let expiryMessage = '';
+      if (!expiredDeletion.removedDurably) {
+        const restoration = restoreDeletedAnalysisSnapshot(expiredDeletion);
+        expiryMessage = restoration.conflict
+          ? `A newer reflection for “${expiredDeletion.title}” was saved elsewhere and preserved instead of restoring the older deleted version.`
+          : restoration.restoredDurably
+            ? `Permanent deletion of “${expiredDeletion.title}” was blocked. The reflection was restored on this device.`
+            : `Permanent deletion of “${expiredDeletion.title}” was blocked. The reflection was restored in this open page; a durable copy may still remain in browser storage.`;
+      } else {
+        expiryMessage = manually
+          ? `Deletion finished for “${expiredDeletion.title}”; its original dream account remains.`
+          : `Undo expired. The reflection for “${expiredDeletion.title}” was deleted; its original dream account remains.`;
+      }
+      analysisDeletionNotice = {
+        dreamID: expiredDeletion.dreamID,
+        title: expiredDeletion.title,
+        message: expiryMessage
+      };
+      pendingDeletedAnalysis = null;
+      undoWindowHeld = false;
+      analysisUndoDelete.hidden = true;
+      analysisKeepUndo.hidden = true;
+      analysisFinishDeletion.hidden = true;
+      analysisUndoDelete.textContent = 'Undo deletion';
+      analysisDeleteReflection.disabled = false;
+      if (deletedAnalysisWasVisible) openAnalysis(expiredDeletion.dreamID);
+      analysisStorageStatus.textContent = expiryMessage;
+      if (undoHadFocus) {
+        (expiredDeletion.removedDurably ? analysisRegenerateResponse : analysisDeleteReflection).focus();
+      } else if (deletedAnalysisWasVisible) restoreAnalysisFocus(priorFocus);
+    }
+
+    function deleteAnalysisReflection() {
+      if (!analysisStorageKey || !activeAnalysisDreamID || !analysisSession) return;
+      if (analysisDeleteReflection.dataset.confirmDelete !== 'true') {
+        analysisDeleteReflection.dataset.confirmDelete = 'true';
+        analysisDeleteReflection.textContent = 'Delete permanently? Tap again';
+        analysisStorageStatus.textContent = 'Tap again when ready to delete this reflection. The original dream account will remain.';
+        return;
+      }
+      resetAnalysisDeleteConfirmation();
+      analysisDeletionNotice = null;
+      undoWindowHeld = false;
+      window.clearTimeout(deleteUndoTimer);
+      const tombstoneRaw = JSON.stringify({
+        schemaVersion: 1,
+        dreamID: activeAnalysisDreamID,
+        deleted: true,
+        deletedAt: new Date().toISOString()
+      });
+      pendingDeletedAnalysis = {
+        key: analysisStorageKey,
+        dreamID: activeAnalysisDreamID,
+        title: analysisTitle.textContent,
+        removedDurably: false,
+        tombstoneRaw,
+        snapshot: analysisSession.snapshot()
+      };
+      const responseRemoved = appStorage.remove(analysisStorageKey);
+      const tombstoneStored = responseRemoved && appStorage.set(analysisStorageKey, tombstoneRaw);
+      pendingDeletedAnalysis.removedDurably = Boolean(responseRemoved && tombstoneStored);
+      if (!pendingDeletedAnalysis.removedDurably) restoreDeletedAnalysisSnapshot(pendingDeletedAnalysis);
+      openAnalysis(pendingDeletedAnalysis.dreamID);
+      analysisUndoDelete.focus();
+      deleteUndoTimer = window.setTimeout(finalizePendingAnalysisDeletion, 10000);
+    }
+
+    function keepAnalysisUndoAvailable() {
+      if (!pendingDeletedAnalysis) return;
+      window.clearTimeout(deleteUndoTimer);
+      undoWindowHeld = true;
+      analysisKeepUndo.hidden = true;
+      analysisFinishDeletion.hidden = false;
+      analysisStorageStatus.textContent = `Undo for “${pendingDeletedAnalysis.title}” will remain available in this open page until you undo, finish deletion, or close the page.`;
+      analysisUndoDelete.focus();
+    }
+
+    function undoAnalysisDeletion() {
+      if (!pendingDeletedAnalysis) return;
+      window.clearTimeout(deleteUndoTimer);
+      const deleted = pendingDeletedAnalysis;
+      pendingDeletedAnalysis = null;
+      analysisDeletionNotice = null;
+      undoWindowHeld = false;
+      const restoration = restoreDeletedAnalysisSnapshot(deleted);
+      openAnalysis(deleted.dreamID);
+      analysisUndoDelete.hidden = true;
+      analysisKeepUndo.hidden = true;
+      analysisFinishDeletion.hidden = true;
+      analysisUndoDelete.textContent = 'Undo deletion';
+      analysisStorageStatus.textContent = restoration.conflict
+        ? 'A newer reflection saved elsewhere was preserved; the older deleted version was not restored.'
+        : restoration.restoredDurably
+          ? 'Reflection restored on this device.'
+          : 'Reflection restored in this open page only because browser storage is unavailable.';
+      analysisDeleteReflection.focus();
+    }
+
+    function regenerateAnalysisResponse() {
+      if (!activeAnalysisDreamID || pendingDeletedAnalysis) return;
+      const dream = getAnalysisDream(activeAnalysisDreamID);
+      if (!dream) return;
+      const freshSession = DreamAnalysis.createAnalysisSession({
+        dreamID: dream.id,
+        title: dream.title,
+        transcript: dream.transcript,
+        transcriptSource: dream.source
+      });
+      const storedDurably = appStorage.set(analysisStorageKey, JSON.stringify(freshSession.snapshot()));
+      analysisDeletionNotice = null;
+      openAnalysis(dream.id);
+      analysisStorageStatus.textContent = storedDurably
+        ? 'A new response was created from the transcript and saved in this browser.'
+        : 'A new response was created in this open page, but browser storage is unavailable.';
+      analysisBack.focus();
     }
 
     function setTextDraftLocked(locked) {
@@ -883,6 +1403,7 @@
         recordedBlob = null;
         hasCapture = false;
         dialogueFlow.reset();
+        pendingDialogueRecord = null;
         setTextDraftLocked(false);
         captureState.textContent = 'No audio captured';
         captureError.textContent = 'This browser did not produce an audio recording. Please try again in Safari or the native Dreamworld app.';
@@ -916,6 +1437,7 @@
       recordedBlob = null;
       hasCapture = false;
       dialogueFlow.reset();
+      pendingDialogueRecord = null;
       saveButton.disabled = true;
       capturePlayback.style.display = 'none';
 
@@ -992,6 +1514,7 @@
         dialogueSpeaker.textContent = 'You · Dream log';
         dialogueText.classList.remove('secondary');
         dialogueText.textContent = transcript;
+        dialogueFinish.textContent = 'Finish logging';
         dialogueOverlay.classList.add('ready');
         dialogueFinish.focus();
       } catch (error) {
@@ -1033,6 +1556,7 @@
       dialogueSpeaker.textContent = 'You · Dream draft';
       dialogueText.classList.remove('secondary');
       dialogueText.textContent = dialogueFlow.transcript;
+      dialogueFinish.textContent = 'Finish logging';
       dialogueFinish.focus();
     }
 
@@ -1048,9 +1572,11 @@
         captureError.textContent = error instanceof Error ? error.message : 'Choose either the text draft or saved audio before logging.';
         return;
       }
+      captureError.textContent = '';
 
       if (source === 'text') {
         dialogueFlow.reset();
+        pendingDialogueRecord = null;
         if (!dialogueFlow.saveTextDraft(dreamTextInput.value, 'keyboard-text-unverified-provider')) return;
         showTextDialogue();
         return;
@@ -1065,11 +1591,61 @@
     }
 
     function finishDialogue() {
+      if (dialogueFlow.phase !== 'transcriptReady') return;
+      if (pendingDeletedAnalysis) {
+        dialogueStatus.textContent = 'Resolve pending deletion first';
+        dialogueText.classList.add('secondary');
+        dialogueText.textContent = `Undo or wait for deletion of “${pendingDeletedAnalysis.title}” to resolve before logging another dream. Your approved transcript remains here.`;
+        captureState.textContent = 'Dream not logged yet';
+        dialogueFinish.focus();
+        return;
+      }
+      let record = pendingDialogueRecord || {
+        schemaVersion: 1,
+        id: createDreamID(),
+        loggedAt: new Date().toISOString(),
+        title: `Dream · ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+        transcript: dialogueFlow.transcript,
+        source: dialogueFlow.source || 'unknown',
+        model: dialogueFlow.source === 'browser-local-whisper' ? activeTranscriptionModelID : ''
+      };
+      pendingDialogueRecord = record;
+      const legacyLatest = getLegacyLatestDreamRecord();
+      if (legacyLatest && !dreamRecordsEquivalent(legacyLatest, record)) {
+        const migration = persistDreamRecordCreateOnly(legacyLatest, { legacy: true });
+        if (!migration.storedDurably) {
+          dialogueStatus.textContent = 'Couldn’t preserve existing history';
+          dialogueText.classList.add('secondary');
+          dialogueText.textContent = 'Your approved transcript is still here, but Dreamworld could not safely migrate the previous dream. Free browser storage or copy this transcript before trying again.';
+          dialogueFinish.textContent = 'Try saving again';
+          captureState.textContent = 'Dream not logged yet';
+          renderLatestDreamRow();
+          dialogueFinish.focus();
+          return;
+        }
+      }
+      const persistence = persistDreamRecordCreateOnly(record);
+      record = persistence.record;
+      pendingDialogueRecord = record;
+      const recordKey = `${DREAM_RECORD_PREFIX}${record.id}`;
+      if (!persistence.storedDurably) {
+        appStorage.remove(recordKey);
+        dialogueStatus.textContent = 'Couldn’t save permanently';
+        dialogueText.classList.add('secondary');
+        dialogueText.textContent = 'Your approved transcript is still visible and kept in this open page only. Copy it before closing, or try saving again if browser storage becomes available.';
+        dialogueFinish.textContent = 'Try saving again';
+        captureState.textContent = 'Not saved permanently';
+        renderLatestDreamRow();
+        dialogueFinish.focus();
+        return;
+      }
       if (!dialogueFlow.finishDialogue()) return;
-      appStorage.set('dreamworld:worldFirstLastDream', new Date().toISOString());
-      appStorage.set('dreamworld:lastTranscript', dialogueFlow.transcript);
-      appStorage.set('dreamworld:lastTranscriptSource', dialogueFlow.source || 'unknown');
-      if (dialogueFlow.source === 'browser-local-whisper') appStorage.set('dreamworld:lastTranscriptModel', activeTranscriptionModelID);
+      pendingDialogueRecord = null;
+      appStorage.set('dreamworld:lastDream', JSON.stringify(record));
+      appStorage.set('dreamworld:worldFirstLastDream', record.loggedAt);
+      appStorage.set('dreamworld:lastTranscript', record.transcript);
+      appStorage.set('dreamworld:lastTranscriptSource', record.source);
+      if (record.model) appStorage.set('dreamworld:lastTranscriptModel', record.model);
       else appStorage.remove('dreamworld:lastTranscriptModel');
       dialogueOverlay.classList.remove('visible', 'ready', 'failed');
       captureState.textContent = 'Dream logged';
@@ -1077,14 +1653,21 @@
       dreamTextInput.value = '';
       appStorage.remove(TEXT_DRAFT_KEY);
       setTextDraftLocked(false);
+      renderLatestDreamRow();
       if (navigator.vibrate) navigator.vibrate([30, 30, 60]);
-      window.setTimeout(() => openView('dreams'), 220);
+      window.setTimeout(() => openAnalysis(record.id), 220);
     }
 
     function logNoDream() {
       if (hasCapture || micButton.classList.contains('recording')) return;
-      appStorage.set('dreamworld:worldFirstNoRecall', new Date().toISOString());
-      captureState.textContent = 'Logged';
+      const storedDurably = appStorage.set('dreamworld:worldFirstNoRecall', new Date().toISOString());
+      if (!storedDurably) {
+        captureState.textContent = 'Not saved permanently';
+        captureError.textContent = 'Browser storage is unavailable. This no-recall entry was not logged.';
+        return;
+      }
+      captureError.textContent = '';
+      captureState.textContent = 'No recall logged';
       window.setTimeout(() => openView('world'), 450);
     }
 
@@ -1199,6 +1782,11 @@
     }
 
     document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => openView(button.dataset.go)));
+    window.addEventListener('storage', event => {
+      if (event.key === null || event.key === 'dreamworld:lastDream' || event.key?.startsWith(DREAM_RECORD_PREFIX)) {
+        renderLatestDreamRow();
+      }
+    });
     document.querySelectorAll('.hotspot').forEach(button => button.addEventListener('click', () => {
       document.getElementById('placeName').textContent = button.dataset.place;
       document.getElementById('placeKind').textContent = button.dataset.kind;
@@ -1249,7 +1837,22 @@
       const on = button.classList.toggle('on');
       button.setAttribute('aria-pressed', String(on));
     }));
-    document.querySelectorAll('.dream-row').forEach(link => link.addEventListener('click', event => event.preventDefault()));
+    dreamList.addEventListener('click', event => {
+      const row = event.target.closest('[data-open-analysis]');
+      if (row) {
+        lastAnalysisTrigger = row;
+        openAnalysis(row.dataset.openAnalysis);
+      }
+    });
+    analysisBack.addEventListener('click', () => {
+      openView('dreams');
+      window.requestAnimationFrame(() => lastAnalysisTrigger?.focus());
+    });
+    analysisDeleteReflection.addEventListener('click', deleteAnalysisReflection);
+    analysisRegenerateResponse.addEventListener('click', regenerateAnalysisResponse);
+    analysisUndoDelete.addEventListener('click', undoAnalysisDeletion);
+    analysisKeepUndo.addEventListener('click', keepAnalysisUndoAvailable);
+    analysisFinishDeletion.addEventListener('click', () => finalizePendingAnalysisDeletion({ manually: true }));
     micButton.addEventListener('click', toggleRecording);
     dreamTextInput.addEventListener('input', persistTextDraft);
     wisprFocusButton.addEventListener('click', focusWisprKeyboard);
@@ -1261,8 +1864,12 @@
     loadAlarms();
     loadTranscriptionModelSetting();
     loadTextDraft();
+    renderLatestDreamRow();
     applyTimePhase();
-    if (new URLSearchParams(window.location.search).get('dialogue') === 'preview') {
+    const previewParams = new URLSearchParams(window.location.search);
+    if (previewParams.get('analysis') === 'preview') {
+      openAnalysis('ocean-house');
+    } else if (previewParams.get('dialogue') === 'preview') {
       openView('capture');
     }
     window.setInterval(applyTimePhase, 60000);

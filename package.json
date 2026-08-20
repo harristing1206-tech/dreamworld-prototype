@@ -1,0 +1,26 @@
+{
+  "name": "dreamworld-prototype",
+  "version": "1.0.0",
+  "description": "Dreamworld mobile PWA and native prototype",
+  "main": "analysis-state.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harristing1206-tech/dreamworld-prototype.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/harristing1206-tech/dreamworld-prototype/issues"
+  },
+  "homepage": "https://github.com/harristing1206-tech/dreamworld-prototype#readme",
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}

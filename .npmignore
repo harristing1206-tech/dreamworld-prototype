@@ -1,0 +1,7 @@
+# Rejected framework-browser recovery copies are never release artifacts.
+archive/
+
+# Local dependencies and generated bundles.
+node_modules/
+*.tar.gz
+*.zip

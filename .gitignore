@@ -3,3 +3,5 @@ research-*.md
 
 # Local development artifacts
 .DS_Store
+node_modules/
+archive/

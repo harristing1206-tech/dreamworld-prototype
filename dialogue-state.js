@@ -57,6 +57,38 @@
           tombstones.add(key);
           return false;
         }
+      },
+
+      keys(prefix = '') {
+        const normalizedPrefix = String(prefix);
+        const found = new Set(fallback.keys());
+        try {
+          if (storage && Number.isInteger(storage.length) && typeof storage.key === 'function') {
+            for (let index = 0; index < storage.length; index += 1) {
+              const key = storage.key(index);
+              if (key !== null) found.add(key);
+            }
+          }
+        } catch (_) {}
+        tombstones.forEach(key => found.delete(key));
+        return [...found].filter(key => key.startsWith(normalizedPrefix)).sort();
+      },
+
+      isDurable(key) {
+        if (tombstones.has(key) || overlays.has(key)) return false;
+        try {
+          return Boolean(storage?.getItem) && storage.getItem(key) !== null;
+        } catch (_) {
+          return false;
+        }
+      },
+
+      getDurable(key) {
+        try {
+          return storage?.getItem ? storage.getItem(key) : null;
+        } catch (_) {
+          return null;
+        }
       }
     };
   }

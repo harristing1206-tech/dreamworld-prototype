@@ -23,6 +23,24 @@ assert.equal(overlayStorage.get('draft'), 'new in-memory draft', 'failed durable
 assert.equal(overlayStorage.remove('draft'), false);
 assert.equal(overlayStorage.get('draft'), null, 'failed durable remove must preserve an in-memory tombstone');
 
+const durableValues = new Map([['dreamworld:dream:existing', 'old']]);
+const enumerableStorage = {
+  get length() { return durableValues.size; },
+  key(index) { return [...durableValues.keys()][index] ?? null; },
+  getItem(key) { return durableValues.get(key) ?? null; },
+  setItem(key, value) { durableValues.set(key, String(value)); },
+  removeItem(key) { durableValues.delete(key); }
+};
+const indexedStorage = createSafeStorage(enumerableStorage);
+assert.deepEqual(indexedStorage.keys('dreamworld:dream:'), ['dreamworld:dream:existing']);
+assert.equal(indexedStorage.isDurable('dreamworld:dream:existing'), true);
+assert.equal(indexedStorage.getDurable('dreamworld:dream:existing'), 'old');
+assert.equal(indexedStorage.set('dreamworld:dream:new', 'new'), true);
+assert.deepEqual(indexedStorage.keys('dreamworld:dream:'), ['dreamworld:dream:existing', 'dreamworld:dream:new']);
+assert.equal(indexedStorage.remove('dreamworld:dream:existing'), true);
+assert.deepEqual(indexedStorage.keys('dreamworld:dream:'), ['dreamworld:dream:new']);
+assert.equal(indexedStorage.isDurable('dreamworld:dream:existing'), false);
+
 assert.equal(resolveCaptureSource({ textDraft: 'A fragment', hasAudio: false }), 'text');
 assert.equal(resolveCaptureSource({ textDraft: '', hasAudio: true }), 'audio');
 assert.equal(resolveCaptureSource({ textDraft: '', hasAudio: false }), null);

@@ -255,13 +255,14 @@
     .analysis-dialogue-content { min-width: 0; display: flex; flex-direction: column; }
     .character-identity { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 1px 0 7px; }
     .character-name { color: var(--paper); font: 750 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
-    .character-role { color: var(--gold); font: 700 8px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
+    .character-role { color: var(--gold); font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
     .analysis-dialogue-advance { position: relative; flex: 1; width: 100%; min-height: 145px; padding: 4px 20px 24px 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
-    .character-copy { margin: 0; color: var(--paper); font: 600 15px/1.48 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
+    .character-copy { margin: 0; overflow-wrap: anywhere; color: var(--paper); font: 600 15px/1.48 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
     .analysis-dialogue-cue { position: absolute; right: 1px; bottom: 4px; width: 10px; height: 10px; border-right: 3px solid var(--gold); border-bottom: 3px solid var(--gold); transform: rotate(45deg); animation: dialogue-cue 850ms steps(2, end) infinite; }
     .character-response[data-typing="true"] .analysis-dialogue-cue { border: 0; width: 5px; height: 14px; background: var(--gold); transform: none; animation: typing-cursor 600ms steps(1, end) infinite; }
     .character-response[data-complete="true"] .analysis-dialogue-cue { display: none; }
-    .analysis-dialogue-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 7px; border-top: 1px solid rgba(231,223,197,.15); color: var(--sage); font: 700 8px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .analysis-dialogue-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 7px; border-top: 1px solid rgba(231,223,197,.15); color: var(--sage); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .analysis-dialogue-advance:disabled { cursor: default; }
     .analysis-dialogue-page { color: var(--gold); }
     .analysis-panel { position: absolute; z-index: 10; top: max(66px, calc(env(safe-area-inset-top) + 58px)); left: 10px; right: 10px; bottom: 10px; padding: 18px; overflow-y: auto; border: 1px solid rgba(231,223,197,.35); background: rgba(8,17,27,.98); box-shadow: 0 20px 50px rgba(0,0,0,.55); }
     .analysis-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
@@ -690,13 +691,13 @@
       </article>
       <p class="sr-only" id="analysisDialogueStatus" aria-live="polite"></p>
 
-      <section class="analysis-panel analysis-transcript" id="analysisTranscriptPanel" aria-labelledby="analysisTranscriptLabel" hidden>
+      <section class="analysis-panel analysis-transcript" id="analysisTranscriptPanel" role="dialog" aria-modal="true" aria-labelledby="analysisTranscriptLabel" hidden>
         <header class="analysis-panel-head"><h2 class="analysis-panel-title" id="analysisTranscriptLabel">Your transcript</h2><button class="analysis-panel-close" id="analysisTranscriptClose" aria-label="Close transcript">×</button></header>
         <p id="analysisTranscript"></p>
         <p class="analysis-source" id="analysisEvidenceSource">Sample text · not your history</p>
       </section>
 
-      <section class="analysis-panel analysis-controls" id="analysisControlsPanel" aria-labelledby="analysisControlsTitle" hidden>
+      <section class="analysis-panel analysis-controls" id="analysisControlsPanel" role="dialog" aria-modal="true" aria-labelledby="analysisControlsTitle" hidden>
         <header class="analysis-panel-head"><h2 class="analysis-panel-title" id="analysisControlsTitle">Reflection controls</h2><button class="analysis-panel-close" id="analysisControlsClose" aria-label="Close reflection controls">×</button></header>
         <p class="analysis-storage-note" id="analysisStorageDisclosure">Storage status for this transcript and response appears below.</p>
         <p class="analysis-storage-note">A reflection, not a diagnosis or prediction. You decide what fits.</p>
@@ -847,10 +848,10 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=22"></script>
-  <script src="./analysis-state.js?v=22"></script>
-  <script src="./analysis-dialogue.js?v=22"></script>
-  <script src="./browser-transcriber.js?v=22"></script>
+  <script src="./dialogue-state.js?v=23"></script>
+  <script src="./analysis-state.js?v=23"></script>
+  <script src="./analysis-dialogue.js?v=23"></script>
+  <script src="./browser-transcriber.js?v=23"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -905,6 +906,8 @@
     const analysisControlsToggle = document.getElementById('analysisControlsToggle');
     const analysisControlsPanel = document.getElementById('analysisControlsPanel');
     const analysisControlsClose = document.getElementById('analysisControlsClose');
+    const analysisHud = document.querySelector('.analysis-hud');
+    const primaryNavigation = document.querySelector('.nav');
     const analysisStorageDisclosure = document.getElementById('analysisStorageDisclosure');
     const analysisStorageStatus = document.getElementById('analysisStorageStatus');
     const analysisDeleteReflection = document.getElementById('analysisDeleteReflection');
@@ -1002,7 +1005,10 @@
     }
 
     function openView(name) {
-      if (name !== 'analysis') analysisDialogueController?.destroy();
+      if (name !== 'analysis') {
+        analysisDialogueController?.destroy();
+        closeAnalysisPanels();
+      }
       views.forEach(view => view.classList.toggle('active', view.dataset.view === name));
       navButtons.forEach(button => button.setAttribute('aria-selected', String(button.dataset.go === name)));
     }
@@ -1219,6 +1225,9 @@
       analysisControlsPanel.hidden = true;
       analysisTranscriptToggle.setAttribute('aria-expanded', 'false');
       analysisControlsToggle.setAttribute('aria-expanded', 'false');
+      analysisHud.inert = false;
+      analysisCharacterCard.inert = false;
+      primaryNavigation.inert = false;
       if (restoreFocus && transcriptWasOpen) analysisTranscriptToggle.focus();
       else if (restoreFocus && controlsWereOpen) analysisControlsToggle.focus();
     }
@@ -1227,6 +1236,9 @@
       closeAnalysisPanels();
       const transcript = panel === analysisTranscriptPanel;
       panel.hidden = false;
+      analysisHud.inert = true;
+      analysisCharacterCard.inert = true;
+      primaryNavigation.inert = true;
       analysisTranscriptToggle.setAttribute('aria-expanded', String(transcript));
       analysisControlsToggle.setAttribute('aria-expanded', String(!transcript));
       (transcript ? analysisTranscriptClose : analysisControlsClose).focus();
@@ -1247,6 +1259,7 @@
         : state.finalPage
           ? 'Reflection complete'
           : `Continue to dialogue page ${state.pageIndex + 2} of ${state.pageCount}`);
+      analysisDialogueAdvance.disabled = state.complete;
       if (!state.typing && state.visibleText === state.pageText && announcedAnalysisPage !== state.pageIndex) {
         announcedAnalysisPage = state.pageIndex;
         analysisDialogueStatus.textContent = `Dialogue page ${state.pageIndex + 1} of ${state.pageCount} complete.`;
@@ -1257,7 +1270,7 @@
       analysisDialogueController?.destroy();
       announcedAnalysisPage = -1;
       analysisDialogueStatus.textContent = '';
-      const pages = DreamAnalysisDialogue.paginateResponse(responseText, { maxCharacters: 220 });
+      const pages = DreamAnalysisDialogue.paginateResponse(responseText, { maxCharacters: 280 });
       analysisDialogueController = DreamAnalysisDialogue.createTypewriterDialogue({
         pages,
         reducedMotion: Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
@@ -1422,6 +1435,7 @@
       pendingDeletedAnalysis.removedDurably = Boolean(responseRemoved && tombstoneStored);
       if (!pendingDeletedAnalysis.removedDurably) restoreDeletedAnalysisSnapshot(pendingDeletedAnalysis);
       openAnalysis(pendingDeletedAnalysis.dreamID);
+      showAnalysisPanel(analysisControlsPanel);
       analysisUndoDelete.focus();
       deleteUndoTimer = window.setTimeout(finalizePendingAnalysisDeletion, 10000);
     }
@@ -1985,9 +1999,29 @@
     analysisTranscriptClose.addEventListener('click', () => closeAnalysisPanels({ restoreFocus: true }));
     analysisControlsClose.addEventListener('click', () => closeAnalysisPanels({ restoreFocus: true }));
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && (!analysisTranscriptPanel.hidden || !analysisControlsPanel.hidden)) {
+      const openPanel = !analysisTranscriptPanel.hidden
+        ? analysisTranscriptPanel
+        : !analysisControlsPanel.hidden
+          ? analysisControlsPanel
+          : null;
+      if (!openPanel) return;
+      if (event.key === 'Escape') {
         event.preventDefault();
         closeAnalysisPanels({ restoreFocus: true });
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...openPanel.querySelectorAll('button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])')]
+        .filter(element => !element.hidden && !element.closest('[hidden]'));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && (document.activeElement === first || !openPanel.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !openPanel.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
       }
     });
     analysisDeleteReflection.addEventListener('click', deleteAnalysisReflection);

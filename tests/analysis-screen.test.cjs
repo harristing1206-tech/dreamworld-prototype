@@ -29,11 +29,14 @@ assert.match(html, /\.character-response\[data-complete="true"\][^{]+\{[^}]*disp
 assert.match(html, /id="analysisDialogueStatus"[^>]+aria-live="polite"/, 'page completion should be announced without reading every typed character');
 assert.match(html, /id="analysisTranscriptToggle"/, 'the transcript must remain available without dominating the scene');
 assert.match(html, /id="analysisControlsToggle"/, 'privacy controls must remain reachable');
+assert.match(html, /id="analysisTranscriptPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
+assert.match(html, /id="analysisControlsPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
 assert.match(html, /id="analysisCharacterResponse"[^>]+aria-live="off"/);
 assert.match(html, /A reflection, not a diagnosis/);
 assert.match(html, /DreamAnalysis\.createAnalysisSession/);
 assert.match(html, /DreamAnalysisDialogue\.paginateResponse/);
 assert.match(html, /DreamAnalysisDialogue\.createTypewriterDialogue/);
+assert.match(html, /maxCharacters:\s*280/, 'long reflections should use the reviewed adaptive page size');
 assert.match(html, /characterResponse/);
 assert.match(html, /window\.setTimeout\(\(\) => openAnalysis\(record\.id\), 220\)/, 'logging should route directly to the character response');
 
@@ -54,6 +57,7 @@ assert.match(html, /this response could not be saved in browser storage/i);
 assert.match(html, /saved response has been deleted/i);
 assert.match(html, /\[hidden\]\s*\{\s*display:\s*none\s*!important/);
 assert.match(html, /prefers-reduced-motion/);
+assert.match(html, /\.character-copy[^}]+overflow-wrap:\s*anywhere/s);
 
 const analysisSection = html.match(/<section class="view analysis-view"[\s\S]*?<\/section>\s*<section class="view capture-view"/i)?.[0] || '';
 assert.ok(analysisSection.length > 0);

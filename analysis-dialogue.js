@@ -12,6 +12,16 @@
     const chunks = [];
     let current = '';
     words.forEach(word => {
+      if (word.length > maxCharacters) {
+        if (current) chunks.push(current);
+        current = '';
+        for (let start = 0; start < word.length; start += maxCharacters) {
+          const tokenChunk = word.slice(start, start + maxCharacters);
+          if (tokenChunk.length === maxCharacters) chunks.push(tokenChunk);
+          else current = tokenChunk;
+        }
+        return;
+      }
       const next = current ? `${current} ${word}` : word;
       if (current && next.length > maxCharacters) {
         chunks.push(current);

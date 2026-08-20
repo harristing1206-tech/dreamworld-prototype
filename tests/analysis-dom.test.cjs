@@ -102,6 +102,7 @@ test('analysis flow shows one character response and preserves deletion recovery
     assert.match(document.getElementById('analysisCharacterResponse').textContent, /response was deleted/i);
     const undo = document.getElementById('analysisUndoDelete');
     assert.equal(undo.hidden, false);
+    assert.equal(document.getElementById('analysisControlsPanel').hidden, false, 'Undo must remain inside a visible controls dialog');
     assert.match(undo.textContent, /Ocean House/);
     assert.equal(document.activeElement, undo, 'Undo receives focus');
     assert.equal(deleteButton.disabled, true, 'another deletion cannot replace the pending Undo');
@@ -178,6 +179,7 @@ test('game dialogue types one page, reveals it, then advances without exposing t
     assert.equal(card.dataset.typing, 'false');
     assert.equal(card.dataset.complete, 'true');
     assert.equal(document.getElementById('analysisDialogueHint').textContent, 'Reflection complete');
+    assert.equal(advance.disabled, true, 'the completed dialogue target must not remain actionable');
     const finalText = text.textContent;
     advance.click();
     assert.equal(text.textContent, finalText, 'tapping a completed reflection must remain a no-op');
@@ -186,8 +188,13 @@ test('game dialogue types one page, reveals it, then advances without exposing t
     transcriptToggle.click();
     assert.equal(document.getElementById('analysisTranscriptPanel').hidden, false);
     assert.equal(document.activeElement, document.getElementById('analysisTranscriptClose'));
+    assert.equal(document.querySelector('.analysis-hud').inert, true);
+    assert.equal(document.getElementById('analysisCharacterCard').inert, true);
+    document.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    assert.equal(document.activeElement, document.getElementById('analysisTranscriptClose'), 'focus stays inside the transcript dialog');
     document.getElementById('analysisTranscriptClose').click();
     assert.equal(document.getElementById('analysisTranscriptPanel').hidden, true);
+    assert.equal(document.querySelector('.analysis-hud').inert, false);
     assert.equal(document.activeElement, transcriptToggle);
   } finally {
     dom.window.close();

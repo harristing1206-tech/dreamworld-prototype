@@ -9,6 +9,11 @@ assert.equal(pages.join(' ').replace(/\s+/g, ' '), response, 'pagination must pr
 assert.match(pages[0], /slow departure/i);
 assert.match(pages.at(-1), /grief and love/i);
 
+const oversizedToken = 'x'.repeat(255);
+const tokenPages = paginateResponse(oversizedToken, { maxCharacters: 100 });
+assert.ok(tokenPages.every(page => page.length <= 100), 'unbroken tokens must respect the page limit');
+assert.equal(tokenPages.join(''), oversizedToken);
+
 const scheduled = [];
 const cancelled = [];
 const updates = [];

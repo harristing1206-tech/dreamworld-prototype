@@ -55,7 +55,7 @@ function storedDreams(storage) {
     .sort((left, right) => Date.parse(left.loggedAt) - Date.parse(right.loggedAt));
 }
 
-async function loadPage(storage, query = '?analysis=preview') {
+async function loadPage(storage, query = '?analysis=preview', { reducedMotion = true } = {}) {
   const virtualConsole = new VirtualConsole();
   const errors = [];
   virtualConsole.on('jsdomError', error => errors.push(error));
@@ -66,7 +66,7 @@ async function loadPage(storage, query = '?analysis=preview') {
     virtualConsole,
     beforeParse(window) {
       Object.defineProperty(window, 'localStorage', { value: storage });
-      window.matchMedia = () => ({ matches: true, addListener() {}, removeListener() {} });
+      window.matchMedia = mediaQuery => ({ matches: reducedMotion && mediaQuery.includes('prefers-reduced-motion'), addListener() {}, removeListener() {} });
       window.HTMLElement.prototype.scrollIntoView = function () {};
     }
   });
@@ -144,6 +144,51 @@ test('analysis flow shows one character response and preserves deletion recovery
     const document = dom.window.document;
     assert.equal(document.getElementById('analysisCharacterResponse').textContent, originalResponse);
     assert.equal(document.querySelectorAll('[data-analysis-lens]').length, 0);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('game dialogue types one page, reveals it, then advances without exposing the whole response', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '?analysis=preview', { reducedMotion: false });
+  try {
+    const document = dom.window.document;
+    const card = document.getElementById('analysisCharacterCard');
+    const text = document.getElementById('analysisCharacterResponse');
+    const advance = document.getElementById('analysisDialogueAdvance');
+    const stored = JSON.parse(storage.values.get('dreamworld:analysis:ocean-house'));
+    assert.equal(card.dataset.typing, 'true');
+    assert.ok(text.textContent.length < stored.characterResponse.text.length, 'the full reflection must not appear at once');
+    assert.match(document.getElementById('analysisDialoguePage').textContent, /^1 \/ [2-9]/);
+
+    advance.click();
+    assert.equal(card.dataset.typing, 'false');
+    const firstPage = text.textContent;
+    assert.ok(firstPage.length > 80);
+    assert.ok(firstPage.length < stored.characterResponse.text.length, 'reveal shows the current page, not every page');
+    assert.equal(document.getElementById('analysisDialogueHint').textContent, 'Tap to continue');
+
+    advance.click();
+    assert.equal(card.dataset.typing, 'true');
+    assert.match(document.getElementById('analysisDialoguePage').textContent, /^2 \/ /);
+    assert.ok(text.textContent.length < firstPage.length, 'the next page begins typing from an empty dialogue field');
+
+    advance.click();
+    assert.equal(card.dataset.typing, 'false');
+    assert.equal(card.dataset.complete, 'true');
+    assert.equal(document.getElementById('analysisDialogueHint').textContent, 'Reflection complete');
+    const finalText = text.textContent;
+    advance.click();
+    assert.equal(text.textContent, finalText, 'tapping a completed reflection must remain a no-op');
+
+    const transcriptToggle = document.getElementById('analysisTranscriptToggle');
+    transcriptToggle.click();
+    assert.equal(document.getElementById('analysisTranscriptPanel').hidden, false);
+    assert.equal(document.activeElement, document.getElementById('analysisTranscriptClose'));
+    document.getElementById('analysisTranscriptClose').click();
+    assert.equal(document.getElementById('analysisTranscriptPanel').hidden, true);
+    assert.equal(document.activeElement, transcriptToggle);
   } finally {
     dom.window.close();
   }

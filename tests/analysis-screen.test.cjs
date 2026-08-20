@@ -7,7 +7,7 @@ const serviceWorker = fs.readFileSync(path.join(__dirname, '..', 'service-worker
 
 const cacheVersion = serviceWorker.match(/dreamworld-world-v(\d+)/)?.[1];
 assert.ok(cacheVersion, 'service worker cache must be versioned');
-for (const asset of ['dialogue-state.js', 'analysis-state.js', 'browser-transcriber.js']) {
+for (const asset of ['dialogue-state.js', 'analysis-state.js', 'analysis-dialogue.js', 'browser-transcriber.js']) {
   assert.match(html, new RegExp(`<script src="\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}"><\\/script>`), `${asset} must be cache-busted with the release version`);
   assert.match(serviceWorker, new RegExp(`\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}`), `${asset} must be cached under the same release-versioned URL`);
 }
@@ -19,13 +19,21 @@ assert.match(html, /id="noDreamButton" class="capture-skip"/);
 assert.match(html, /id="analysisBack"/);
 assert.match(html, /id="analysisTitle"/);
 assert.match(html, /id="analysisTranscript"/);
-assert.match(html, />Transcript</);
+assert.match(html, />Your transcript</);
 assert.match(html, /id="analysisCharacterName"/);
 assert.match(html, /The Listener/);
-assert.match(html, /\.character-copy\s*\{[^}]*white-space:\s*pre-wrap/s, 'multi-paragraph character analysis must preserve readable paragraph breaks');
-assert.match(html, /id="analysisCharacterResponse"[^>]+aria-live="polite"/);
+assert.match(html, /class="analysis-game-scene"/, 'analysis should remain inside the game world');
+assert.match(html, /id="analysisDialogueAdvance"/, 'the dialogue box should be the reveal and advance target');
+assert.match(html, /id="analysisDialoguePage"/, 'dialogue should show page progress');
+assert.match(html, /\.character-response\[data-complete="true"\][^{]+\{[^}]*display:\s*none/s, 'the continuation cue should disappear after the final page');
+assert.match(html, /id="analysisDialogueStatus"[^>]+aria-live="polite"/, 'page completion should be announced without reading every typed character');
+assert.match(html, /id="analysisTranscriptToggle"/, 'the transcript must remain available without dominating the scene');
+assert.match(html, /id="analysisControlsToggle"/, 'privacy controls must remain reachable');
+assert.match(html, /id="analysisCharacterResponse"[^>]+aria-live="off"/);
 assert.match(html, /A reflection, not a diagnosis/);
 assert.match(html, /DreamAnalysis\.createAnalysisSession/);
+assert.match(html, /DreamAnalysisDialogue\.paginateResponse/);
+assert.match(html, /DreamAnalysisDialogue\.createTypewriterDialogue/);
 assert.match(html, /characterResponse/);
 assert.match(html, /window\.setTimeout\(\(\) => openAnalysis\(record\.id\), 220\)/, 'logging should route directly to the character response');
 
@@ -47,11 +55,11 @@ assert.match(html, /saved response has been deleted/i);
 assert.match(html, /\[hidden\]\s*\{\s*display:\s*none\s*!important/);
 assert.match(html, /prefers-reduced-motion/);
 
-const analysisSection = html.match(/<section class="view panel-view analysis-view"[\s\S]*?<\/section>\s*<section class="view capture-view"/i)?.[0] || '';
+const analysisSection = html.match(/<section class="view analysis-view"[\s\S]*?<\/section>\s*<section class="view capture-view"/i)?.[0] || '';
 assert.ok(analysisSection.length > 0);
-assert.ok((analysisSection.match(/<section\b/g) || []).length <= 3, 'analysis should contain only its outer view, transcript, and the captured opening of the following view');
+assert.match(analysisSection, /id="analysisTranscriptPanel"[^>]+hidden/, 'transcript starts behind a quiet game HUD action');
+assert.match(analysisSection, /id="analysisControlsPanel"[^>]+hidden/, 'privacy controls start behind a quiet game HUD action');
 assert.doesNotMatch(analysisSection, /class="analysis-section/, 'the old stacked analysis sections must be gone');
-assert.ok((analysisSection.match(/<button\b/g) || []).length <= 6, 'analysis should keep actions restrained');
 
 const navLabels = [...html.matchAll(/<span class="nav-label">([^<]+)<\/span>/g)].map(match => match[1]);
 assert.deepEqual(navLabels, ['World', 'Dreams', 'Capture', 'Alarms', 'Settings']);

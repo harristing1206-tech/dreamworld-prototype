@@ -888,11 +888,11 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=25"></script>
-  <script src="./analysis-state.js?v=25"></script>
-  <script src="./analysis-dialogue.js?v=25"></script>
-  <script src="./dream-scene.js?v=25"></script>
-  <script src="./browser-transcriber.js?v=25"></script>
+  <script src="./dialogue-state.js?v=26"></script>
+  <script src="./analysis-state.js?v=26"></script>
+  <script src="./analysis-dialogue.js?v=26"></script>
+  <script src="./dream-scene.js?v=26"></script>
+  <script src="./browser-transcriber.js?v=26"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -1378,12 +1378,22 @@
       analysisStorageKey = `dreamworld:analysis:${activeAnalysisDreamID}`;
       const savedState = loadSavedAnalysisState(analysisStorageKey);
       const eligibility = DreamAnalysis.assessTranscriptEligibility(dream.transcript);
+      let needsDetailMessage = '';
+      if (eligibility.analyzable) {
+        try {
+          DreamAnalysis.createCharacterAnalysis(dream.transcript);
+        } catch (error) {
+          if (error?.code !== 'DREAM_ANALYSIS_NEEDS_DETAIL') throw error;
+          needsDetailMessage = error.message;
+        }
+      }
+      const responseCanBeGenerated = eligibility.analyzable && !needsDetailMessage;
       const responseWasDeleted = savedState?.schemaVersion === 1
         && savedState.deleted === true
         && savedState.dreamID === dream.id;
-      analysisDeleteReflection.hidden = responseWasDeleted || !eligibility.analyzable;
+      analysisDeleteReflection.hidden = responseWasDeleted || !responseCanBeGenerated;
       analysisDeleteReflection.disabled = Boolean(pendingDeletedAnalysis);
-      analysisRegenerateResponse.hidden = !responseWasDeleted || Boolean(pendingDeletedAnalysis);
+      analysisRegenerateResponse.hidden = !responseWasDeleted || Boolean(pendingDeletedAnalysis) || !responseCanBeGenerated;
       analysisEntryKind.textContent = dream.source === 'sample-content' ? 'Sample dream' : 'Your dream';
       analysisTitle.textContent = dream.title;
       analysisEvidenceSource.textContent = dream.source === 'sample-content' ? 'Sample text · not your history' : `Your transcript · ${dream.source}`;
@@ -1394,8 +1404,21 @@
       if (!eligibility.analyzable) {
         analysisSession = null;
         responseText = eligibility.message;
-        analysisStorageDisclosure.textContent = 'No reflection was generated or saved for this transcript. The original text remains in your local dream history so you can review it.';
+        analysisStorageDisclosure.textContent = savedState
+          ? 'No prior reflection was loaded and no new reflection was generated. An older local response record may remain until you delete it; the transcript remains in dream history.'
+          : 'No reflection was generated or saved for this transcript. The original text remains in your local dream history so you can review it.';
         analysisStorageStatus.textContent = 'This transcript does not contain enough clear dream language for a responsible analysis.';
+      } else if (needsDetailMessage) {
+        analysisSession = null;
+        responseText = needsDetailMessage;
+        analysisStorageDisclosure.textContent = responseWasDeleted
+          ? 'The prior response remains deleted. The transcript is still in dream history, but there is not enough concrete detail to create a new interpretation.'
+          : savedState
+            ? 'The transcript remains in local dream history. An older response was not loaded, and no new interpretation was generated or saved.'
+            : 'The transcript was saved in local dream history, but no interpretation was generated or saved.';
+        analysisStorageStatus.textContent = pendingDeletionStatus()
+          || analysisDeletionNotice?.message
+          || 'Add concrete events, people, or feelings before asking The Listener for an analysis.';
       } else if (responseWasDeleted) {
         analysisSession = null;
         responseText = 'This response was deleted. Your transcript is still available, and you can explicitly create a new response from the reflection controls.';
@@ -1404,26 +1427,40 @@
           || analysisDeletionNotice?.message
           || 'The saved response was deleted and will not be recreated automatically.';
       } else {
-        analysisSession = DreamAnalysis.createAnalysisSession({
-          dreamID: dream.id,
-          title: dream.title,
-          transcript: dream.transcript,
-          transcriptSource: dream.source,
-          savedState
-        });
-        const state = analysisSession.snapshot();
-        const deletionTargetsThisResponse = pendingDeletedAnalysis?.key === analysisStorageKey;
-        const storedDurably = deletionTargetsThisResponse ? true : persistAnalysisState();
-        analysisCharacterName.textContent = state.characterResponse.speaker;
-        responseText = state.characterResponse.text;
-        analysisStorageDisclosure.textContent = dream.source === 'sample-content'
-          ? 'This is sample content, not your dream history. Its generated response may be cached in this browser.'
-          : storedDurably
-            ? 'Your transcript remains in local dream history, and this response is saved in this browser without encryption.'
-            : 'Your transcript remains available, but this response could not be saved in browser storage.';
-        analysisStorageStatus.textContent = pendingDeletionStatus()
-          || analysisDeletionNotice?.message
-          || (storedDurably ? '' : 'This response is available only in the open page because browser storage is unavailable.');
+        try {
+          analysisSession = DreamAnalysis.createAnalysisSession({
+            dreamID: dream.id,
+            title: dream.title,
+            transcript: dream.transcript,
+            transcriptSource: dream.source,
+            savedState
+          });
+          const state = analysisSession.snapshot();
+          const deletionTargetsThisResponse = pendingDeletedAnalysis?.key === analysisStorageKey;
+          const storedDurably = deletionTargetsThisResponse ? true : persistAnalysisState();
+          analysisCharacterName.textContent = state.characterResponse.speaker;
+          responseText = state.characterResponse.text;
+          analysisStorageDisclosure.textContent = dream.source === 'sample-content'
+            ? 'This is sample content, not your dream history. Its generated response may be cached in this browser.'
+            : storedDurably
+              ? 'Your transcript remains in local dream history, and this response is saved in this browser without encryption.'
+              : 'Your transcript remains available, but this response could not be saved in browser storage.';
+          analysisStorageStatus.textContent = pendingDeletionStatus()
+            || analysisDeletionNotice?.message
+            || (storedDurably ? '' : 'This response is available only in the open page because browser storage is unavailable.');
+        } catch (error) {
+          if (error?.code !== 'DREAM_ANALYSIS_NEEDS_DETAIL') throw error;
+          analysisSession = null;
+          responseText = error.message;
+          analysisDeleteReflection.hidden = true;
+          analysisRegenerateResponse.hidden = true;
+          analysisStorageDisclosure.textContent = savedState
+            ? 'The transcript remains in local dream history. An older response was not loaded, and no new interpretation was generated or saved.'
+            : 'The transcript was saved in local dream history, but no interpretation was generated or saved.';
+          analysisStorageStatus.textContent = pendingDeletionStatus()
+            || analysisDeletionNotice?.message
+            || 'Add concrete events, people, or feelings before asking The Listener for an analysis.';
+        }
       }
       activeAnalysisResponseText = analysisSession ? responseText : '';
       analysisFullText.textContent = activeAnalysisResponseText;
@@ -1562,12 +1599,20 @@
       if (!activeAnalysisDreamID || pendingDeletedAnalysis) return;
       const dream = getAnalysisDream(activeAnalysisDreamID);
       if (!dream) return;
-      const freshSession = DreamAnalysis.createAnalysisSession({
-        dreamID: dream.id,
-        title: dream.title,
-        transcript: dream.transcript,
-        transcriptSource: dream.source
-      });
+      const eligibility = DreamAnalysis.assessTranscriptEligibility(dream.transcript);
+      if (!eligibility.analyzable) return;
+      let freshSession;
+      try {
+        freshSession = DreamAnalysis.createAnalysisSession({
+          dreamID: dream.id,
+          title: dream.title,
+          transcript: dream.transcript,
+          transcriptSource: dream.source
+        });
+      } catch (error) {
+        if (error?.code === 'DREAM_ANALYSIS_NEEDS_DETAIL') return;
+        throw error;
+      }
       const storedDurably = appStorage.set(analysisStorageKey, JSON.stringify(freshSession.snapshot()));
       analysisDeletionNotice = null;
       openAnalysis(dream.id);

@@ -21,6 +21,17 @@ for (const transcript of [
   'I fell.',
   'Falling',
   'Ocean',
+  'My wedding',
+  'giant spider',
+  'I was naked',
+  'flying alone',
+  'could not move',
+  'Soñé con abuela',
+  'Casa azul',
+  'volé sobre montañas',
+  'je volais',
+  'ein Albtraum',
+  'sonhei voando',
   'Red room. Ocean outside.',
   'Soñé con mi abuela en una casa azul.',
   '紅色的房間裡有一隻貓。'
@@ -28,8 +39,16 @@ for (const transcript of [
   assert.equal(assessTranscriptEligibility(transcript).analyzable, true, `valid short or multilingual dream should remain eligible: ${transcript}`);
 }
 
-for (const transcript of ['... 1234 ???', 'um um um', 'asdfghjkl', 'hello', 'hello world']) {
+for (const transcript of ['... 1234 ???', 'um um um', 'asdfghjkl']) {
   assert.equal(assessTranscriptEligibility(transcript).analyzable, false, `obvious transcription noise should be rejected: ${transcript}`);
+}
+
+for (const transcript of ['hello', 'hello world', 'foo bar baz qux', 'blarg snorf glibble wobble', 'Casa azul']) {
+  assert.throws(
+    () => createCharacterAnalysis(transcript),
+    error => error?.code === 'DREAM_ANALYSIS_NEEDS_DETAIL' && /concrete dream detail/i.test(error.message),
+    `plausible but unsupported content must not receive a generic interpretation: ${transcript}`
+  );
 }
 
 const grandparentsDream = `I had a dream where I was hanging out with friends, and then towards the end of our hangout, they all left one by one in a car. I watched them all leave, and I was overcome with a sense of sadness.
@@ -78,8 +97,11 @@ assert.match(blockedResponse, /door|blocked|access|pressure/i);
 assert.notEqual(blockedResponse, oceanResponse, 'different transcripts should produce different responses');
 
 for (const transcript of ['I saw my brain glowing on a table.', 'I was training for a marathon.']) {
-  const response = createCharacterAnalysis(transcript);
-  assert.doesNotMatch(response, /Water is doing most of the emotional work/i, `substring fragments must not trigger a water reading: ${transcript}`);
+  assert.throws(
+    () => createCharacterAnalysis(transcript),
+    error => error?.code === 'DREAM_ANALYSIS_NEEDS_DETAIL',
+    `substring fragments must not trigger a water reading or a generic fallback: ${transcript}`
+  );
 }
 
 const session = createAnalysisSession({
@@ -126,12 +148,12 @@ assert.equal(regenerated.characterResponse.text, oceanResponse, 'responses from 
 const changedEvidence = createAnalysisSession({
   dreamID: 'dream-1',
   title: 'Ocean House',
-  transcript: 'A different dream about missing a train.',
+  transcript: 'I missed the train and could not reach the station.',
   transcriptSource: 'keyboard-text-unverified-provider',
   savedState: snapshot
 });
 assert.notEqual(changedEvidence.snapshot().characterResponse.text, snapshot.characterResponse.text);
-assert.equal(changedEvidence.snapshot().evidence.transcript, 'A different dream about missing a train.');
+assert.equal(changedEvidence.snapshot().evidence.transcript, 'I missed the train and could not reach the station.');
 
 assert.throws(() => createCharacterAnalysis('   '), /transcript/i);
 assert.throws(() => createAnalysisSession({ dreamID: 'empty', transcript: '   ' }), /transcript/i);

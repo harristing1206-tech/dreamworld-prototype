@@ -3,11 +3,12 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.DreamAnalysis = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI() {
-  const ANALYSIS_VERSION = 4;
+  const ANALYSIS_VERSION = 5;
   const CHARACTER_NAME = 'The Listener';
   const UNCLEAR_TRANSCRIPT_MESSAGE = 'I couldn’t find enough clear dream language in this transcript to analyze. Review or replace the text—no analysis was created.';
+  const NEEDS_DETAIL_MESSAGE = 'I couldn’t find enough concrete dream detail to analyze responsibly. Your transcript was saved, but no interpretation was created. Add what happened, who was there, or how it felt.';
   const FILLER_WORDS = new Set(['ah', 'blah', 'er', 'erm', 'hmm', 'hmmm', 'uh', 'um']);
-  const DREAM_ANCHOR_WORDS = new Set('afraid airport animal bed bedroom blocked bridge bus car chased chasing city cliff cried crying dark dead door dream dreamed dreaming escape exam fall falling fell family fire flew flight floating forest friend friends gate grandma grandfather grandpa grandmother grief happy home house journey lake light lost miss missed missing moon mother ocean plane rain river road room sad sadness school sea sky smoke star station stuck swim swimming train tree water wave waves work'.split(' '));
+
   const COMMON_LATIN_BIGRAMS = new Set('al an ar as at be bi ce ch co de ea ed en er es ge ha he hi ic id in io is it le li ll ma me na nd ne ng nt of om on or ou pe ra re ri ro se si st te th ti to tr ur us ve wa'.split(' '));
   const clean = value => String(value || '').trim();
   const escapePattern = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -57,12 +58,6 @@
           return { analyzable: false, reason: 'low-language-confidence', message: UNCLEAR_TRANSCRIPT_MESSAGE };
         }
       }
-    }
-
-    const plainLatinWords = normalizedWords.map(word => word.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-    const entirelyLatin = plainLatinWords.every(word => /^[a-z]+$/.test(word));
-    if (entirelyLatin && plainLatinWords.length <= 3 && !plainLatinWords.some(word => DREAM_ANCHOR_WORDS.has(word))) {
-      return { analyzable: false, reason: 'insufficient-dream-content', message: UNCLEAR_TRANSCRIPT_MESSAGE };
     }
 
     return { analyzable: true, reason: 'clear-enough', message: '' };
@@ -140,8 +135,9 @@
       return 'The house or room makes this dream feel personal and inward. Homes in dreams often organize questions of safety, privacy, memory, and belonging, but the meaning depends on how the space felt to you. I’d pay attention to what was open, hidden, familiar, or missing. What part of your life currently feels like it needs a safer place to land?';
     }
 
-    const excerpt = account.replace(/\s+/g, ' ').slice(0, 120).replace(/[.!?]+$/, '');
-    return `What stands out is the emotional situation inside “${excerpt}${account.length > 120 ? '…' : ''}.” I would not treat it as a prediction or a fixed symbol. It reads more like your mind rehearsing a feeling, conflict, or possibility that has not fully settled yet. Which moment carried the strongest feeling when you woke up—and where does that feeling already exist in your waking life?`;
+    const error = new Error(NEEDS_DETAIL_MESSAGE);
+    error.code = 'DREAM_ANALYSIS_NEEDS_DETAIL';
+    throw error;
   }
 
   function createAnalysisSession({ dreamID, title = 'Dream', transcript, transcriptSource = 'unknown', savedState = null } = {}) {

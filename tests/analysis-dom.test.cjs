@@ -292,6 +292,82 @@ test('saved transcription noise opens without generating or restoring an analysi
   }
 });
 
+test('plausible but unsupported content is saved without a fabricated generic analysis', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'blarg snorf glibble wobble';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 250));
+    assert.equal([...storage.values.keys()].filter(key => key.startsWith('dreamworld:dream:')).length, 1, 'plausible text remains saved for later review');
+    assert.equal([...storage.values.keys()].filter(key => key.startsWith('dreamworld:analysis:')).length, 0, 'unsupported content must not gain analysis state');
+    assert.equal(document.getElementById('analysisView').classList.contains('active'), true);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /concrete dream detail/i);
+    assert.equal(document.getElementById('analysisFullOpen').hidden, true);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('deleted legacy noise cannot expose or execute regeneration', async () => {
+  const noiseRecord = {
+    schemaVersion: 1,
+    id: 'dream-noise-deleted',
+    loggedAt: '2026-08-21T00:00:00.000Z',
+    title: 'Unclear recording',
+    transcript: 'erdcyvubibkuvkugvt',
+    source: 'browser-local-whisper'
+  };
+  const storage = createStorage(new Map([
+    ['dreamworld:dream:dream-noise-deleted', JSON.stringify(noiseRecord)],
+    ['dreamworld:lastDream', JSON.stringify(noiseRecord)],
+    ['dreamworld:analysis:dream-noise-deleted', JSON.stringify({ schemaVersion: 1, dreamID: 'dream-noise-deleted', deleted: true, deletedAt: '2026-08-21T00:01:00.000Z' })]
+  ]));
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-open-analysis="latest"]').click();
+    assert.equal(document.getElementById('analysisRegenerateResponse').hidden, true);
+    document.getElementById('analysisRegenerateResponse').click();
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /clear dream language|couldn.t find enough/i);
+    assert.equal(storage.values.get('dreamworld:analysis:dream-noise-deleted'), JSON.stringify({ schemaVersion: 1, dreamID: 'dream-noise-deleted', deleted: true, deletedAt: '2026-08-21T00:01:00.000Z' }));
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('deleted plausible but unsupported content cannot expose regeneration', async () => {
+  const record = {
+    schemaVersion: 1,
+    id: 'dream-unsupported-deleted',
+    loggedAt: '2026-08-21T00:00:00.000Z',
+    title: 'Unclear scene',
+    transcript: 'blarg snorf glibble wobble',
+    source: 'keyboard-text-unverified-provider'
+  };
+  const tombstone = { schemaVersion: 1, dreamID: record.id, deleted: true, deletedAt: '2026-08-21T00:01:00.000Z' };
+  const storage = createStorage(new Map([
+    [`dreamworld:dream:${record.id}`, JSON.stringify(record)],
+    ['dreamworld:lastDream', JSON.stringify(record)],
+    [`dreamworld:analysis:${record.id}`, JSON.stringify(tombstone)]
+  ]));
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-open-analysis="latest"]').click();
+    assert.equal(document.getElementById('analysisRegenerateResponse').hidden, true);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /concrete dream detail/i);
+    assert.equal(storage.values.get(`dreamworld:analysis:${record.id}`), JSON.stringify(tombstone));
+  } finally {
+    dom.window.close();
+  }
+});
+
 test('durable capture writes one atomic dream record and clears only after success', async () => {
   const storage = createStorage();
   const dom = await loadPage(storage, '');
@@ -299,7 +375,7 @@ test('durable capture writes one atomic dream record and clears only after succe
     const document = dom.window.document;
     document.querySelector('[data-go="capture"]').click();
     const input = document.getElementById('dreamTextInput');
-    input.value = 'I crossed a bridge and reached the other side.';
+    input.value = 'I crossed a dark ocean toward a house.';
     input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
     document.getElementById('saveButton').click();
     document.getElementById('dialogueFinish').click();
@@ -307,7 +383,7 @@ test('durable capture writes one atomic dream record and clears only after succe
     const record = JSON.parse(storage.values.get('dreamworld:lastDream'));
     assert.equal(record.schemaVersion, 1);
     assert.match(record.id, /^[a-z0-9-]+$/i);
-    assert.equal(record.transcript, 'I crossed a bridge and reached the other side.');
+    assert.equal(record.transcript, 'I crossed a dark ocean toward a house.');
     assert.equal(record.source, 'keyboard-text-unverified-provider');
     assert.equal(storage.values.has(`dreamworld:dream:${record.id}`), true);
     assert.doesNotMatch(document.getElementById('latestDreamMeta').textContent, /Open page only/);

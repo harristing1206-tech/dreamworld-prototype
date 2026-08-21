@@ -55,7 +55,7 @@ function storedDreams(storage) {
     .sort((left, right) => Date.parse(left.loggedAt) - Date.parse(right.loggedAt));
 }
 
-async function loadPage(storage, query = '?analysis=preview', { reducedMotion = true } = {}) {
+async function loadPage(storage, query = '?analysis=preview', { reducedMotion = true, preparationTimings = [8, 8, 8] } = {}) {
   const virtualConsole = new VirtualConsole();
   const errors = [];
   virtualConsole.on('jsdomError', error => errors.push(error));
@@ -66,6 +66,7 @@ async function loadPage(storage, query = '?analysis=preview', { reducedMotion = 
     virtualConsole,
     beforeParse(window) {
       Object.defineProperty(window, 'localStorage', { value: storage });
+      window.__DREAMWORLD_TEST_TIMINGS__ = { analysisPreparation: preparationTimings };
       window.matchMedia = mediaQuery => ({ matches: reducedMotion && mediaQuery.includes('prefers-reduced-motion'), addListener() {}, removeListener() {} });
       window.HTMLElement.prototype.scrollIntoView = function () {};
     }
@@ -380,6 +381,10 @@ test('durable capture writes one atomic dream record and clears only after succe
     document.getElementById('saveButton').click();
     document.getElementById('dialogueFinish').click();
 
+    assert.equal(document.getElementById('analysisPreparation').hidden, false, 'durable logging enters reflection preparation immediately');
+    assert.match(document.getElementById('analysisPreparationTitle').textContent, /Reading your dream/i);
+    assert.equal(document.getElementById('analysisView').classList.contains('active'), false, 'analysis must wait for preparation');
+
     const record = JSON.parse(storage.values.get('dreamworld:lastDream'));
     assert.equal(record.schemaVersion, 1);
     assert.match(record.id, /^[a-z0-9-]+$/i);
@@ -424,6 +429,34 @@ test('durable capture writes one atomic dream record and clears only after succe
     document.getElementById('analysisUndoDelete').click();
     assert.equal(storage.values.has(secondKey), true);
     assert.equal(document.getElementById('analysisCharacterResponse').textContent, firstResponse);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('reflection preparation advances through all stages before analysis opens', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '', { reducedMotion: false, preparationTimings: [35, 35, 35] });
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I crossed a dark ocean toward a house.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+
+    const preparation = document.getElementById('analysisPreparation');
+    const title = document.getElementById('analysisPreparationTitle');
+    assert.equal(preparation.hidden, false);
+    assert.match(title.textContent, /Reading your dream/i);
+    await new Promise(resolve => dom.window.setTimeout(resolve, 45));
+    assert.match(title.textContent, /Following the details/i);
+    await new Promise(resolve => dom.window.setTimeout(resolve, 40));
+    assert.match(title.textContent, /Preparing a reflection/i);
+    await new Promise(resolve => dom.window.setTimeout(resolve, 45));
+    assert.equal(preparation.hidden, true);
+    assert.equal(document.getElementById('analysisView').classList.contains('active'), true);
   } finally {
     dom.window.close();
   }

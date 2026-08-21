@@ -436,6 +436,66 @@
     @keyframes dialogue-dot { to { opacity: .28; } }
     @keyframes dialogue-bar { to { transform: scaleY(.45); opacity: .5; } }
 
+    .analysis-preparation {
+      --scene-sky-top: #101c2b;
+      --scene-sky-bottom: #16283a;
+      --scene-horizon: #1e3843;
+      --scene-ground: #142a31;
+      --scene-accent: #b69a63;
+      --scene-glow: #e7dfc5;
+      position: absolute;
+      inset: 0;
+      z-index: 92;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--scene-sky-top), var(--scene-sky-bottom) 58%, var(--scene-ground));
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+    .analysis-preparation.visible { opacity: 1; }
+    .preparation-canvas { position: relative; min-height: 0; overflow: hidden; }
+    .preparation-canvas::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .64;
+      background-image: linear-gradient(var(--scene-glow) 0 0), linear-gradient(var(--scene-accent) 0 0), linear-gradient(var(--scene-glow) 0 0), linear-gradient(var(--scene-accent) 0 0), linear-gradient(var(--scene-glow) 0 0);
+      background-repeat: no-repeat;
+      background-size: 2px 2px, 3px 3px, 2px 2px, 3px 3px, 2px 2px;
+      background-position: 13% 18%, 30% 31%, 53% 14%, 74% 25%, 88% 12%;
+    }
+    .preparation-horizon { position: absolute; left: -10%; right: -10%; bottom: -5%; height: 34%; border-radius: 50% 50% 0 0; background: var(--scene-horizon); opacity: .82; }
+    .preparation-orbit { position: absolute; left: 50%; top: 48%; width: 210px; height: 210px; margin: -105px; border: 1px solid rgba(231,223,197,.34); border: 1px solid color-mix(in srgb, var(--scene-glow) 34%, transparent); border-radius: 50%; animation: preparation-orbit 8s linear infinite; }
+    .preparation-orbit::before, .preparation-orbit::after { content: ""; position: absolute; width: 7px; height: 7px; background: var(--scene-accent); box-shadow: 0 0 18px rgba(182,154,99,.7); box-shadow: 0 0 18px color-mix(in srgb, var(--scene-accent) 70%, transparent); }
+    .preparation-orbit::before { left: 18px; top: 31px; }
+    .preparation-orbit::after { right: 8px; bottom: 59px; }
+    .preparation-glyph { position: absolute; left: 50%; top: 48%; width: 88px; height: 112px; translate: -50% -50%; filter: drop-shadow(0 12px 24px rgba(0,0,0,.34)); }
+    .preparation-glyph-head { position: absolute; left: 27px; top: 0; width: 34px; height: 32px; background: #4c5550; background: color-mix(in srgb, var(--scene-glow) 28%, #293637); }
+    .preparation-glyph-eye { position: absolute; right: 7px; top: 12px; width: 6px; height: 6px; background: var(--scene-accent); animation: preparation-eye 1.2s steps(2, end) infinite; }
+    .preparation-glyph-hat { position: absolute; left: 13px; top: -10px; width: 62px; height: 19px; background: rgba(182,154,99,.68); background: color-mix(in srgb, var(--scene-accent) 68%, transparent); }
+    .preparation-glyph-body { position: absolute; left: 18px; top: 32px; width: 52px; height: 55px; background: #4d5e55; background: color-mix(in srgb, var(--scene-horizon) 62%, var(--scene-accent)); }
+    .preparation-glyph::before, .preparation-glyph::after { content: ""; position: absolute; bottom: 0; width: 17px; height: 27px; background: #4d5e55; background: color-mix(in srgb, var(--scene-horizon) 62%, var(--scene-accent)); }
+    .preparation-glyph::before { left: 20px; } .preparation-glyph::after { right: 20px; }
+    .preparation-fragment { position: absolute; height: 2px; background: var(--scene-glow); opacity: .18; animation: preparation-fragment 1.8s ease-in-out infinite alternate; }
+    .preparation-fragment.one { left: 12%; top: 37%; width: 54px; }
+    .preparation-fragment.two { right: 10%; top: 43%; width: 72px; animation-delay: 260ms; }
+    .preparation-fragment.three { left: 20%; top: 63%; width: 38px; animation-delay: 520ms; }
+    .analysis-preparation[data-stage="1"] .preparation-fragment { opacity: .48; }
+    .analysis-preparation[data-stage="2"] .preparation-orbit { border-color: color-mix(in srgb, var(--scene-accent) 76%, transparent); }
+    .analysis-preparation[data-stage="2"] .preparation-glyph { animation: preparation-resolve .7s ease-in-out infinite alternate; }
+    .preparation-copy { position: relative; z-index: 2; min-height: 224px; padding: 28px 24px max(34px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(231,223,197,.22); border-top: 1px solid color-mix(in srgb, var(--scene-glow) 22%, transparent); background: rgba(8, 17, 25, .92); }
+    .preparation-kicker { display: block; margin-bottom: 12px; color: var(--scene-accent); font: 900 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .16em; text-transform: uppercase; }
+    .preparation-title { margin: 0; color: var(--paper); font-size: clamp(25px, 7vw, 32px); font-weight: 580; letter-spacing: -.035em; }
+    .preparation-detail { min-height: 44px; margin: 12px 0 20px; color: #b9c4bb; font-size: 14px; line-height: 1.5; }
+    .preparation-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .preparation-step { height: 3px; background: rgba(231,223,197,.14); transition: background 180ms ease, box-shadow 180ms ease; }
+    .preparation-step.active { background: var(--scene-accent); box-shadow: 0 0 12px rgba(182,154,99,.54); box-shadow: 0 0 12px color-mix(in srgb, var(--scene-accent) 54%, transparent); }
+    @keyframes preparation-orbit { to { rotate: 1turn; } }
+    @keyframes preparation-eye { 50% { opacity: .22; } }
+    @keyframes preparation-fragment { to { translate: 10px -5px; opacity: .5; } }
+    @keyframes preparation-resolve { to { translate: -50% calc(-50% - 4px); filter: drop-shadow(0 0 18px rgba(182,154,99,.38)); filter: drop-shadow(0 0 18px color-mix(in srgb, var(--scene-accent) 38%, transparent)); } }
+
     .settings-list { border-top: 1px solid var(--line); }
     .setting-row { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
     .setting-row > span:last-child { color: var(--sage); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; text-transform: uppercase; }
@@ -824,6 +884,23 @@
       </div>
     </section>
 
+    <section class="analysis-preparation" id="analysisPreparation" role="status" aria-live="polite" aria-atomic="true" aria-busy="false" hidden>
+      <div class="preparation-canvas" aria-hidden="true">
+        <span class="preparation-horizon"></span>
+        <span class="preparation-orbit"></span>
+        <span class="preparation-fragment one"></span>
+        <span class="preparation-fragment two"></span>
+        <span class="preparation-fragment three"></span>
+        <span class="preparation-glyph"><span class="preparation-glyph-hat"></span><span class="preparation-glyph-head"><span class="preparation-glyph-eye"></span></span><span class="preparation-glyph-body"></span></span>
+      </div>
+      <div class="preparation-copy">
+        <span class="preparation-kicker">Dream logged · The Listener</span>
+        <h2 class="preparation-title" id="analysisPreparationTitle">Reading your dream</h2>
+        <p class="preparation-detail" id="analysisPreparationDetail">Holding onto the words you remembered.</p>
+        <div class="preparation-steps" id="analysisPreparationSteps" aria-hidden="true"><span class="preparation-step active"></span><span class="preparation-step"></span><span class="preparation-step"></span></div>
+      </div>
+    </section>
+
     <section class="dialogue-overlay" id="dialogueOverlay" role="dialog" aria-modal="true" aria-labelledby="dialogueSpeaker" aria-live="polite">
       <div class="dialogue-status">
         <span class="dialogue-status-dot"></span>
@@ -888,11 +965,11 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=26"></script>
-  <script src="./analysis-state.js?v=26"></script>
-  <script src="./analysis-dialogue.js?v=26"></script>
-  <script src="./dream-scene.js?v=26"></script>
-  <script src="./browser-transcriber.js?v=26"></script>
+  <script src="./dialogue-state.js?v=27"></script>
+  <script src="./analysis-state.js?v=27"></script>
+  <script src="./analysis-dialogue.js?v=27"></script>
+  <script src="./dream-scene.js?v=27"></script>
+  <script src="./browser-transcriber.js?v=27"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -922,6 +999,10 @@
     const dialogueProgressText = document.getElementById('dialogueProgressText');
     const dialogueFinish = document.getElementById('dialogueFinish');
     const dialogueRetry = document.getElementById('dialogueRetry');
+    const analysisPreparation = document.getElementById('analysisPreparation');
+    const analysisPreparationTitle = document.getElementById('analysisPreparationTitle');
+    const analysisPreparationDetail = document.getElementById('analysisPreparationDetail');
+    const analysisPreparationSteps = [...document.querySelectorAll('.preparation-step')];
     const transcriptionModelSelect = document.getElementById('transcriptionModel');
     const transcriptionModelNote = document.getElementById('transcriptionModelNote');
     const dreamList = document.getElementById('dreamList');
@@ -969,6 +1050,12 @@
     const TRANSCRIPTION_MODEL_KEY = 'dreamworld:transcriptionModel';
     const TEXT_DRAFT_KEY = 'dreamworld:textDraft';
     const DREAM_RECORD_PREFIX = 'dreamworld:dream:';
+    const ANALYSIS_PREPARATION_DURATIONS = [900, 950, 950];
+    const ANALYSIS_PREPARATION_STAGES = [
+      { title: 'Reading your dream', detail: 'Holding onto the words you remembered.' },
+      { title: 'Following the details', detail: 'Noticing the people, places, movement, and feeling.' },
+      { title: 'Preparing a reflection', detail: 'Keeping The Listener’s response grounded in your transcript.' }
+    ];
     const TRANSCRIPTION_MODELS = {
       'Xenova/whisper-tiny': { shortLabel: 'Tiny · Multi', size: '39.0 MiB', note: 'Fastest multilingual baseline. Lowest expected accuracy.' },
       'Xenova/whisper-tiny.en': { shortLabel: 'Tiny · English', size: '39.0 MiB', note: 'Fast English baseline. Tests whether language detection is hurting accuracy.' },
@@ -1012,6 +1099,8 @@
     let undoWindowHeld = false;
     let pendingDialogueRecord = null;
     let deleteUndoTimer = null;
+    let analysisPreparationTimer = null;
+    let analysisPreparationRun = 0;
 
     function getTimePhase(hour) {
       if (hour >= 5 && hour < 6) return { id: 'blue-hour', label: 'Blue hour' };
@@ -1295,11 +1384,11 @@
       (transcript ? analysisTranscriptClose : controls ? analysisControlsClose : analysisFullClose).focus();
     }
 
-    function applyDreamScene(dream) {
+    function applyDreamScene(dream, target = analysisView) {
       const profile = DreamScene.createDreamScene(dream.transcript, dream.id);
-      analysisView.dataset.scene = profile.motif;
-      analysisView.dataset.sceneSignature = profile.signature;
-      analysisSceneName.textContent = profile.label;
+      target.dataset.scene = profile.motif;
+      target.dataset.sceneSignature = profile.signature;
+      if (target === analysisView) analysisSceneName.textContent = profile.label;
       const variables = {
         '--scene-sky-top': profile.palette.skyTop,
         '--scene-sky-bottom': profile.palette.skyBottom,
@@ -1316,7 +1405,62 @@
         '--scene-pulse': `${profile.motion.pulseSeconds}s`,
         '--scene-stars': String(profile.motion.starOpacity)
       };
-      Object.entries(variables).forEach(([name, value]) => analysisView.style.setProperty(name, value));
+      Object.entries(variables).forEach(([name, value]) => target.style.setProperty(name, value));
+      return profile;
+    }
+
+    function preparationDurations() {
+      const testDurations = window.__DREAMWORLD_TEST_TIMINGS__?.analysisPreparation;
+      if (Array.isArray(testDurations) && testDurations.length === ANALYSIS_PREPARATION_STAGES.length) {
+        return testDurations.map(value => Math.max(0, Number(value) || 0));
+      }
+      return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+        ? [300, 300, 300]
+        : ANALYSIS_PREPARATION_DURATIONS;
+    }
+
+    function setPreparationBackgroundInert(inert) {
+      views.forEach(view => { view.inert = inert; });
+      primaryNavigation.inert = inert;
+      dialogueOverlay.inert = inert;
+    }
+
+    function renderAnalysisPreparationStage(index) {
+      const stage = ANALYSIS_PREPARATION_STAGES[index];
+      analysisPreparation.dataset.stage = String(index);
+      analysisPreparationTitle.textContent = stage.title;
+      analysisPreparationDetail.textContent = stage.detail;
+      analysisPreparationSteps.forEach((step, stepIndex) => step.classList.toggle('active', stepIndex <= index));
+    }
+
+    function startAnalysisPreparation(dream) {
+      window.clearTimeout(analysisPreparationTimer);
+      const run = ++analysisPreparationRun;
+      const durations = preparationDurations();
+      applyDreamScene(dream, analysisPreparation);
+      setPreparationBackgroundInert(true);
+      analysisPreparation.hidden = false;
+      analysisPreparation.setAttribute('aria-busy', 'true');
+      renderAnalysisPreparationStage(0);
+      window.requestAnimationFrame(() => {
+        if (run === analysisPreparationRun) analysisPreparation.classList.add('visible');
+      });
+
+      const advance = index => {
+        if (run !== analysisPreparationRun) return;
+        if (index >= ANALYSIS_PREPARATION_STAGES.length) {
+          analysisPreparation.classList.remove('visible');
+          analysisPreparation.hidden = true;
+          analysisPreparation.setAttribute('aria-busy', 'false');
+          setPreparationBackgroundInert(false);
+          openAnalysis(dream.id);
+          return;
+        }
+        renderAnalysisPreparationStage(index);
+        analysisPreparationTimer = window.setTimeout(() => advance(index + 1), durations[index]);
+      };
+
+      analysisPreparationTimer = window.setTimeout(() => advance(1), durations[0]);
     }
 
     function renderAnalysisDialogue(state) {
@@ -1966,7 +2110,7 @@
       setTextDraftLocked(false);
       renderLatestDreamRow();
       if (navigator.vibrate) navigator.vibrate([30, 30, 60]);
-      window.setTimeout(() => openAnalysis(record.id), 220);
+      startAnalysisPreparation(record);
     }
 
     function logNoDream() {

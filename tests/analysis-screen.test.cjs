@@ -42,12 +42,20 @@ assert.match(html, /dataset\.action === 'edit-unclear'[\s\S]+saveDraft\(\)[\s\S]
 assert.match(html, /DreamAnalysisDialogue\.paginateResponse/);
 assert.match(html, /DreamAnalysisDialogue\.createTypewriterDialogue/);
 assert.match(html, /DreamScene\.createDreamScene/);
+assert.match(html, /id="analysisPreparation"[^>]+role="status"[^>]+aria-live="polite"[^>]+hidden/, 'analysis preparation starts hidden and announces stage changes');
+assert.match(html, /id="analysisPreparationTitle"/);
+assert.match(html, /Reading your dream/);
+assert.match(html, /Following the details/);
+assert.match(html, /Preparing a reflection/);
+assert.match(html, /const ANALYSIS_PREPARATION_DURATIONS = \[900, 950, 950\]/, 'production reflection pacing should be deliberate but bounded');
+assert.match(html, /function startAnalysisPreparation\(dream\)/);
+assert.match(html, /startAnalysisPreparation\(record\)/, 'durable logging should enter preparation before analysis');
 assert.match(html, /\.character-response\[data-typing="true"\][^{]+\.listener-mouth/s, 'the Listener portrait should visibly speak while text types');
 assert.match(html, /data-scene/, 'the analysis view should expose its active dreamscape motif');
 assert.match(html, /\.character-response\s*\{[^}]*border:\s*2px solid rgba[^}]*border:\s*2px solid color-mix[^}]*background:\s*linear-gradient\([^;]*rgba[^}]*background:\s*linear-gradient\([^;]*color-mix/s, 'the dialogue card needs readable fallbacks before enhanced color-mix styling');
 assert.match(html, /maxCharacters:\s*280/, 'long reflections should use the reviewed adaptive page size');
 assert.match(html, /characterResponse/);
-assert.match(html, /window\.setTimeout\(\(\) => openAnalysis\(record\.id\), 220\)/, 'logging should route directly to the character response');
+assert.doesNotMatch(html, /window\.setTimeout\(\(\) => openAnalysis\(record\.id\), 220\)/, 'logging must no longer hard-cut directly to analysis');
 
 assert.doesNotMatch(html, /Perspective families/);
 assert.doesNotMatch(html, /analysisLensList/);

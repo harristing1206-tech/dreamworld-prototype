@@ -116,6 +116,34 @@ assert.doesNotMatch(
   'a living relative’s key must not be attributed to a different deceased relative mentioned earlier'
 );
 
+const assertNoEntrustedThreshold = (transcript, message) => {
+  let response;
+  try {
+    response = createCharacterAnalysis(transcript);
+  } catch (error) {
+    assert.equal(error?.code, 'DREAM_ANALYSIS_NEEDS_DETAIL', message);
+    return;
+  }
+  assert.doesNotMatch(response, /safe guide|receiving a key and facing a staircase|offers access without opening|returns authority to you/i, message);
+};
+assertNoEntrustedThreshold('My deceased grandmother watched quietly. My friend gave me a key. Then I walked down a staircase.', 'another actor’s gift must not be attributed to the deceased relative');
+assertNoEntrustedThreshold('My deceased grandmother watched while my friend gave me a key beside a staircase.', 'another actor in the same sentence must remain the transfer subject');
+assertNoEntrustedThreshold('My deceased grandmother gave my friend a key beside a staircase.', 'a key given to someone else must not be described as given to the dreamer');
+assertNoEntrustedThreshold('My deceased grandmother did not give me a key beside a staircase.', 'a negated transfer must not activate the branch');
+assertNoEntrustedThreshold('My deceased grandmother had a hand-painted key beside a staircase.', 'a hand-painted key must not be parsed as the verb hand');
+assertNoEntrustedThreshold('My deceased grandmother gave me a key on the piano beside a staircase.', 'a piano key in either word order must not be treated as a physical entrusted key');
+assertNoEntrustedThreshold('My deceased grandmother gave me a key from the keyboard beside a staircase.', 'a keyboard key in either word order must not be treated as a physical entrusted key');
+assertNoEntrustedThreshold('My deceased grandmother gave me a key. A bell rang. I entered a garden. At school I climbed stairs.', 'unrelated stairs several sentences later must not complete the branch');
+
+const pluralNaturalResponse = createCharacterAnalysis('My deceased grandparents gave me a key beside a staircase. I felt afraid.');
+assert.match(pluralNaturalResponse, /grandparents (?:appear and give|sit[\s\S]{0,40}give)/i);
+const noLongerAliveResponse = createCharacterAnalysis('My grandmother is no longer alive. She gave me a key beside a staircase. I felt afraid.');
+assert.match(noLongerAliveResponse, /grandmother/i);
+const appositiveResponse = createCharacterAnalysis('My grandmother, now deceased, gave me a key beside a staircase. I felt afraid.');
+assert.match(appositiveResponse, /grandmother/i);
+const passiveGiftResponse = createCharacterAnalysis('A key was given to me by my deceased grandmother beside a staircase. I felt afraid.');
+assert.match(passiveGiftResponse, /grandmother/i);
+
 const ordinaryChildhoodResponse = createCharacterAnalysis('My deceased grandmother handed me a key beside a staircase in my childhood school. I felt afraid.');
 assert.match(ordinaryChildhoodResponse, /childhood/i);
 assert.doesNotMatch(ordinaryChildhoodResponse, /floating houses|open old home/i, 'childhood alone must not invent floating houses or an open home');
@@ -125,6 +153,17 @@ assert.doesNotMatch(unrelatedWaterResponse, /staircase appears beneath the water
 
 const plainMothResponse = createCharacterAnalysis('My deceased grandmother handed me a key beside a staircase. A moth flew past. I felt afraid.');
 assert.doesNotMatch(plainMothResponse, /giant white moth|resting above the room/i, 'a plain moth must not inherit absent size, color, or position');
+
+const balloonResponse = createCharacterAnalysis('My deceased grandmother gave me a key beside a staircase. A house stood nearby while balloons were floating. I felt afraid.');
+assert.doesNotMatch(balloonResponse, /floating houses/i, 'floating balloons must not make a nearby house float');
+const openedBookResponse = createCharacterAnalysis('At home, my deceased grandmother gave me a key beside a staircase. She opened a book. I felt afraid.');
+assert.doesNotMatch(openedBookResponse, /open home/i, 'opening a book must not make the home open');
+const waterGlassResponse = createCharacterAnalysis('My deceased grandmother gave me a key beside a staircase next to a glass of water. I felt afraid.');
+assert.doesNotMatch(waterGlassResponse, /staircase appears beneath the water|steps remain visible/i, 'water in a glass must not submerge the staircase');
+const roomWaterGlassResponse = createCharacterAnalysis('My deceased grandmother gave me a key beside a staircase in a room with a glass of water. I felt afraid.');
+assert.doesNotMatch(roomWaterGlassResponse, /staircase appears beneath the water|steps remain visible/i, 'a staircase in a room containing water must not become a staircase in water');
+const restingDreamerResponse = createCharacterAnalysis('My deceased grandmother gave me a key beside a staircase. A moth flew past. I was resting beneath the ceiling.');
+assert.doesNotMatch(restingDreamerResponse, /resting above the room|moth[\s\S]{0,80}witness/i, 'the dreamer’s resting position must not be assigned to the moth');
 
 const overlapResponse = createCharacterAnalysis(`${childhoodKeyDream} Before I reached the house, my friends drove away one by one.`);
 assert.match(overlapResponse, /golden key/i);

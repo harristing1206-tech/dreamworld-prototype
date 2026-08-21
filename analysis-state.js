@@ -3,7 +3,7 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.DreamAnalysis = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI() {
-  const ANALYSIS_VERSION = 7;
+  const ANALYSIS_VERSION = 8;
   const CHARACTER_NAME = 'The Listener';
   const UNCLEAR_TRANSCRIPT_MESSAGE = 'I couldn’t find enough clear dream language in this transcript to analyze. Review or replace the text—no analysis was created.';
   const NEEDS_DETAIL_MESSAGE = 'I couldn’t find enough concrete dream detail to analyze responsibly. Your transcript was saved, but no interpretation was created. Add what happened, who was there, or how it felt.';
@@ -81,34 +81,55 @@
     const admittedSadness = hasAny(text, ['sometimes i do feel sad', 'sometimes i feel sad']);
     const reassurance = hasAny(text, ["that's okay", 'that is okay']);
 
-    const relativeIsDeparted = names => {
-      const relation = `(?:${names.join('|')})`;
-      return new RegExp(`\\b(?:dead|deceased|late)\\s+${relation}\\b`).test(text)
-        || new RegExp(`\\b${relation}\\b\\s+(?:had\\s+)?(?:passed away|died|is dead|was dead|is deceased|was deceased)\\b`).test(text)
-        || new RegExp(`\\b${relation}\\b.{0,120}\\b(?:he|she|they|who)\\s+(?:had\\s+)?(?:passed away|died|is dead|was dead|is deceased|was deceased)\\b`).test(text);
+    const sentences = text.split(/(?<=[.!?])\s+|[;\n]+/).map(sentence => sentence.trim()).filter(Boolean);
+    const transferVerbs = '(?:hand|handed|hands|give|gave|gives|offer|offered|offers)';
+    const transferredVerbs = '(?:handed|given|offered)';
+    const instrumentKey = /\b(?:piano|keyboard|computer|typewriter)\s+key\b|\bkey\s+(?:on|from|of)\s+(?:the\s+)?(?:piano|keyboard|computer|typewriter)\b/;
+    const negatedTransfer = /\b(?:did\s+not|didn['’]t|never|not)\s+(?:hand|give|offer)\b|\b(?:was|is)\s+not\s+(?:handed|given|offered)\b/;
+    const relativeSpecs = [
+      {
+        key: 'grandparents',
+        subject: '(?:grandparents|(?:grandmother|grandma)\\s+and\\s+(?:grandfather|grandpa)|(?:grandfather|grandpa)\\s+and\\s+(?:grandmother|grandma))',
+        pronoun: 'they'
+      },
+      { key: 'grandmother', subject: '(?:grandmother|grandma)', pronoun: 'she' },
+      { key: 'grandfather', subject: '(?:grandfather|grandpa)', pronoun: 'he' }
+    ];
+    const sentenceMarksLiving = (sentence, spec) => new RegExp(`\\b(?:living\\s+${spec.subject}|${spec.subject}\\b.{0,24}\\b(?:is|was|are|were)\\s+(?:still\\s+)?alive|${spec.subject}\\b.{0,24}\\b(?:is|was|are|were)\\s+not\\s+(?:dead|deceased))\\b`).test(sentence);
+    const sentenceMarksDeparted = (sentence, spec) => {
+      if (sentenceMarksLiving(sentence, spec)) return false;
+      return new RegExp(`\\b(?:dead|deceased|late)\\s+${spec.subject}\\b`).test(sentence)
+        || new RegExp(`\\b${spec.subject}\\b\\s*,?\\s*(?:who\\s+(?:is|was)\\s+|now\\s+)?(?:dead|deceased)\\b`).test(sentence)
+        || new RegExp(`\\b${spec.subject}\\b\\s+(?:is|was|are|were)\\s+no\\s+longer\\s+alive\\b`).test(sentence)
+        || new RegExp(`\\b${spec.subject}\\b.{0,120}\\b${spec.pronoun}\\s+(?:had\\s+)?(?:passed away|died|is dead|was dead|is deceased|was deceased)\\b`).test(sentence);
     };
-    const coordinatedDepartedGrandparents = /\b(?:dead|deceased|late)\s+(?:grandmother|grandma)\s+and\s+(?:grandfather|grandpa)\b|\b(?:dead|deceased|late)\s+(?:grandfather|grandpa)\s+and\s+(?:grandmother|grandma)\b/.test(text);
-    const relativeEntrustsKey = names => {
-      const relation = `(?:${names.join('|')})`;
-      const pattern = new RegExp(`\\b${relation}\\b.{0,180}\\b(?:hand|handed|hands|give|gave|gives|offer|offered|offers)\\b.{0,40}\\b(?:small\\s+)?(?:golden\\s+)?key\\b`, 'g');
-      return [...text.matchAll(pattern)].some(match => {
-        const relativeMentions = match[0].match(/\b(?:grandmother|grandma|grandfather|grandpa|grandparents)\b/g) || [];
-        return relativeMentions.length === 1
-          && !/\b(?:piano|keyboard|computer|typewriter)\s+key\b/.test(match[0]);
-      });
+    const sentenceTransfersKey = (sentence, spec, usePronoun = false) => {
+      if (instrumentKey.test(sentence) || negatedTransfer.test(sentence)) return false;
+      const subject = usePronoun ? spec.pronoun : spec.subject;
+      const directSubject = new RegExp(`\\b${subject}\\b(?:\\s*,\\s*(?:now\\s+)?deceased\\s*,?)?\\s+(?:(?:then|quietly|gently|carefully|suddenly)\\s+)?${transferVerbs}\\s+(?:me|us)\\s+(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key\\b`).test(sentence);
+      const continuedSubject = new RegExp(`\\b${subject}\\b.{0,50}\\band\\s+${transferVerbs}\\s+(?:me|us)\\s+(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key\\b`).test(sentence);
+      const passive = new RegExp(`\\b(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key\\s+(?:was|is)\\s+${transferredVerbs}\\s+to\\s+(?:me|us)\\s+by\\s+(?:my\\s+)?(?:dead\\s+|deceased\\s+|late\\s+)?${spec.subject}\\b`).test(sentence);
+      return directSubject || continuedSubject || passive;
     };
-    const jointKeyPattern = /\b(?:(?:grandmother|grandma)\s+and\s+(?:grandfather|grandpa)|(?:grandfather|grandpa)\s+and\s+(?:grandmother|grandma)|grandparents)\b.{0,180}\b(?:hand|handed|hands|give|gave|gives|offer|offered|offers)\b.{0,40}\b(?:small\s+)?(?:golden\s+)?key\b/g;
-    const jointlyEntrustedKey = coordinatedDepartedGrandparents
-      && [...text.matchAll(jointKeyPattern)].some(match => !/\b(?:piano|keyboard|computer|typewriter)\s+key\b/.test(match[0]));
-    const grandfatherDeparted = coordinatedDepartedGrandparents || relativeIsDeparted(['grandfather', 'grandpa']);
-    const grandmotherDeparted = coordinatedDepartedGrandparents || relativeIsDeparted(['grandmother', 'grandma']);
-    const grandfatherEntrustsKey = relativeEntrustsKey(['grandfather', 'grandpa']);
-    const grandmotherEntrustsKey = relativeEntrustsKey(['grandmother', 'grandma']);
-    const grandfatherThresholdGuide = grandfatherDeparted && (grandfatherEntrustsKey || jointlyEntrustedKey);
-    const grandmotherThresholdGuide = grandmotherDeparted && (grandmotherEntrustsKey || jointlyEntrustedKey);
-    const descent = hasAny(text, ['staircase', 'stairs', 'stairway', 'descend', 'descending'])
-      || /\bsteps?\s+(?:down|downward|below|beneath|into)\b/.test(text);
-    const layeredThresholdDream = descent && (grandfatherThresholdGuide || grandmotherThresholdGuide);
+    const sentenceHasDescent = sentence => hasAny(sentence, ['staircase', 'stairs', 'stairway', 'descend', 'descending'])
+      || /\bsteps?\s+(?:down|downward|below|beneath|into)\b/.test(sentence);
+    const findThresholdGuide = spec => {
+      const departedIndices = sentences
+        .map((sentence, index) => sentenceMarksDeparted(sentence, spec) ? index : -1)
+        .filter(index => index >= 0);
+      for (let index = 0; index < sentences.length; index += 1) {
+        const departedHere = departedIndices.includes(index);
+        const departedImmediatelyBefore = departedIndices.includes(index - 1);
+        const directTransfer = sentenceTransfersKey(sentences[index], spec, false);
+        const pronounTransfer = departedImmediatelyBefore && sentenceTransfersKey(sentences[index], spec, true);
+        if (!(directTransfer && (departedHere || departedImmediatelyBefore)) && !pronounTransfer) continue;
+        const hasNearbyDescent = sentences.slice(index, index + 3).some(sentenceHasDescent);
+        if (hasNearbyDescent) return { ...spec, transferIndex: index };
+      }
+      return null;
+    };
+    const thresholdGuide = relativeSpecs.map(findThresholdGuide).find(Boolean) || null;
+    const layeredThresholdDream = Boolean(thresholdGuide);
 
     if (socialDeparture && deceased && (grandfather || grandmother) && !layeredThresholdDream) {
       if (grandfather && grandmother && youngAgain && impermanenceMessage && admittedSadness && reassurance) {
@@ -132,20 +153,20 @@
     const guidingFlowers = hasAny(text, ['glowing blue flowers', 'blue flowers', 'glowing flowers']);
     const homeSetting = hasAny(text, ['house', 'home', 'room', 'bedroom', 'apartment']);
     const kitchenSetting = hasAny(text, ['kitchen']);
-    const floatingHome = /\b(?:house|houses|home|homes)\b.{0,40}\b(?:floating|floated|levitating)\b|\b(?:floating|floated|levitating)\b.{0,40}\b(?:house|houses|home|homes)\b/.test(text);
-    const openHome = /\b(?:open|opened|standing open)\b.{0,40}\b(?:door|home|house)\b|\b(?:door|home|house)\b.{0,40}\b(?:open|opened|standing open)\b/.test(text);
-    const submergedStaircase = /\b(?:staircase|stairs|stairway|steps)\b.{0,80}\b(?:beneath|under|below|in)\b.{0,24}\b(?:water|ocean|sea)\b|\b(?:beneath|under|below|in)\b.{0,24}\b(?:water|ocean|sea)\b.{0,80}\b(?:staircase|stairs|stairway|steps)\b/.test(text);
+    const floatingHome = sentences.some(sentence => /\b(?:floating|floated|levitating)\s+(?:house|houses|home|homes)\b|\b(?:house|houses|home|homes)\s+(?:was|were|is|are|had been)?\s*(?:floating|floated|levitating)\b/.test(sentence));
+    const openHome = sentences.some(sentence => /\b(?:open|opened)\s+(?:door|home|house)\b|\b(?:door|home|house)\b.{0,24}\b(?:stood|standing|was|is|were|are)?\s*open\b/.test(sentence));
+    const submergedStaircase = sentences.some(sentence => /\b(?:underwater|submerged)\s+(?:staircase|stairs|stairway|steps)\b|\b(?:staircase|stairs|stairway|steps)\b.{0,56}\b(?:beneath|under|below)\s+(?:the\s+)?(?:water|ocean|sea)\b|\b(?:beneath|under|below)\s+(?:the\s+)?(?:water|ocean|sea)\b.{0,56}\b(?:staircase|stairs|stairway|steps)\b|\b(?:staircase|stairs|stairway|steps)\b\s+(?:(?:was|is|appeared|stood|lay)\s+)?in\s+(?:the\s+)?(?:water|ocean|sea)\b/.test(sentence));
     const moth = hasAny(text, ['moth', 'white moth']);
     const whiteMoth = hasAny(text, ['white moth']);
     const giantMoth = hasAny(text, ['giant moth', 'giant white moth', 'huge moth', 'large moth']);
-    const mothRestingAbove = /\b(?:moth|white moth)\b.{0,80}\b(?:resting|rested|sitting|perched)\b.{0,40}\b(?:ceiling|above|overhead)\b|\b(?:resting|rested|sitting|perched)\b.{0,40}\b(?:moth|white moth)\b.{0,40}\b(?:ceiling|above|overhead)\b/.test(text);
+    const mothRestingAbove = sentences.some(sentence => /\b(?:moth|white moth)\b\s+(?:was|is|had been)?\s*(?:resting|rested|sitting|perched)\s+(?:on|against|near|above)\s+(?:the\s+)?(?:ceiling|wall|room)|\b(?:moth|white moth)\b\s+(?:was|is|had been)?\s*(?:resting|rested|sitting|perched)\s+(?:above|overhead)\b/.test(sentence));
     const fear = hasAny(text, ['afraid', 'fear', 'fearful', 'scared', 'terrified']);
     const relief = hasAny(text, ['relief', 'relieved', 'comforted', 'release']);
     const alreadyKnows = hasAny(text, ['already know', 'already knew', 'you know which door', 'knew which door']);
 
     if (layeredThresholdDream) {
-      const pluralRelatives = grandfatherThresholdGuide && grandmotherThresholdGuide;
-      const relative = pluralRelatives ? 'grandparents' : grandfatherThresholdGuide ? 'grandfather' : 'grandmother';
+      const pluralRelatives = thresholdGuide.key === 'grandparents';
+      const relative = thresholdGuide.key;
       const keyLabel = goldenKey ? 'golden key' : 'key';
       const settingParts = childhoodSetting
         ? ['The dream returns you to a childhood setting, bringing the past into the scene without assuming it can be entered exactly as it was.']

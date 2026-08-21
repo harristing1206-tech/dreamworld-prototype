@@ -3,7 +3,7 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.DreamAnalysis = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI() {
-  const ANALYSIS_VERSION = 6;
+  const ANALYSIS_VERSION = 7;
   const CHARACTER_NAME = 'The Listener';
   const UNCLEAR_TRANSCRIPT_MESSAGE = 'I couldn’t find enough clear dream language in this transcript to analyze. Review or replace the text—no analysis was created.';
   const NEEDS_DETAIL_MESSAGE = 'I couldn’t find enough concrete dream detail to analyze responsibly. Your transcript was saved, but no interpretation was created. Add what happened, who was there, or how it felt.';
@@ -81,7 +81,36 @@
     const admittedSadness = hasAny(text, ['sometimes i do feel sad', 'sometimes i feel sad']);
     const reassurance = hasAny(text, ["that's okay", 'that is okay']);
 
-    if (socialDeparture && deceased && (grandfather || grandmother)) {
+    const relativeIsDeparted = names => {
+      const relation = `(?:${names.join('|')})`;
+      return new RegExp(`\\b(?:dead|deceased|late)\\s+${relation}\\b`).test(text)
+        || new RegExp(`\\b${relation}\\b\\s+(?:had\\s+)?(?:passed away|died|is dead|was dead|is deceased|was deceased)\\b`).test(text)
+        || new RegExp(`\\b${relation}\\b.{0,120}\\b(?:he|she|they|who)\\s+(?:had\\s+)?(?:passed away|died|is dead|was dead|is deceased|was deceased)\\b`).test(text);
+    };
+    const coordinatedDepartedGrandparents = /\b(?:dead|deceased|late)\s+(?:grandmother|grandma)\s+and\s+(?:grandfather|grandpa)\b|\b(?:dead|deceased|late)\s+(?:grandfather|grandpa)\s+and\s+(?:grandmother|grandma)\b/.test(text);
+    const relativeEntrustsKey = names => {
+      const relation = `(?:${names.join('|')})`;
+      const pattern = new RegExp(`\\b${relation}\\b.{0,180}\\b(?:hand|handed|hands|give|gave|gives|offer|offered|offers)\\b.{0,40}\\b(?:small\\s+)?(?:golden\\s+)?key\\b`, 'g');
+      return [...text.matchAll(pattern)].some(match => {
+        const relativeMentions = match[0].match(/\b(?:grandmother|grandma|grandfather|grandpa|grandparents)\b/g) || [];
+        return relativeMentions.length === 1
+          && !/\b(?:piano|keyboard|computer|typewriter)\s+key\b/.test(match[0]);
+      });
+    };
+    const jointKeyPattern = /\b(?:(?:grandmother|grandma)\s+and\s+(?:grandfather|grandpa)|(?:grandfather|grandpa)\s+and\s+(?:grandmother|grandma)|grandparents)\b.{0,180}\b(?:hand|handed|hands|give|gave|gives|offer|offered|offers)\b.{0,40}\b(?:small\s+)?(?:golden\s+)?key\b/g;
+    const jointlyEntrustedKey = coordinatedDepartedGrandparents
+      && [...text.matchAll(jointKeyPattern)].some(match => !/\b(?:piano|keyboard|computer|typewriter)\s+key\b/.test(match[0]));
+    const grandfatherDeparted = coordinatedDepartedGrandparents || relativeIsDeparted(['grandfather', 'grandpa']);
+    const grandmotherDeparted = coordinatedDepartedGrandparents || relativeIsDeparted(['grandmother', 'grandma']);
+    const grandfatherEntrustsKey = relativeEntrustsKey(['grandfather', 'grandpa']);
+    const grandmotherEntrustsKey = relativeEntrustsKey(['grandmother', 'grandma']);
+    const grandfatherThresholdGuide = grandfatherDeparted && (grandfatherEntrustsKey || jointlyEntrustedKey);
+    const grandmotherThresholdGuide = grandmotherDeparted && (grandmotherEntrustsKey || jointlyEntrustedKey);
+    const descent = hasAny(text, ['staircase', 'stairs', 'stairway', 'descend', 'descending'])
+      || /\bsteps?\s+(?:down|downward|below|beneath|into)\b/.test(text);
+    const layeredThresholdDream = descent && (grandfatherThresholdGuide || grandmotherThresholdGuide);
+
+    if (socialDeparture && deceased && (grandfather || grandmother) && !layeredThresholdDream) {
       if (grandfather && grandmother && youngAgain && impermanenceMessage && admittedSadness && reassurance) {
         return `The dream begins with a social loss in slow motion: your friends leave one by one, and you remain watching. The sadness seems less about the car than about being the person left behind as a shared moment ends. One possible connection is a sensitivity to transitions—or to the way closeness changes even when nothing has gone wrong.\n\nYour grandfather then appears young, at an age you never knew him. Because the dream is creating an image rather than replaying an age you remember, it may be imagining him as a whole person with a life before your memories began. When your grandfather asks whether you are sad, you answer, “Sometimes I do feel sad.” The dream does not hide the feeling; it names it. His reply—“That’s okay. That’s how life is: people come and go”—could be read as a familiar, internalized voice offering acceptance of both sadness and impermanence, not telling you to move on.\n\nOnly after that reassurance does your grandmother appear, also young, and you cry because you miss them. That sequence matters: departure opens the sadness, your grandfather helps you admit and hold it, and your grandmother’s arrival releases grief and love together. This may be less a warning than a dream about allowing attachment and loss to coexist. Has a recent goodbye or change made their absence feel closer—or made you need the kind of comfort your grandfather gave you here?`;
       }
@@ -98,31 +127,37 @@
       return `The dream places two kinds of separation beside each other: your friends leave one by one while you watch, and then your ${relatives}, who are gone, return. That makes the sadness less about the car and more about being the person who remains after people move out of reach. It may be touching a current sensitivity to change, friendship transitions, or the fact that closeness cannot be held still.\n\n${ageReading}\n\n${messageReading} ${emotionReading} A grounded question is whether some recent departure or transition has reactivated how much you miss them—and whether their way of speaking has become part of how you now comfort yourself.`;
     }
 
-    const entrustedKey = hasAny(text, ['key', 'golden key']);
     const goldenKey = hasAny(text, ['golden key']);
-    const descent = hasAny(text, ['staircase', 'stairs', 'stairway', 'steps', 'descend', 'descending']);
     const childhoodSetting = hasAny(text, ['childhood', 'old home', 'grew up', 'used to live']);
     const guidingFlowers = hasAny(text, ['glowing blue flowers', 'blue flowers', 'glowing flowers']);
     const homeSetting = hasAny(text, ['house', 'home', 'room', 'bedroom', 'apartment']);
     const kitchenSetting = hasAny(text, ['kitchen']);
-    const submerged = hasAny(text, ['water', 'ocean', 'sea', 'flood', 'submerged', 'beneath the water', 'under the water']);
+    const floatingHome = /\b(?:house|houses|home|homes)\b.{0,40}\b(?:floating|floated|levitating)\b|\b(?:floating|floated|levitating)\b.{0,40}\b(?:house|houses|home|homes)\b/.test(text);
+    const openHome = /\b(?:open|opened|standing open)\b.{0,40}\b(?:door|home|house)\b|\b(?:door|home|house)\b.{0,40}\b(?:open|opened|standing open)\b/.test(text);
+    const submergedStaircase = /\b(?:staircase|stairs|stairway|steps)\b.{0,80}\b(?:beneath|under|below|in)\b.{0,24}\b(?:water|ocean|sea)\b|\b(?:beneath|under|below|in)\b.{0,24}\b(?:water|ocean|sea)\b.{0,80}\b(?:staircase|stairs|stairway|steps)\b/.test(text);
     const moth = hasAny(text, ['moth', 'white moth']);
+    const whiteMoth = hasAny(text, ['white moth']);
+    const giantMoth = hasAny(text, ['giant moth', 'giant white moth', 'huge moth', 'large moth']);
+    const mothRestingAbove = /\b(?:moth|white moth)\b.{0,80}\b(?:resting|rested|sitting|perched)\b.{0,40}\b(?:ceiling|above|overhead)\b|\b(?:resting|rested|sitting|perched)\b.{0,40}\b(?:moth|white moth)\b.{0,40}\b(?:ceiling|above|overhead)\b/.test(text);
     const fear = hasAny(text, ['afraid', 'fear', 'fearful', 'scared', 'terrified']);
     const relief = hasAny(text, ['relief', 'relieved', 'comforted', 'release']);
     const alreadyKnows = hasAny(text, ['already know', 'already knew', 'you know which door', 'knew which door']);
 
-    if (deceased && (grandfather || grandmother) && entrustedKey && descent) {
-      const pluralRelatives = grandfather && grandmother;
-      const relative = pluralRelatives ? 'grandparents' : grandfather ? 'grandfather' : 'grandmother';
+    if (layeredThresholdDream) {
+      const pluralRelatives = grandfatherThresholdGuide && grandmotherThresholdGuide;
+      const relative = pluralRelatives ? 'grandparents' : grandfatherThresholdGuide ? 'grandfather' : 'grandmother';
       const keyLabel = goldenKey ? 'golden key' : 'key';
-      const settingReading = childhoodSetting
-        ? guidingFlowers
-          ? `The dream returns you to a childhood neighborhood that is recognizable but physically impossible. The floating houses keep the past visible but out of ordinary reach. Glowing blue flowers lead directly to your open old home, so the return feels guided—an invitation into changed memory rather than exclusion.`
-          : `The dream returns you to a childhood neighborhood that is recognizable but physically impossible. The floating houses keep the past visible but out of ordinary reach. Yet your old home is open, making this feel more like an invitation into changed memory than exclusion.`
-        : homeSetting
-          ? `The familiar home has changed, revisiting something known while acknowledging that you cannot return to it exactly as it was.`
-          : `The dream pairs two concrete actions: receiving a key and facing a staircase. One offers access; the other asks whether you will go deeper.`;
-      const waterReading = submerged
+      const settingParts = childhoodSetting
+        ? ['The dream returns you to a childhood setting, bringing the past into the scene without assuming it can be entered exactly as it was.']
+        : [];
+      if (floatingHome) settingParts.push('The floating houses keep that past visible but out of ordinary reach.');
+      if (guidingFlowers) settingParts.push(`Glowing blue flowers lead${openHome ? ' directly to your open old home' : ' you forward'}, so the movement feels guided rather than accidental.`);
+      else if (openHome) settingParts.push('The open home makes the approach feel more like an invitation than an exclusion.');
+      if (!settingParts.length && homeSetting) settingParts.push('The familiar home brings memory and belonging into the choice that follows.');
+      const settingReading = settingParts.length
+        ? settingParts.join(' ')
+        : `The dream pairs two concrete actions: receiving a key and facing a staircase. One offers access; the other asks whether you will go deeper.`;
+      const waterReading = submergedStaircase
         ? `The staircase appears beneath the water, so the route is not away from feeling or memory but down through it. Because the steps remain visible, the descent is difficult but available—not a picture of being lost or overwhelmed.`
         : `The staircase makes the direction explicit: downward, toward something remembered, felt, or partly known beneath the familiar surface.`;
       const emotionReading = fear && relief
@@ -132,8 +167,9 @@
           : relief
             ? `The relief suggests recognition—some part of you may experience the descent not as danger, but as finally approaching something that has waited for attention.`
             : `Your response to the staircase matters more than treating it as a universal symbol; the dream has placed a choice directly in front of you.`;
+      const mothDescription = `${giantMoth ? 'giant ' : ''}${whiteMoth ? 'white ' : ''}moth`;
       const mothReading = moth
-        ? `The giant white moth could echo change, fragility, or movement toward light, but it is not a fixed symbol. Resting above the room instead of attacking or guiding you, it feels more like a witness than the dream’s explanation.`
+        ? `The ${mothDescription} could echo change, fragility, or movement toward light, but it is not a fixed symbol.${mothRestingAbove ? ' Resting above the room instead of attacking or guiding you, it feels more like a witness than the dream’s explanation.' : ''}`
         : '';
       const relativePresence = kitchenSetting
         ? `Your ${relative} ${pluralRelatives ? 'sit' : 'sits'} calmly in the kitchen and ${pluralRelatives ? 'give' : 'gives'} you a ${keyLabel} rather than a warning.`

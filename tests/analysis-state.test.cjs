@@ -103,6 +103,34 @@ assert.match(grandparentsKeyResponse, /grandparents (?:sit|appear)/i, 'plural re
 assert.match(grandparentsKeyResponse, /grandparents[\s\S]{0,100}give/i, 'plural relatives must give rather than gives');
 assert.doesNotMatch(grandparentsKeyResponse, /grandparents (?:sits|gives)/i);
 
+assert.throws(
+  () => createCharacterAnalysis('My living grandfather said my dog died. Later my grandmother played a piano key while reading recipe steps.'),
+  error => error?.code === 'DREAM_ANALYSIS_NEEDS_DETAIL' && /enough concrete dream detail/i.test(error.message),
+  'unrelated death, piano-key, and recipe-step tokens must be rejected rather than activating the entrusted-key branch'
+);
+
+const crossRelativeResponse = createCharacterAnalysis('My dead grandfather watched from across the room. My living grandmother gave me a key beside a staircase.');
+assert.doesNotMatch(
+  crossRelativeResponse,
+  /grandfather[\s\S]{0,120}(?:gives|gave|hands|handed|offers|offered)[\s\S]{0,40}key|grandfather[\s\S]{0,120}safe guide/i,
+  'a living relative’s key must not be attributed to a different deceased relative mentioned earlier'
+);
+
+const ordinaryChildhoodResponse = createCharacterAnalysis('My deceased grandmother handed me a key beside a staircase in my childhood school. I felt afraid.');
+assert.match(ordinaryChildhoodResponse, /childhood/i);
+assert.doesNotMatch(ordinaryChildhoodResponse, /floating houses|open old home/i, 'childhood alone must not invent floating houses or an open home');
+
+const unrelatedWaterResponse = createCharacterAnalysis('My deceased grandmother handed me a key beside a staircase. Earlier, I walked through rain. I felt afraid.');
+assert.doesNotMatch(unrelatedWaterResponse, /staircase appears beneath the water|steps remain visible/i, 'water elsewhere must not be attached to the staircase');
+
+const plainMothResponse = createCharacterAnalysis('My deceased grandmother handed me a key beside a staircase. A moth flew past. I felt afraid.');
+assert.doesNotMatch(plainMothResponse, /giant white moth|resting above the room/i, 'a plain moth must not inherit absent size, color, or position');
+
+const overlapResponse = createCharacterAnalysis(`${childhoodKeyDream} Before I reached the house, my friends drove away one by one.`);
+assert.match(overlapResponse, /golden key/i);
+assert.match(overlapResponse, /staircase/i, 'the richer key-and-descent structure should outrank the generic social-departure branch');
+assert.doesNotMatch(overlapResponse, /friends leave one by one while you watch/i);
+
 const oceanResponse = createCharacterAnalysis('I crossed a dark ocean toward a house, but every room was empty.');
 assert.match(oceanResponse, /ocean|water/i, 'the response should reflect concrete dream imagery');
 assert.match(oceanResponse, /house|home|belong/i, 'the response should connect recurring imagery into one coherent reading');

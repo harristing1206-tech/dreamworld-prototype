@@ -2,12 +2,35 @@ const assert = require('node:assert/strict');
 const {
   ANALYSIS_VERSION,
   CHARACTER_NAME,
+  assessTranscriptEligibility,
   createCharacterAnalysis,
   createAnalysisSession
 } = require('../analysis-state.js');
 
 assert.equal(CHARACTER_NAME, 'The Listener');
 assert.equal(typeof ANALYSIS_VERSION, 'number');
+
+const gibberishAssessment = assessTranscriptEligibility('erdcyvubibkuvkugvt');
+assert.equal(gibberishAssessment.analyzable, false);
+assert.equal(gibberishAssessment.reason, 'low-language-confidence');
+assert.match(gibberishAssessment.message, /clear dream language/i);
+assert.throws(() => createCharacterAnalysis('erdcyvubibkuvkugvt'), /clear dream language/i);
+assert.throws(() => createAnalysisSession({ dreamID: 'noise', transcript: 'erdcyvubibkuvkugvt' }), /clear dream language/i);
+
+for (const transcript of [
+  'I fell.',
+  'Falling',
+  'Ocean',
+  'Red room. Ocean outside.',
+  'Soñé con mi abuela en una casa azul.',
+  '紅色的房間裡有一隻貓。'
+]) {
+  assert.equal(assessTranscriptEligibility(transcript).analyzable, true, `valid short or multilingual dream should remain eligible: ${transcript}`);
+}
+
+for (const transcript of ['... 1234 ???', 'um um um', 'asdfghjkl', 'hello', 'hello world']) {
+  assert.equal(assessTranscriptEligibility(transcript).analyzable, false, `obvious transcription noise should be rejected: ${transcript}`);
+}
 
 const grandparentsDream = `I had a dream where I was hanging out with friends, and then towards the end of our hangout, they all left one by one in a car. I watched them all leave, and I was overcome with a sense of sadness.
 

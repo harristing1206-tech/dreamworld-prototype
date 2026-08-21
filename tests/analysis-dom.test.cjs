@@ -232,6 +232,66 @@ test('analysis dreamscape changes with transcript evidence while remaining stabl
   }
 });
 
+test('unclear transcript is preserved for editing without creating a dream or analysis', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'erdcyvubibkuvkugvt';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+
+    assert.deepEqual(storedDreams(storage), [], 'unclear text must not be stored as a dream');
+    assert.match(document.getElementById('dialogueStatus').textContent, /needs.*clear|not enough clear/i);
+    assert.match(document.getElementById('dialogueText').textContent, /no analysis|clear dream language/i);
+    assert.equal(document.getElementById('dialogueFinish').textContent, 'Edit transcript');
+
+    document.getElementById('dialogueFinish').click();
+    assert.equal(document.getElementById('dialogueOverlay').classList.contains('visible'), false);
+    assert.equal(input.value, 'erdcyvubibkuvkugvt', 'the questionable transcript remains available for correction');
+    assert.equal(document.activeElement, input);
+    assert.match(document.getElementById('captureError').textContent, /review|clear/i);
+
+    input.value = 'I fell from a bridge into the ocean.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    assert.equal(storedDreams(storage).length, 1, 'a corrected meaningful transcript can be logged normally');
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('saved transcription noise opens without generating or restoring an analysis', async () => {
+  const noiseRecord = {
+    schemaVersion: 1,
+    id: 'dream-noise',
+    loggedAt: '2026-08-21T00:00:00.000Z',
+    title: 'Unclear recording',
+    transcript: 'erdcyvubibkuvkugvt',
+    source: 'browser-local-whisper',
+    model: 'Xenova/whisper-tiny'
+  };
+  const storage = createStorage(new Map([
+    ['dreamworld:dream:dream-noise', JSON.stringify(noiseRecord)],
+    ['dreamworld:lastDream', JSON.stringify(noiseRecord)]
+  ]));
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-open-analysis="latest"]').click();
+    assert.equal(document.getElementById('analysisView').classList.contains('active'), true);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /clear dream language|couldn.t find enough/i);
+    assert.equal(document.getElementById('analysisFullOpen').hidden, true);
+    assert.equal(storage.values.has('dreamworld:analysis:dream-noise'), false, 'noise must not gain a saved analysis state');
+  } finally {
+    dom.window.close();
+  }
+});
+
 test('durable capture writes one atomic dream record and clears only after success', async () => {
   const storage = createStorage();
   const dom = await loadPage(storage, '');

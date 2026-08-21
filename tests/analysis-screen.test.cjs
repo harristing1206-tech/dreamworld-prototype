@@ -37,6 +37,8 @@ assert.match(html, /id="analysisControlsPanel"[^>]+role="dialog"[^>]+aria-modal=
 assert.match(html, /id="analysisCharacterResponse"[^>]+aria-live="off"/);
 assert.match(html, /A reflection, not a diagnosis/);
 assert.match(html, /DreamAnalysis\.createAnalysisSession/);
+assert.match(html, /DreamAnalysis\.assessTranscriptEligibility\(dialogueFlow\.transcript\)/, 'logging must gate unclear text before persistence');
+assert.match(html, /dataset\.action === 'edit-unclear'[\s\S]+saveDraft\(\)[\s\S]+logDream\(\)[\s\S]+showTranscriptionScene\(\)/, 'unclear audio must remain retryable before the user chooses editing');
 assert.match(html, /DreamAnalysisDialogue\.paginateResponse/);
 assert.match(html, /DreamAnalysisDialogue\.createTypewriterDialogue/);
 assert.match(html, /DreamScene\.createDreamScene/);

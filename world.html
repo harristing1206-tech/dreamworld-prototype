@@ -888,11 +888,11 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=24"></script>
-  <script src="./analysis-state.js?v=24"></script>
-  <script src="./analysis-dialogue.js?v=24"></script>
-  <script src="./dream-scene.js?v=24"></script>
-  <script src="./browser-transcriber.js?v=24"></script>
+  <script src="./dialogue-state.js?v=25"></script>
+  <script src="./analysis-state.js?v=25"></script>
+  <script src="./analysis-dialogue.js?v=25"></script>
+  <script src="./dream-scene.js?v=25"></script>
+  <script src="./browser-transcriber.js?v=25"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -1377,10 +1377,11 @@
       activeAnalysisDreamID = dream.id;
       analysisStorageKey = `dreamworld:analysis:${activeAnalysisDreamID}`;
       const savedState = loadSavedAnalysisState(analysisStorageKey);
+      const eligibility = DreamAnalysis.assessTranscriptEligibility(dream.transcript);
       const responseWasDeleted = savedState?.schemaVersion === 1
         && savedState.deleted === true
         && savedState.dreamID === dream.id;
-      analysisDeleteReflection.hidden = responseWasDeleted;
+      analysisDeleteReflection.hidden = responseWasDeleted || !eligibility.analyzable;
       analysisDeleteReflection.disabled = Boolean(pendingDeletedAnalysis);
       analysisRegenerateResponse.hidden = !responseWasDeleted || Boolean(pendingDeletedAnalysis);
       analysisEntryKind.textContent = dream.source === 'sample-content' ? 'Sample dream' : 'Your dream';
@@ -1390,7 +1391,12 @@
       analysisCharacterName.textContent = DreamAnalysis.CHARACTER_NAME;
       let responseText = '';
 
-      if (responseWasDeleted) {
+      if (!eligibility.analyzable) {
+        analysisSession = null;
+        responseText = eligibility.message;
+        analysisStorageDisclosure.textContent = 'No reflection was generated or saved for this transcript. The original text remains in your local dream history so you can review it.';
+        analysisStorageStatus.textContent = 'This transcript does not contain enough clear dream language for a responsible analysis.';
+      } else if (responseWasDeleted) {
         analysisSession = null;
         responseText = 'This response was deleted. Your transcript is still available, and you can explicitly create a new response from the reflection controls.';
         analysisStorageDisclosure.textContent = 'The saved response has been deleted. The original dream transcript remains in your local dream history.';
@@ -1805,12 +1811,53 @@
     }
 
     function retryDialogueTranscription() {
+      if (dialogueFinish.dataset.action === 'edit-unclear' && recordedBlob) {
+        dialogueFlow.reset();
+        if (!dialogueFlow.saveDraft() || !dialogueFlow.logDream()) return;
+        delete dialogueFinish.dataset.action;
+        showTranscriptionScene();
+        return;
+      }
       if (!recordedBlob || !dialogueFlow.retryTranscription()) return;
       showTranscriptionScene();
     }
 
+    function returnUnclearTranscriptForEditing() {
+      const transcript = dialogueFlow.transcript;
+      dialogueFlow.reset();
+      pendingDialogueRecord = null;
+      delete dialogueFinish.dataset.action;
+      dialogueOverlay.classList.remove('visible', 'ready', 'failed');
+      dreamTextInput.value = transcript;
+      hasCapture = false;
+      setTextDraftLocked(false);
+      appStorage.set(TEXT_DRAFT_KEY, transcript);
+      saveButton.disabled = !transcript.trim();
+      captureState.textContent = 'Review transcript';
+      captureError.textContent = 'Review or replace the unclear text before logging. No dream or analysis was created.';
+      dreamTextInput.focus();
+    }
+
     function finishDialogue() {
+      if (dialogueFinish.dataset.action === 'edit-unclear') {
+        returnUnclearTranscriptForEditing();
+        return;
+      }
       if (dialogueFlow.phase !== 'transcriptReady') return;
+      const eligibility = DreamAnalysis.assessTranscriptEligibility(dialogueFlow.transcript);
+      if (!eligibility.analyzable) {
+        dialogueFinish.dataset.action = 'edit-unclear';
+        dialogueStatus.textContent = 'Needs clearer dream language';
+        dialogueSpeaker.textContent = 'Dreamworld · Check transcript';
+        dialogueText.classList.add('secondary');
+        dialogueText.textContent = `${eligibility.message} Your transcript is still available to review.`;
+        dialogueProgressText.textContent = 'No dream or analysis created';
+        dialogueFinish.textContent = 'Edit transcript';
+        captureState.textContent = 'Dream not logged yet';
+        if (dialogueFlow.source === 'browser-local-whisper' && recordedBlob) dialogueOverlay.classList.add('failed');
+        dialogueFinish.focus();
+        return;
+      }
       if (pendingDeletedAnalysis) {
         dialogueStatus.textContent = 'Resolve pending deletion first';
         dialogueText.classList.add('secondary');

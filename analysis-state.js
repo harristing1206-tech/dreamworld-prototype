@@ -3,8 +3,12 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.DreamAnalysis = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI() {
-  const ANALYSIS_VERSION = 3;
+  const ANALYSIS_VERSION = 4;
   const CHARACTER_NAME = 'The Listener';
+  const UNCLEAR_TRANSCRIPT_MESSAGE = 'I couldn’t find enough clear dream language in this transcript to analyze. Review or replace the text—no analysis was created.';
+  const FILLER_WORDS = new Set(['ah', 'blah', 'er', 'erm', 'hmm', 'hmmm', 'uh', 'um']);
+  const DREAM_ANCHOR_WORDS = new Set('afraid airport animal bed bedroom blocked bridge bus car chased chasing city cliff cried crying dark dead door dream dreamed dreaming escape exam fall falling fell family fire flew flight floating forest friend friends gate grandma grandfather grandpa grandmother grief happy home house journey lake light lost miss missed missing moon mother ocean plane rain river road room sad sadness school sea sky smoke star station stuck swim swimming train tree water wave waves work'.split(' '));
+  const COMMON_LATIN_BIGRAMS = new Set('al an ar as at be bi ce ch co de ea ed en er es ge ha he hi ic id in io is it le li ll ma me na nd ne ng nt of om on or ou pe ra re ri ro se si st te th ti to tr ur us ve wa'.split(' '));
   const clean = value => String(value || '').trim();
   const escapePattern = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const hasAny = (text, words) => words.some(word => {
@@ -12,9 +16,62 @@
     return new RegExp(`(^|[^a-z0-9])${phrase}(?=$|[^a-z0-9])`, 'i').test(text);
   });
 
+  function latinBigramRatio(token) {
+    if (token.length < 2) return 1;
+    let recognized = 0;
+    for (let index = 0; index < token.length - 1; index += 1) {
+      if (COMMON_LATIN_BIGRAMS.has(token.slice(index, index + 2))) recognized += 1;
+    }
+    return recognized / (token.length - 1);
+  }
+
+  function assessTranscriptEligibility(transcript) {
+    const account = clean(transcript);
+    if (!account) {
+      return {
+        analyzable: false,
+        reason: 'empty',
+        message: 'A dream transcript is required for analysis.'
+      };
+    }
+
+    const words = account.match(/[\p{L}]+(?:[’'-][\p{L}]+)*/gu) || [];
+    if (!words.length || words.join('').length < 2) {
+      return { analyzable: false, reason: 'no-language', message: UNCLEAR_TRANSCRIPT_MESSAGE };
+    }
+
+    const normalizedWords = words.map(word => word.toLocaleLowerCase());
+    if (normalizedWords.every(word => FILLER_WORDS.has(word))) {
+      return { analyzable: false, reason: 'filler-only', message: UNCLEAR_TRANSCRIPT_MESSAGE };
+    }
+
+    if (normalizedWords.length === 1) {
+      const latin = normalizedWords[0].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (/^[a-z]+$/.test(latin)) {
+        const keyboardRun = /(asdf|sdfg|dfgh|fghj|ghjk|hjkl|qwer|wert|erty|zxcv|xcvb|cvbn|vbnm)/.test(latin);
+        const repeatedRun = /(.)\1{3,}/.test(latin);
+        const bigramRatio = latinBigramRatio(latin);
+        const implausibleLongToken = (latin.length >= 8 && bigramRatio < 0.12)
+          || (latin.length >= 12 && bigramRatio < 0.24);
+        if (keyboardRun || repeatedRun || implausibleLongToken) {
+          return { analyzable: false, reason: 'low-language-confidence', message: UNCLEAR_TRANSCRIPT_MESSAGE };
+        }
+      }
+    }
+
+    const plainLatinWords = normalizedWords.map(word => word.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+    const entirelyLatin = plainLatinWords.every(word => /^[a-z]+$/.test(word));
+    if (entirelyLatin && plainLatinWords.length <= 3 && !plainLatinWords.some(word => DREAM_ANCHOR_WORDS.has(word))) {
+      return { analyzable: false, reason: 'insufficient-dream-content', message: UNCLEAR_TRANSCRIPT_MESSAGE };
+    }
+
+    return { analyzable: true, reason: 'clear-enough', message: '' };
+  }
+
   function createCharacterAnalysis(transcript) {
     const account = clean(transcript);
-    if (!account) throw new Error('A dream transcript is required for analysis.');
+    const eligibility = assessTranscriptEligibility(account);
+    if (!eligibility.analyzable) throw new Error(eligibility.message);
     const text = account.toLowerCase();
 
     const friends = hasAny(text, ['friend', 'friends']);
@@ -89,7 +146,8 @@
 
   function createAnalysisSession({ dreamID, title = 'Dream', transcript, transcriptSource = 'unknown', savedState = null } = {}) {
     const normalizedTranscript = clean(transcript);
-    if (!normalizedTranscript) throw new Error('A dream transcript is required for analysis.');
+    const eligibility = assessTranscriptEligibility(normalizedTranscript);
+    if (!eligibility.analyzable) throw new Error(eligibility.message);
 
     const evidence = {
       transcript: normalizedTranscript,
@@ -127,6 +185,7 @@
   return {
     ANALYSIS_VERSION,
     CHARACTER_NAME,
+    assessTranscriptEligibility,
     createCharacterAnalysis,
     createAnalysisSession
   };

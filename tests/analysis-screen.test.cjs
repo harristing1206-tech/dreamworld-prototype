@@ -42,7 +42,8 @@ assert.match(html, /dataset\.action === 'edit-unclear'[\s\S]+saveDraft\(\)[\s\S]
 assert.match(html, /DreamAnalysisDialogue\.paginateResponse/);
 assert.match(html, /DreamAnalysisDialogue\.createTypewriterDialogue/);
 assert.match(html, /DreamScene\.createDreamScene/);
-assert.match(html, /id="analysisPreparation"[^>]+role="status"[^>]+aria-live="polite"[^>]+hidden/, 'analysis preparation starts hidden and announces stage changes');
+assert.match(html, /id="analysisPreparation"[^>]+role="status"[^>]+aria-live="polite"[^>]+tabindex="-1"[^>]+hidden/, 'analysis preparation starts hidden, accepts programmatic focus, and announces stage changes');
+assert.doesNotMatch(html, /id="analysisPreparation"[^>]+aria-busy/, 'stage announcements must not be suppressed behind aria-busy');
 assert.match(html, /id="analysisPreparationTitle"/);
 assert.match(html, /Reading your dream/);
 assert.match(html, /Following the details/);

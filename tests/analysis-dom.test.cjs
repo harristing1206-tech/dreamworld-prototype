@@ -444,12 +444,17 @@ test('reflection preparation advances through all stages before analysis opens',
     input.value = 'I crossed a dark ocean toward a house.';
     input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
     document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').focus();
+    document.getElementById('alarmsView').inert = true;
     document.getElementById('dialogueFinish').click();
 
     const preparation = document.getElementById('analysisPreparation');
     const title = document.getElementById('analysisPreparationTitle');
     assert.equal(preparation.hidden, false);
     assert.match(title.textContent, /Reading your dream/i);
+    assert.equal(document.activeElement, preparation, 'focus moves out of the dialogue before it becomes inert');
+    assert.equal(document.getElementById('dialogueOverlay').inert, true);
+    assert.equal(preparation.hasAttribute('aria-busy'), false, 'live stage changes are not suppressed while busy');
     await new Promise(resolve => dom.window.setTimeout(resolve, 45));
     assert.match(title.textContent, /Following the details/i);
     await new Promise(resolve => dom.window.setTimeout(resolve, 40));
@@ -457,6 +462,10 @@ test('reflection preparation advances through all stages before analysis opens',
     await new Promise(resolve => dom.window.setTimeout(resolve, 45));
     assert.equal(preparation.hidden, true);
     assert.equal(document.getElementById('analysisView').classList.contains('active'), true);
+    assert.equal(document.activeElement, document.getElementById('analysisBack'), 'analysis establishes the next valid focus target');
+    assert.equal(document.getElementById('dialogueOverlay').inert, false);
+    assert.equal(document.getElementById('alarmsView').inert, true, 'pre-existing inert state is restored rather than flattened');
+    document.getElementById('alarmsView').inert = false;
   } finally {
     dom.window.close();
   }

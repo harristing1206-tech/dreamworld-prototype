@@ -76,6 +76,29 @@ async function loadPage(storage, query = '?analysis=preview', { reducedMotion = 
   return dom;
 }
 
+test('persisted alarm IDs cannot create executable markup', async () => {
+  const hostileID = '\"><img id="alarmXssProbe" src="x" onerror="window.__alarmXss = true">';
+  const values = new Map([
+    ['dreamworld:alarms', JSON.stringify([{ id: hostileID, time: '07:30', days: ['Mon'], enabled: true }])]
+  ]);
+  const storage = createStorage(values);
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    assert.equal(document.getElementById('alarmXssProbe'), null, 'persisted alarm data must not become HTML');
+    assert.equal(document.querySelector('[onerror]'), null, 'no executable event attribute may be created');
+    assert.equal(dom.window.__alarmXss, undefined);
+    const row = document.querySelector('.alarm-row');
+    assert.ok(row);
+    assert.match(row.dataset.alarmId, /^[a-z0-9-]{1,80}$/i, 'invalid persisted IDs are normalized to inert identifiers');
+    const persisted = JSON.parse(storage.values.get('dreamworld:alarms'));
+    assert.match(persisted[0].id, /^[a-z0-9-]{1,80}$/i);
+    assert.equal(persisted[0].time, '07:30', 'sanitizing an ID preserves the valid alarm');
+  } finally {
+    dom.window.close();
+  }
+});
+
 test('analysis flow shows one character response and preserves deletion recovery', async () => {
   const storage = createStorage();
   let dom = await loadPage(storage);
@@ -293,7 +316,7 @@ test('saved transcription noise opens without generating or restoring an analysi
   }
 });
 
-test('plausible but unsupported content is saved without a fabricated generic analysis', async () => {
+test('plausible but unsupported content is saved and clarified without a fabricated generic analysis', async () => {
   const storage = createStorage();
   const dom = await loadPage(storage, '');
   try {
@@ -308,7 +331,8 @@ test('plausible but unsupported content is saved without a fabricated generic an
     assert.equal([...storage.values.keys()].filter(key => key.startsWith('dreamworld:dream:')).length, 1, 'plausible text remains saved for later review');
     assert.equal([...storage.values.keys()].filter(key => key.startsWith('dreamworld:analysis:')).length, 0, 'unsupported content must not gain analysis state');
     assert.equal(document.getElementById('analysisView').classList.contains('active'), true);
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /concrete dream detail/i);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /what does it mean to you personally/i);
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
     assert.equal(document.getElementById('analysisFullOpen').hidden, true);
   } finally {
     dom.window.close();
@@ -342,7 +366,7 @@ test('deleted legacy noise cannot expose or execute regeneration', async () => {
   }
 });
 
-test('deleted plausible but unsupported content cannot expose regeneration', async () => {
+test('deleted plausible but unsupported content may restart a personal interview without regenerating analysis', async () => {
   const record = {
     schemaVersion: 1,
     id: 'dream-unsupported-deleted',
@@ -361,9 +385,43 @@ test('deleted plausible but unsupported content cannot expose regeneration', asy
   try {
     const document = dom.window.document;
     document.querySelector('[data-open-analysis="latest"]').click();
-    assert.equal(document.getElementById('analysisRegenerateResponse').hidden, true);
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /concrete dream detail/i);
-    assert.equal(storage.values.get(`dreamworld:analysis:${record.id}`), JSON.stringify(tombstone));
+    const regenerate = document.getElementById('analysisRegenerateResponse');
+    assert.equal(regenerate.hidden, false, 'unfamiliar but plausible language must not be permanently barred by an English-only gate');
+    regenerate.click();
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /detail that stands out most|personally/i);
+    assert.equal(storage.values.has(`dreamworld:analysis:${record.id}`), false, 'clearing the tombstone starts an interview but does not fabricate a response');
+    assert.equal(storage.values.has(`dreamworld:interview:${record.id}`), true, 'the empty local interview is durably recoverable');
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('deleted personal reflection restarts the interview instead of regenerating without answers', async () => {
+  const record = {
+    schemaVersion: 1,
+    id: 'dream-personal-deleted',
+    loggedAt: '2026-08-21T00:00:00.000Z',
+    title: 'Road dream',
+    transcript: 'I drove a red car through my old neighborhood and felt nervous when it stopped.',
+    source: 'keyboard-text-unverified-provider'
+  };
+  const analysisKey = `dreamworld:analysis:${record.id}`;
+  const storage = createStorage(new Map([
+    [`dreamworld:dream:${record.id}`, JSON.stringify(record)],
+    ['dreamworld:lastDream', JSON.stringify(record)],
+    [analysisKey, JSON.stringify({ schemaVersion: 1, dreamID: record.id, deleted: true, deletedAt: '2026-08-21T00:01:00.000Z' })]
+  ]));
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-open-analysis="latest"]').click();
+    const regenerate = document.getElementById('analysisRegenerateResponse');
+    assert.equal(regenerate.hidden, false);
+    regenerate.click();
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /car/i);
+    assert.equal(storage.values.has(analysisKey), false, 'no replacement response exists before new answers');
   } finally {
     dom.window.close();
   }
@@ -381,9 +439,9 @@ test('durable capture writes one atomic dream record and clears only after succe
     document.getElementById('saveButton').click();
     document.getElementById('dialogueFinish').click();
 
-    assert.equal(document.getElementById('analysisPreparation').hidden, false, 'durable logging enters reflection preparation immediately');
-    assert.match(document.getElementById('analysisPreparationTitle').textContent, /Reading your dream/i);
-    assert.equal(document.getElementById('analysisView').classList.contains('active'), false, 'analysis must wait for preparation');
+    assert.equal(document.getElementById('analysisPreparation').hidden, true, 'preparation waits until the user has answered The Listener');
+    assert.equal(document.getElementById('analysisView').classList.contains('active'), true, 'durable logging enters the Listener interview');
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
 
     const record = JSON.parse(storage.values.get('dreamworld:lastDream'));
     assert.equal(record.schemaVersion, 1);
@@ -395,22 +453,43 @@ test('durable capture writes one atomic dream record and clears only after succe
     assert.equal(document.getElementById('captureState').textContent, 'Dream logged');
     assert.equal(input.value, '');
 
+    const interviewAnswer = document.getElementById('analysisInterviewAnswer');
+    interviewAnswer.value = 'It feels like trying to reach a place that keeps moving away.';
+    interviewAnswer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    document.getElementById('analysisInterviewFinish').click();
     await new Promise(resolve => dom.window.setTimeout(resolve, 250));
-    assert.equal(document.getElementById('analysisView').classList.contains('active'), true, 'successful logging routes directly to the response');
+    assert.equal(document.getElementById('analysisView').classList.contains('active'), true, 'successful interview routes to the response after preparation');
     assert.equal(document.getElementById('analysisTranscript').textContent, record.transcript);
     const firstResponse = document.getElementById('analysisCharacterResponse').textContent;
     assert.ok(firstResponse.length > 80);
     const firstKey = `dreamworld:analysis:${record.id}`;
     assert.equal(storage.values.has(firstKey), true);
+    const firstFullResponse = JSON.parse(storage.values.get(firstKey)).characterResponse.text;
 
     document.querySelector('[data-go="capture"]').click();
     input.value = record.transcript;
     input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
     document.getElementById('saveButton').click();
     document.getElementById('dialogueFinish').click();
+    interviewAnswer.value = 'It still feels connected to something moving out of reach.';
+    interviewAnswer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    document.getElementById('analysisInterviewFinish').click();
     await new Promise(resolve => dom.window.setTimeout(resolve, 250));
     const secondRecord = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const secondResponse = document.getElementById('analysisCharacterResponse').textContent;
+    const secondStoredAnalysis = JSON.parse(storage.values.get(`dreamworld:analysis:${secondRecord.id}`));
+    const secondFullResponse = secondStoredAnalysis.characterResponse.text;
     assert.notEqual(secondRecord.id, record.id, 'separate logs receive separate identities even when their words match');
+    assert.notEqual(secondFullResponse, firstFullResponse, 'different personal answers should create different complete responses for identical transcripts');
+    assert.match(secondFullResponse, /Across your saved history/i, 'a user-associated detail recurring in an earlier immutable record should be named without decoding it');
+    assert.match(secondFullResponse, /does not give it a fixed meaning/i);
+    assert.equal(secondStoredAnalysis.methodology.claimStatus, 'interpretive-hypothesis');
+    assert.equal(secondStoredAnalysis.methodology.longitudinal.recurrences[0].dreamID, record.id);
+    assert.match(document.getElementById('analysisMethodDisclosure').textContent, /Context-first Jungian reflection/i);
+    assert.match(document.getElementById('analysisMethodDisclosure').textContent, /hypothesis/i);
+    assert.match(document.getElementById('analysisMethodSources').textContent, /CW 7/i);
     const library = storedDreams(storage);
     assert.deepEqual(library.map(item => item.id), [record.id, secondRecord.id]);
     const historicalRow = document.querySelector(`[data-open-analysis="${record.id}"]`);
@@ -418,17 +497,80 @@ test('durable capture writes one atomic dream record and clears only after succe
     historicalRow.click();
     assert.equal(document.getElementById('analysisCharacterResponse').textContent, firstResponse);
     document.getElementById('latestDreamRow').click();
-    assert.equal(document.getElementById('analysisCharacterResponse').textContent, firstResponse, 'matching words may yield the same response while records remain separate');
+    assert.equal(document.getElementById('analysisCharacterResponse').textContent, secondResponse, 'each record restores the response grounded in its own answers');
 
     const secondKey = `dreamworld:analysis:${secondRecord.id}`;
+    const secondInterviewKey = `dreamworld:interview:${secondRecord.id}`;
     assert.equal(storage.values.has(secondKey), true);
+    assert.equal(storage.values.has(secondInterviewKey), true);
     const realDreamDelete = document.getElementById('analysisDeleteReflection');
     realDreamDelete.click();
     realDreamDelete.click();
     assert.equal(JSON.parse(storage.values.get(secondKey)).deleted, true);
+    assert.equal(storage.values.has(secondInterviewKey), false, 'deleting a personalized reflection removes its interview answers');
     document.getElementById('analysisUndoDelete').click();
     assert.equal(storage.values.has(secondKey), true);
-    assert.equal(document.getElementById('analysisCharacterResponse').textContent, firstResponse);
+    assert.equal(storage.values.has(secondInterviewKey), true, 'Undo restores interview evidence with the reflection');
+    assert.equal(document.getElementById('analysisCharacterResponse').textContent, secondResponse);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('durable logging enters a one-question-at-a-time personal interview before reflection', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '', { reducedMotion: true, preparationTimings: [8, 8, 8] });
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const transcript = document.getElementById('dreamTextInput');
+    transcript.value = 'I drove a red car through my old neighborhood. A black hat sat on the passenger seat. I felt nervous when the car stopped.';
+    transcript.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const interviewKey = `dreamworld:interview:${dream.id}`;
+    const analysisKey = `dreamworld:analysis:${dream.id}`;
+    const form = document.getElementById('analysisInterviewForm');
+    const answer = document.getElementById('analysisInterviewAnswer');
+    const submit = document.getElementById('analysisInterviewSubmit');
+
+    assert.equal(document.getElementById('analysisView').classList.contains('active'), true, 'logging should enter The Listener encounter');
+    assert.equal(document.getElementById('analysisPreparation').hidden, true, 'preparation belongs after the questions, before reflection');
+    assert.equal(form.hidden, false, 'the answer control should be visible for the current question');
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /car/i);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /to you|personally/i);
+    assert.equal(storage.values.has(analysisKey), false, 'no interpretation may be created before answers');
+    assert.equal(document.activeElement, answer, 'keyboard focus should move to the answer field');
+
+    answer.value = 'It reminds me of learning to drive with my older sister.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    submit.click();
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /learning to drive with my older sister/i);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /hat/i);
+    assert.equal(JSON.parse(storage.values.get(interviewKey)).answers.length, 1);
+    assert.equal(storage.values.has(analysisKey), false);
+
+    answer.value = "It felt out of place, like I wasn't ready.";
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    submit.click();
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /feeling|right now|life/i);
+
+    answer.value = 'I am nervous about making a decision on my own.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    submit.click();
+    assert.equal(document.getElementById('analysisPreparation').hidden, false, 'completed questions trigger the reflection preparation pause');
+    assert.equal(storage.values.has(analysisKey), false, 'the response remains absent during preparation');
+
+    await new Promise(resolve => dom.window.setTimeout(resolve, 45));
+    assert.equal(document.getElementById('analysisPreparation').hidden, true);
+    assert.equal(form.hidden, true);
+    assert.equal(storage.values.has(analysisKey), true);
+    const savedAnalysis = JSON.parse(storage.values.get(analysisKey));
+    assert.equal(savedAnalysis.evidence.associations.length, 3);
+    assert.match(savedAnalysis.characterResponse.text, /learning to drive with my older sister/i);
+    assert.match(savedAnalysis.characterResponse.text, /making a decision on my own/i);
   } finally {
     dom.window.close();
   }
@@ -445,8 +587,14 @@ test('reflection preparation advances through all stages before analysis opens',
     input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
     document.getElementById('saveButton').click();
     document.getElementById('dialogueFinish').focus();
-    document.getElementById('alarmsView').inert = true;
     document.getElementById('dialogueFinish').click();
+
+    const interviewAnswer = document.getElementById('analysisInterviewAnswer');
+    interviewAnswer.value = 'The moving house feels connected to uncertainty about where I belong.';
+    interviewAnswer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    document.getElementById('alarmsView').inert = true;
+    document.getElementById('analysisInterviewFinish').click();
 
     const preparation = document.getElementById('analysisPreparation');
     const title = document.getElementById('analysisPreparationTitle');
@@ -661,6 +809,243 @@ test('authoritative chronology ignores a stale mirror and refreshes on cross-tab
     assert.equal(document.querySelectorAll('#loggedDreamHistory [data-open-analysis]').length, 2);
     document.getElementById('latestDreamRow').click();
     assert.equal(document.getElementById('analysisTranscript').textContent, newest.transcript);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('external deletion invalidates a stale interview session and cannot resurrect removed answers', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I found a key beside a staircase and felt afraid.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const interviewKey = `dreamworld:interview:${dream.id}`;
+    const analysisKey = `dreamworld:analysis:${dream.id}`;
+    const answer = document.getElementById('analysisInterviewAnswer');
+    answer.value = 'The key reminds me of responsibility.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    assert.equal(JSON.parse(storage.values.get(interviewKey)).answers.length, 1);
+
+    const oldInterview = storage.values.get(interviewKey);
+    storage.values.delete(interviewKey);
+    const tombstone = JSON.stringify({ schemaVersion: 1, dreamID: dream.id, deleted: true, deletedAt: '2026-08-21T12:00:00.000Z' });
+    storage.values.set(analysisKey, tombstone);
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: analysisKey, oldValue: null, newValue: tombstone }));
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: interviewKey, oldValue: oldInterview, newValue: null }));
+
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, true, 'external deletion must close the stale answer form');
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /response was deleted/i);
+    answer.value = 'A stale answer that must not return.';
+    document.getElementById('analysisInterviewForm').dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    assert.equal(storage.values.has(interviewKey), false, 'a stale in-memory session cannot recreate externally deleted answers');
+    assert.equal(storage.values.get(analysisKey), tombstone);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('external active-dream removal closes stale interview state and cannot create orphaned evidence', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'Several keys appeared beside two houses.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const dreamKey = `dreamworld:dream:${dream.id}`;
+    const interviewKey = `dreamworld:interview:${dream.id}`;
+    const analysisKey = `dreamworld:analysis:${dream.id}`;
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
+
+    storage.values.delete(dreamKey);
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: dreamKey, oldValue: JSON.stringify(dream), newValue: null }));
+
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, true, 'removed active dream closes the stale interview form');
+    assert.equal(document.getElementById('latestDreamRow').hidden, true, 'matching legacy mirrors cannot resurrect the deleted authoritative dream');
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /dream was removed in another tab/i);
+    const answer = document.getElementById('analysisInterviewAnswer');
+    answer.value = 'This stale answer must not be written.';
+    document.getElementById('analysisInterviewForm').dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    assert.equal(storage.values.has(interviewKey), false, 'the removed dream cannot retain or recreate orphaned interview answers');
+    assert.equal(storage.values.has(analysisKey), false, 'no orphaned analysis remains after its dream disappears');
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('active source removal cancels held Undo so deleted evidence cannot be restored as an orphan', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '', { reducedMotion: true, preparationTimings: [8, 8, 8] });
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I found a key beside a staircase and felt afraid.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const dreamKey = `dreamworld:dream:${dream.id}`;
+    const interviewKey = `dreamworld:interview:${dream.id}`;
+    const analysisKey = `dreamworld:analysis:${dream.id}`;
+    const answer = document.getElementById('analysisInterviewAnswer');
+    answer.value = 'The key feels like responsibility.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    document.getElementById('analysisInterviewFinish').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 45));
+    const deleteButton = document.getElementById('analysisDeleteReflection');
+    deleteButton.click();
+    deleteButton.click();
+    document.getElementById('analysisKeepUndo').click();
+    assert.equal(document.getElementById('analysisUndoDelete').hidden, false);
+
+    storage.values.delete(dreamKey);
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: dreamKey, oldValue: JSON.stringify(dream), newValue: null }));
+    document.getElementById('analysisUndoDelete').click();
+
+    assert.equal(document.getElementById('analysisUndoDelete').hidden, true, 'source removal cancels held Undo');
+    assert.equal(storage.values.has(interviewKey), false, 'Undo cannot restore orphaned interview evidence');
+    assert.equal(storage.values.has(analysisKey), false, 'Undo cannot restore an orphaned reflection');
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('localStorage clear fully closes an active interview lifecycle', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'A house floated over the ocean while I watched.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    storage.values.clear();
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: null }));
+
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, true);
+    assert.match(document.getElementById('analysisCharacterResponse').textContent, /storage was cleared in another tab/i);
+    assert.equal(document.getElementById('latestDreamRow').hidden, true);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('active removal preserves a split legacy mirror with a different source', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I found a key beside a staircase and felt afraid.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const dreamKey = `dreamworld:dream:${dream.id}`;
+    const unrelatedMirror = { ...dream, source: 'different-device-import' };
+    storage.values.set('dreamworld:lastDream', JSON.stringify(unrelatedMirror));
+    storage.values.set('dreamworld:lastTranscriptSource', unrelatedMirror.source);
+    storage.values.delete(dreamKey);
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: dreamKey, oldValue: JSON.stringify(dream), newValue: null }));
+
+    assert.deepEqual(JSON.parse(storage.values.get('dreamworld:lastDream')), unrelatedMirror, 'same ID alone does not authorize deleting a different-source mirror');
+    assert.equal(storage.values.get('dreamworld:lastTranscript'), dream.transcript, 'same text and timestamp do not authorize deleting a different-source split mirror');
+    assert.equal(storage.values.get('dreamworld:lastTranscriptSource'), 'different-device-import');
+    assert.equal(document.getElementById('latestDreamRow').hidden, false, 'the unrelated legacy mirror remains visible');
+    assert.notEqual(document.getElementById('latestDreamRow').dataset.openAnalysis, dream.id, 'the unrelated mirror receives its own legacy identity');
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('unrelated cross-tab history updates preserve an unfinished interview draft', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I found a key beside a staircase and felt afraid.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const activeDream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const answer = document.getElementById('analysisInterviewAnswer');
+    answer.value = 'This unsent draft connects the key with responsibility.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+
+    const unrelated = {
+      ...activeDream,
+      id: 'dream-unrelated-cross-tab',
+      loggedAt: '2026-08-22T09:00:00.000Z',
+      title: 'Unrelated cross-tab dream',
+      transcript: 'A train crossed an empty field.'
+    };
+    const unrelatedKey = `dreamworld:dream:${unrelated.id}`;
+    storage.values.set(unrelatedKey, JSON.stringify(unrelated));
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: unrelatedKey, oldValue: null, newValue: JSON.stringify(unrelated) }));
+
+    assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
+    assert.equal(answer.value, 'This unsent draft connects the key with responsibility.', 'unrelated history refresh cannot erase unsent interview text');
+    assert.equal(JSON.parse(storage.values.get(`dreamworld:interview:${activeDream.id}`)).answers.length, 0, 'the draft remains unsent until the user submits it');
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('a cross-tab dream record refreshes the active longitudinal response', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '', { reducedMotion: true, preparationTimings: [8, 8, 8] });
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I found a key beside a staircase and felt afraid.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const answer = document.getElementById('analysisInterviewAnswer');
+    answer.value = 'The key reminds me of responsibility.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    document.getElementById('analysisInterviewFinish').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 100));
+    const analysisKey = `dreamworld:analysis:${dream.id}`;
+    assert.doesNotMatch(JSON.parse(storage.values.get(analysisKey)).characterResponse.text, /Across your saved history/i);
+
+    const related = {
+      ...dream,
+      id: 'dream-cross-tab-related',
+      loggedAt: '2026-08-22T08:00:00.000Z',
+      title: 'Later key dream',
+      transcript: 'Several keys appeared beside a door.'
+    };
+    const relatedKey = `dreamworld:dream:${related.id}`;
+    storage.values.set(relatedKey, JSON.stringify(related));
+    dom.window.dispatchEvent(new dom.window.StorageEvent('storage', { key: relatedKey, oldValue: null, newValue: JSON.stringify(related) }));
+
+    const refreshed = JSON.parse(storage.values.get(analysisKey));
+    assert.match(refreshed.characterResponse.text, /Across your saved history/i);
+    assert.equal(refreshed.methodology.longitudinal.recurrences[0].dreamID, related.id);
+    assert.equal(document.getElementById('analysisTitle').textContent, dream.title, 'refreshing history must not navigate away from the active dream');
   } finally {
     dom.window.close();
   }

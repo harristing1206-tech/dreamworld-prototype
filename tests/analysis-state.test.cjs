@@ -6,6 +6,7 @@ const {
   createCharacterAnalysis,
   createAnalysisSession
 } = require('../analysis-state.js');
+const { METHOD_VERSION } = require('../jungian-method.js');
 
 assert.equal(CHARACTER_NAME, 'The Listener');
 assert.equal(typeof ANALYSIS_VERSION, 'number');
@@ -93,6 +94,68 @@ assert.match(childhoodKeyResponse, /not a fixed symbol|could|may|possible/i, 'an
 assert.match(childhoodKeyResponse, /descend|door|already know/i, 'the final question should come from the dream’s actual choice rather than generic insecurity');
 assert.doesNotMatch(childhoodKeyResponse, /distance between the water and the place that should feel like home/i, 'the shallow water-home template must not flatten a layered dream');
 assert.ok(childhoodKeyResponse.length >= 700 && childhoodKeyResponse.length <= 1700, 'a layered dream should receive a substantive but bounded response');
+
+const personalAssociations = [
+  {
+    focus: 'the key',
+    question: 'What does the key mean to you personally?',
+    answer: 'It reminds me of the spare key my grandmother trusted me with when I first lived alone.'
+  },
+  {
+    focus: 'the staircase',
+    question: 'What feeling comes up around the staircase?',
+    answer: 'It feels like making an adult decision without asking my family for permission.'
+  }
+];
+const personalizedChildhoodResponse = createCharacterAnalysis(childhoodKeyDream, { associations: personalAssociations });
+assert.match(personalizedChildhoodResponse, /spare key my grandmother trusted me with/i, 'the final response must use the dreamer’s own stated association');
+assert.match(personalizedChildhoodResponse, /adult decision without asking my family for permission/i, 'multiple answers should remain visible as evidence');
+assert.match(personalizedChildhoodResponse, /your own associations|you connected|you said/i, 'the response should distinguish user-provided meaning from transcript inference');
+assert.doesNotMatch(personalizedChildhoodResponse, /proves|definitely means|universal symbol/i);
+assert.ok(personalizedChildhoodResponse.length > childhoodKeyResponse.length, 'answering questions must materially personalize the response');
+
+const personalizedSession = createAnalysisSession({
+  dreamID: 'personal-childhood',
+  transcript: childhoodKeyDream,
+  transcriptSource: 'typed',
+  associations: personalAssociations,
+  priorDreams: [
+    {
+      id: 'earlier-key-dream',
+      title: 'Garden gate',
+      transcript: 'I found a key beside a garden gate and felt calm.',
+      loggedAt: '2026-08-20T00:00:00.000Z'
+    }
+  ]
+});
+const personalizedSnapshot = personalizedSession.snapshot();
+assert.deepEqual(personalizedSnapshot.evidence.associations, personalAssociations);
+assert.match(personalizedSnapshot.characterResponse.text, /spare key my grandmother trusted me with/i);
+assert.match(personalizedSnapshot.characterResponse.text, /Across your saved history/i);
+assert.match(personalizedSnapshot.characterResponse.text, /does not give it a fixed meaning/i);
+assert.equal(personalizedSnapshot.methodology.methodVersion, METHOD_VERSION);
+assert.equal(personalizedSnapshot.methodology.claimStatus, 'interpretive-hypothesis');
+assert.equal(personalizedSnapshot.methodology.longitudinal.recurrences[0].dreamID, 'earlier-key-dream');
+assert.ok(personalizedSnapshot.methodology.safeguards.includes('no-diagnosis-or-prediction'));
+
+const historyChangedSnapshot = createAnalysisSession({
+  dreamID: 'personal-childhood',
+  transcript: childhoodKeyDream,
+  transcriptSource: 'typed',
+  associations: personalAssociations,
+  priorDreams: [],
+  savedState: personalizedSnapshot
+}).snapshot();
+assert.doesNotMatch(historyChangedSnapshot.characterResponse.text, /Across your saved history/i, 'a changed prior-dream set must regenerate stale longitudinal prose');
+assert.notEqual(historyChangedSnapshot.methodology.historyFingerprint, personalizedSnapshot.methodology.historyFingerprint);
+
+const associationLedResponse = createCharacterAnalysis(
+  'I drove a red car through my old neighborhood. A black hat sat on the passenger seat. I felt nervous when the car stopped.',
+  { associations: [{ focus: 'the car', question: 'What does the car mean to you?', answer: 'It reminds me of learning to drive with my older sister.' }] }
+);
+assert.match(associationLedResponse, /transcript alone|your own associations/i, 'clear dreams unsupported by motif logic may use completed interview evidence');
+assert.match(associationLedResponse, /learning to drive with my older sister/i);
+assert.doesNotMatch(associationLedResponse, /childhood|trauma|definitely means|universal symbol/i, 'the association-led path must not invent a symbolic reading');
 
 const sparseKeyResponse = createCharacterAnalysis('My dead grandfather gave me a key at the top of a staircase. I felt afraid.');
 assert.match(sparseKeyResponse, /grandfather/i);
@@ -250,8 +313,8 @@ assert.equal(snapshot.characterResponse.author, 'character');
 assert.equal(snapshot.analysisVersion, ANALYSIS_VERSION);
 assert.deepEqual(
   Object.keys(snapshot).sort(),
-  ['analysisVersion', 'characterResponse', 'dreamID', 'evidence', 'title'].sort(),
-  'the analysis state should contain only evidence and one character response'
+  ['analysisVersion', 'characterResponse', 'dreamID', 'evidence', 'methodology', 'title'].sort(),
+  'the analysis state should contain evidence, transparent methodology, and one character response'
 );
 
 const restored = createAnalysisSession({

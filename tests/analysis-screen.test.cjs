@@ -7,7 +7,7 @@ const serviceWorker = fs.readFileSync(path.join(__dirname, '..', 'service-worker
 
 const cacheVersion = serviceWorker.match(/dreamworld-world-v(\d+)/)?.[1];
 assert.ok(cacheVersion, 'service worker cache must be versioned');
-for (const asset of ['dialogue-state.js', 'analysis-state.js', 'analysis-dialogue.js', 'dream-scene.js', 'browser-transcriber.js']) {
+for (const asset of ['dialogue-state.js', 'jungian-method.js', 'analysis-state.js', 'analysis-interview.js', 'analysis-dialogue.js', 'dream-scene.js', 'browser-transcriber.js']) {
   assert.match(html, new RegExp(`<script src="\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}"><\\/script>`), `${asset} must be cache-busted with the release version`);
   assert.match(serviceWorker, new RegExp(`\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}`), `${asset} must be cached under the same release-versioned URL`);
 }
@@ -35,7 +35,7 @@ assert.match(html, /id="analysisFullText"/);
 assert.match(html, /id="analysisTranscriptPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
 assert.match(html, /id="analysisControlsPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
 assert.match(html, /id="analysisCharacterResponse"[^>]+aria-live="off"/);
-assert.match(html, /A reflection, not a diagnosis/);
+assert.match(html, /interpretive hypothesis, not a diagnosis or prediction/i);
 assert.match(html, /DreamAnalysis\.createAnalysisSession/);
 assert.match(html, /DreamAnalysis\.assessTranscriptEligibility\(dialogueFlow\.transcript\)/, 'logging must gate unclear text before persistence');
 assert.match(html, /dataset\.action === 'edit-unclear'[\s\S]+saveDraft\(\)[\s\S]+logDream\(\)[\s\S]+showTranscriptionScene\(\)/, 'unclear audio must remain retryable before the user chooses editing');
@@ -50,7 +50,12 @@ assert.match(html, /Following the details/);
 assert.match(html, /Preparing a reflection/);
 assert.match(html, /const ANALYSIS_PREPARATION_DURATIONS = \[900, 950, 950\]/, 'production reflection pacing should be deliberate but bounded');
 assert.match(html, /function startAnalysisPreparation\(dream\)/);
-assert.match(html, /startAnalysisPreparation\(record\)/, 'durable logging should enter preparation before analysis');
+assert.match(html, /openAnalysis\(record\.id\)/, 'durable logging should enter the Listener interview');
+assert.match(html, /function completeAnalysisInterview[\s\S]+startAnalysisPreparation\(dream\)/, 'reflection preparation should begin only after interview evidence exists');
+assert.match(html, /id="analysisInterviewForm"[^>]+hidden/, 'the one-question answer form starts hidden');
+assert.match(html, /id="analysisInterviewAnswer"[^>]+maxlength="600"/);
+assert.match(html, /id="analysisInterviewFinish"[^>]+hidden>Reflect now/, 'the user may end the interview early after answering');
+assert.match(html, /Your answers stay on this device/);
 assert.match(html, /\.character-response\[data-typing="true"\][^{]+\.listener-mouth/s, 'the Listener portrait should visibly speak while text types');
 assert.match(html, /data-scene/, 'the analysis view should expose its active dreamscape motif');
 assert.match(html, /\.character-response\s*\{[^}]*border:\s*2px solid rgba[^}]*border:\s*2px solid color-mix[^}]*background:\s*linear-gradient\([^;]*rgba[^}]*background:\s*linear-gradient\([^;]*color-mix/s, 'the dialogue card needs readable fallbacks before enhanced color-mix styling');
@@ -62,15 +67,20 @@ assert.doesNotMatch(html, /Perspective families/);
 assert.doesNotMatch(html, /analysisLensList/);
 assert.doesNotMatch(html, /analysisAssociation/);
 assert.doesNotMatch(html, /analysisWorkingMeaning/);
-assert.doesNotMatch(html, /Freud|Jung|Plato|Aristotle|Descartes|Spinoza|Buddhist|Advaita|Zhuangzi/);
+assert.doesNotMatch(html, /<(?:button|option)[^>]*>[^<]*(?:Freud|Jung|Plato|Aristotle|Descartes|Spinoza|Buddhist|Advaita|Zhuangzi)/i, 'the encounter must not offer philosopher or framework menus');
 
 assert.match(html, /id="analysisDeleteReflection"/);
 assert.match(html, /id="analysisRegenerateResponse"[^>]+hidden/);
 assert.match(html, /id="analysisStorageDisclosure"/);
+assert.match(html, /id="analysisMethodDisclosure"/);
+assert.match(html, /id="analysisMethodSources"/);
+assert.match(html, /Context-first Jungian reflection/i);
+assert.match(html, /interpretive hypothesis/i);
+assert.match(html, /CW 7[^<]*§§123–140/i);
 assert.match(html, /id="analysisUndoDelete"[^>]+hidden/);
 assert.match(html, /id="analysisKeepUndo"[^>]+hidden/);
 assert.match(html, /id="analysisFinishDeletion"[^>]+hidden/);
-assert.match(html, /this response is saved in this browser without encryption/i);
+assert.match(html, /interview answers and this response are saved in this browser without encryption/i);
 assert.match(html, /this response could not be saved in browser storage/i);
 assert.match(html, /saved response has been deleted/i);
 assert.match(html, /\[hidden\]\s*\{\s*display:\s*none\s*!important/);

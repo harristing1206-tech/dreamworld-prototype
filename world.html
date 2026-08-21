@@ -279,6 +279,13 @@
     .character-response[data-complete="true"] .analysis-dialogue-cue { display: none; }
     .analysis-dialogue-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 7px; border-top: 1px solid rgba(231,223,197,.15); color: var(--sage); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .analysis-dialogue-advance:disabled { cursor: default; }
+    .analysis-interview { display: grid; gap: 9px; margin-top: 10px; }
+    .analysis-interview-answer { width: 100%; min-height: 76px; max-height: 150px; resize: vertical; padding: 11px 12px; border: 1px solid rgba(231,223,197,.3); border-radius: 4px; background: rgba(4,12,20,.78); color: var(--cream); font: 500 15px/1.45 Georgia, serif; }
+    .analysis-interview-answer:focus { outline: 2px solid var(--scene-glow); outline-offset: 2px; }
+    .analysis-interview-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .analysis-interview-submit, .analysis-interview-finish { min-height: 44px; padding: 0 14px; border: 1px solid var(--scene-accent); background: var(--scene-panel-deep); color: var(--cream); font: 750 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .analysis-interview-submit:disabled { opacity: .45; }
+    .analysis-interview-progress { color: var(--sage); font: 650 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .05em; }
     .analysis-full-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px solid rgba(182,154,99,.76); border: 1px solid color-mix(in srgb, var(--scene-accent), transparent 24%); background: rgba(8,17,27,.9); background: color-mix(in srgb, var(--scene-panel-deep), transparent 10%); color: var(--scene-glow); cursor: pointer; font: 750 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
     .analysis-dialogue-page { color: var(--gold); }
     .analysis-panel { position: absolute; z-index: 10; top: max(66px, calc(env(safe-area-inset-top) + 58px)); left: 10px; right: 10px; bottom: 10px; padding: 18px; overflow-y: auto; border: 1px solid rgba(231,223,197,.35); border: 1px solid color-mix(in srgb, var(--scene-accent), transparent 50%); background: var(--scene-panel-deep); box-shadow: 0 20px 50px rgba(0,0,0,.55); }
@@ -780,6 +787,15 @@
             <span id="analysisDialogueHint">Tap to reveal</span>
             <span class="analysis-dialogue-page" id="analysisDialoguePage">1 / 1</span>
           </div>
+          <form class="analysis-interview" id="analysisInterviewForm" hidden>
+            <label class="sr-only" for="analysisInterviewAnswer">Your answer to The Listener</label>
+            <textarea class="analysis-interview-answer" id="analysisInterviewAnswer" maxlength="600" placeholder="Say what this detail means to you…"></textarea>
+            <div class="analysis-interview-actions">
+              <button class="analysis-interview-submit" id="analysisInterviewSubmit" type="submit" disabled>Answer</button>
+              <button class="analysis-interview-finish" id="analysisInterviewFinish" type="button" hidden>Reflect now</button>
+            </div>
+            <span class="analysis-interview-progress" id="analysisInterviewProgress">Question 1 of 3 · Your answers stay on this device</span>
+          </form>
           <button type="button" class="analysis-full-open" id="analysisFullOpen" hidden>Read full analysis</button>
         </div>
       </article>
@@ -800,8 +816,10 @@
       <section class="analysis-panel analysis-controls" id="analysisControlsPanel" role="dialog" aria-modal="true" aria-labelledby="analysisControlsTitle" hidden>
         <header class="analysis-panel-head"><h2 class="analysis-panel-title" id="analysisControlsTitle">Reflection controls</h2><button class="analysis-panel-close" id="analysisControlsClose" aria-label="Close reflection controls">×</button></header>
         <p class="analysis-storage-note" id="analysisStorageDisclosure">Storage status for this transcript and response appears below.</p>
-        <p class="analysis-storage-note">A reflection, not a diagnosis or prediction. You decide what fits.</p>
-        <button class="analysis-delete" id="analysisDeleteReflection">Delete this reflection</button>
+        <p class="analysis-storage-note" id="analysisMethodDisclosure"><strong>Method:</strong> Context-first Jungian reflection · interpretive hypothesis, not a diagnosis or prediction.</p>
+        <p class="analysis-storage-note" id="analysisMethodSources"><strong>Sources:</strong> Jung, CW 7 §§123–140 and §§188–190; <em>Man and His Symbols</em>, pp. 28–31 and 52–53; CW 8 §§443–569.</p>
+        <p class="analysis-storage-note">Your associations lead. Recurrence never creates a fixed symbol meaning, and later dreams may revise this reflection.</p>
+        <button class="analysis-delete" id="analysisDeleteReflection">Delete answers &amp; reflection</button>
         <button class="analysis-undo" id="analysisRegenerateResponse" hidden>Create response again</button>
         <button class="analysis-undo" id="analysisUndoDelete" hidden>Undo deletion</button>
         <button class="analysis-undo" id="analysisKeepUndo" hidden>Keep Undo available</button>
@@ -965,11 +983,13 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=32"></script>
-  <script src="./analysis-state.js?v=32"></script>
-  <script src="./analysis-dialogue.js?v=32"></script>
-  <script src="./dream-scene.js?v=32"></script>
-  <script src="./browser-transcriber.js?v=32"></script>
+  <script src="./dialogue-state.js?v=33"></script>
+  <script src="./jungian-method.js?v=33"></script>
+  <script src="./analysis-state.js?v=33"></script>
+  <script src="./analysis-interview.js?v=33"></script>
+  <script src="./analysis-dialogue.js?v=33"></script>
+  <script src="./dream-scene.js?v=33"></script>
+  <script src="./browser-transcriber.js?v=33"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -1022,6 +1042,11 @@
     const analysisDialogueHint = document.getElementById('analysisDialogueHint');
     const analysisDialoguePage = document.getElementById('analysisDialoguePage');
     const analysisDialogueStatus = document.getElementById('analysisDialogueStatus');
+    const analysisInterviewForm = document.getElementById('analysisInterviewForm');
+    const analysisInterviewAnswer = document.getElementById('analysisInterviewAnswer');
+    const analysisInterviewSubmit = document.getElementById('analysisInterviewSubmit');
+    const analysisInterviewFinish = document.getElementById('analysisInterviewFinish');
+    const analysisInterviewProgress = document.getElementById('analysisInterviewProgress');
     const analysisSceneName = document.getElementById('analysisSceneName');
     const analysisFullOpen = document.getElementById('analysisFullOpen');
     const analysisFullPanel = document.getElementById('analysisFullPanel');
@@ -1088,6 +1113,8 @@
     let hasCapture = false;
     let alarms = [];
     let analysisSession = null;
+    let analysisInterviewSession = null;
+    let analysisInterviewStorageKey = '';
     let analysisDialogueController = null;
     let activeAnalysisResponseText = '';
     let announcedAnalysisPage = -1;
@@ -1245,8 +1272,15 @@
 
     function getLegacyLatestDreamRecord() {
       try {
-        const stored = normalizeDreamRecord(JSON.parse(appStorage.get('dreamworld:lastDream') || 'null'), { legacy: true });
-        if (stored) return stored;
+        const raw = JSON.parse(appStorage.get('dreamworld:lastDream') || 'null');
+        const stored = normalizeDreamRecord(raw, { legacy: true });
+        if (stored) {
+          const authoritativeExists = stored.id.startsWith('dream-')
+            && appStorage.getDurable(`${DREAM_RECORD_PREFIX}${stored.id}`) !== null;
+          return authoritativeExists
+            ? stored
+            : normalizeDreamRecord({ ...raw, id: '' }, { legacy: true });
+        }
       } catch (_) {}
       const transcript = appStorage.get('dreamworld:lastTranscript');
       if (!transcript) return null;
@@ -1257,6 +1291,32 @@
         model: appStorage.get('dreamworld:lastTranscriptModel') || '',
         title: 'Recorded dream'
       }, { legacy: true });
+    }
+
+    function removeMatchingLegacyDreamMirrors(removedRecord) {
+      if (!removedRecord) return;
+      let lastDream = null;
+      try {
+        lastDream = normalizeDreamRecord(JSON.parse(appStorage.getDurable('dreamworld:lastDream') || 'null'), { legacy: true });
+      } catch (_) {}
+      const lastDreamMatches = Boolean(lastDream)
+        && lastDream.loggedAt === removedRecord.loggedAt
+        && lastDream.transcript === removedRecord.transcript
+        && lastDream.source === removedRecord.source;
+      if (lastDreamMatches) appStorage.remove('dreamworld:lastDream');
+
+      const legacyTranscript = appStorage.getDurable('dreamworld:lastTranscript');
+      const legacyLoggedAt = appStorage.getDurable('dreamworld:worldFirstLastDream');
+      const legacySource = appStorage.getDurable('dreamworld:lastTranscriptSource') || 'unknown';
+      const normalizedLegacyDate = legacyLoggedAt && !Number.isNaN(Date.parse(legacyLoggedAt))
+        ? new Date(Date.parse(legacyLoggedAt)).toISOString()
+        : '';
+      if (legacyTranscript === removedRecord.transcript
+        && normalizedLegacyDate === removedRecord.loggedAt
+        && legacySource === removedRecord.source) {
+        ['dreamworld:lastTranscript', 'dreamworld:lastTranscriptSource', 'dreamworld:lastTranscriptModel', 'dreamworld:worldFirstLastDream']
+          .forEach(key => appStorage.remove(key));
+      }
     }
 
     function resolveLatestDreamRecord(library) {
@@ -1515,9 +1575,83 @@
       if ((action === 'revealed' || action === 'advanced') && navigator.vibrate) navigator.vibrate(12);
     }
 
-    function openAnalysis(dreamID) {
+    function loadSavedInterviewState(key) {
+      try {
+        return JSON.parse(appStorage.get(key) || 'null');
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function persistInterviewState() {
+      if (!analysisInterviewSession || !analysisInterviewStorageKey) return false;
+      return appStorage.set(analysisInterviewStorageKey, JSON.stringify(analysisInterviewSession.snapshot()));
+    }
+
+    function renderAnalysisInterview(state) {
+      analysisDialogueController?.destroy();
+      analysisDialogueController = null;
+      analysisSession = null;
+      activeAnalysisResponseText = '';
+      analysisFullText.textContent = '';
+      analysisFullOpen.hidden = true;
+      analysisDialogueAdvance.hidden = true;
+      analysisInterviewForm.hidden = false;
+      analysisInterviewAnswer.value = '';
+      analysisInterviewSubmit.disabled = true;
+      analysisInterviewFinish.hidden = state.answers.length === 0;
+      analysisInterviewProgress.textContent = `Question ${state.questionIndex + 1} of ${state.questionCount} · Your answers stay on this device`;
+      analysisCharacterResponse.textContent = state.currentQuestion.text;
+      analysisCharacterCard.dataset.typing = 'false';
+      analysisCharacterCard.dataset.complete = 'false';
+      analysisView.dataset.speaking = 'false';
+      analysisDialogueHint.textContent = 'Answer to continue';
+      analysisDialoguePage.textContent = `${state.questionIndex + 1} / ${state.questionCount}`;
+      analysisDialogueStatus.textContent = `The Listener asks question ${state.questionIndex + 1} of ${state.questionCount}.`;
+      analysisInterviewAnswer.focus();
+    }
+
+    function beginAnalysisInterview(dream, savedState = null) {
+      analysisInterviewStorageKey = `dreamworld:interview:${dream.id}`;
+      analysisInterviewSession = DreamAnalysisInterview.createInterviewSession({
+        dreamID: dream.id,
+        transcript: dream.transcript,
+        savedState
+      });
+      const state = analysisInterviewSession.snapshot();
+      if (!savedState) persistInterviewState();
+      return state;
+    }
+
+    function completeAnalysisInterview(state) {
+      persistInterviewState();
+      analysisInterviewForm.hidden = true;
+      analysisDialogueAdvance.hidden = false;
+      const dream = getAnalysisDream(activeAnalysisDreamID);
+      if (dream) startAnalysisPreparation(dream);
+    }
+
+    function submitAnalysisInterviewAnswer(event) {
+      event.preventDefault();
+      if (!analysisInterviewSession) return;
+      const state = analysisInterviewSession.submit(analysisInterviewAnswer.value);
+      persistInterviewState();
+      if (state.complete) completeAnalysisInterview(state);
+      else renderAnalysisInterview(state);
+    }
+
+    function finishAnalysisInterviewEarly() {
+      if (!analysisInterviewSession) return;
+      completeAnalysisInterview(analysisInterviewSession.finish());
+    }
+
+    function openAnalysis(dreamID, { externalRefresh = false, changedKey = '' } = {}) {
       const dream = getAnalysisDream(dreamID);
       if (!dream) return;
+      analysisInterviewForm.hidden = true;
+      analysisDialogueAdvance.hidden = false;
+      analysisInterviewSession = null;
+      analysisInterviewStorageKey = '';
       applyDreamScene(dream);
       resetAnalysisDeleteConfirmation();
       analysisUndoDelete.hidden = !pendingDeletedAnalysis;
@@ -1539,19 +1673,70 @@
           needsDetailMessage = error.message;
         }
       }
-      const responseCanBeGenerated = eligibility.analyzable && !needsDetailMessage;
+      let responseCanBeGenerated = eligibility.analyzable && !needsDetailMessage;
       const responseWasDeleted = savedState?.schemaVersion === 1
         && savedState.deleted === true
         && savedState.dreamID === dream.id;
       analysisDeleteReflection.hidden = responseWasDeleted || !responseCanBeGenerated;
       analysisDeleteReflection.disabled = Boolean(pendingDeletedAnalysis);
-      analysisRegenerateResponse.hidden = !responseWasDeleted || Boolean(pendingDeletedAnalysis) || !responseCanBeGenerated;
+      const canRestartPersonalInterview = dream.source !== 'sample-content' && eligibility.analyzable;
+      analysisRegenerateResponse.hidden = !responseWasDeleted
+        || Boolean(pendingDeletedAnalysis)
+        || (!responseCanBeGenerated && !canRestartPersonalInterview);
       analysisEntryKind.textContent = dream.source === 'sample-content' ? 'Sample dream' : 'Your dream';
       analysisTitle.textContent = dream.title;
       analysisEvidenceSource.textContent = dream.source === 'sample-content' ? 'Sample text · not your history' : `Your transcript · ${dream.source}`;
       analysisTranscript.textContent = dream.transcript;
       analysisCharacterName.textContent = DreamAnalysis.CHARACTER_NAME;
       let responseText = '';
+      let associations = [];
+
+      if (dream.source !== 'sample-content' && eligibility.analyzable && !responseWasDeleted) {
+        analysisInterviewStorageKey = `dreamworld:interview:${dream.id}`;
+        const savedInterview = loadSavedInterviewState(analysisInterviewStorageKey);
+        const interviewMissingAfterExternalChange = externalRefresh
+          && !savedInterview
+          && (changedKey === analysisInterviewStorageKey || changedKey === analysisStorageKey || changedKey === '');
+        if (interviewMissingAfterExternalChange) {
+          analysisSession = null;
+          activeAnalysisResponseText = '';
+          analysisFullText.textContent = '';
+          analysisFullOpen.hidden = true;
+          analysisInterviewForm.hidden = true;
+          analysisDialogueAdvance.hidden = false;
+          responseText = 'This reflection changed in another tab. The removed interview answers were not recreated. Reopen this dream when you are ready to begin a new reflection.';
+          analysisStorageDisclosure.textContent = 'Interview evidence changed in another tab. Nothing was regenerated from stale in-memory answers.';
+          analysisStorageStatus.textContent = 'Cross-tab change applied.';
+          closeAnalysisPanels();
+          openView('analysis');
+          startAnalysisDialogue(responseText);
+          return;
+        }
+        let interviewState;
+        try {
+          interviewState = beginAnalysisInterview(dream, savedInterview);
+        } catch (_) {
+          appStorage.remove(analysisInterviewStorageKey);
+          interviewState = beginAnalysisInterview(dream, null);
+        }
+        if (!interviewState.complete) {
+          analysisStorageDisclosure.textContent = savedInterview
+            ? 'Your unfinished answers are saved in this browser without encryption. No interpretation has been created yet.'
+            : 'Your dream is logged. Answer The Listener’s questions to create a personal reflection; no interpretation has been created yet.';
+          analysisStorageStatus.textContent = 'Your answers stay on this device and you can reflect early after answering once.';
+          closeAnalysisPanels();
+          openView('analysis');
+          renderAnalysisInterview(interviewState);
+          return;
+        }
+        associations = interviewState.answers;
+        if (associations.length) {
+          needsDetailMessage = '';
+          responseCanBeGenerated = true;
+          analysisDeleteReflection.hidden = false;
+          analysisRegenerateResponse.hidden = true;
+        }
+      }
 
       if (!eligibility.analyzable) {
         analysisSession = null;
@@ -1560,17 +1745,6 @@
           ? 'No prior reflection was loaded and no new reflection was generated. An older local response record may remain until you delete it; the transcript remains in dream history.'
           : 'No reflection was generated or saved for this transcript. The original text remains in your local dream history so you can review it.';
         analysisStorageStatus.textContent = 'This transcript does not contain enough clear dream language for a responsible analysis.';
-      } else if (needsDetailMessage) {
-        analysisSession = null;
-        responseText = needsDetailMessage;
-        analysisStorageDisclosure.textContent = responseWasDeleted
-          ? 'The prior response remains deleted. The transcript is still in dream history, but there is not enough concrete detail to create a new interpretation.'
-          : savedState
-            ? 'The transcript remains in local dream history. An older response was not loaded, and no new interpretation was generated or saved.'
-            : 'The transcript was saved in local dream history, but no interpretation was generated or saved.';
-        analysisStorageStatus.textContent = pendingDeletionStatus()
-          || analysisDeletionNotice?.message
-          || 'Add concrete events, people, or feelings before asking The Listener for an analysis.';
       } else if (responseWasDeleted) {
         analysisSession = null;
         responseText = 'This response was deleted. Your transcript is still available, and you can explicitly create a new response from the reflection controls.';
@@ -1578,6 +1752,15 @@
         analysisStorageStatus.textContent = pendingDeletionStatus()
           || analysisDeletionNotice?.message
           || 'The saved response was deleted and will not be recreated automatically.';
+      } else if (needsDetailMessage) {
+        analysisSession = null;
+        responseText = needsDetailMessage;
+        analysisStorageDisclosure.textContent = savedState
+          ? 'The transcript remains in local dream history. An older response was not loaded, and no new interpretation was generated or saved.'
+          : 'The transcript was saved in local dream history, but no interpretation was generated or saved.';
+        analysisStorageStatus.textContent = pendingDeletionStatus()
+          || analysisDeletionNotice?.message
+          || 'Add concrete events, people, or feelings before asking The Listener for an analysis.';
       } else {
         try {
           analysisSession = DreamAnalysis.createAnalysisSession({
@@ -1585,6 +1768,8 @@
             title: dream.title,
             transcript: dream.transcript,
             transcriptSource: dream.source,
+            associations,
+            priorDreams: loadDreamLibrary(),
             savedState
           });
           const state = analysisSession.snapshot();
@@ -1595,7 +1780,7 @@
           analysisStorageDisclosure.textContent = dream.source === 'sample-content'
             ? 'This is sample content, not your dream history. Its generated response may be cached in this browser.'
             : storedDurably
-              ? 'Your transcript remains in local dream history, and this response is saved in this browser without encryption.'
+              ? 'Your transcript remains in local dream history. Your interview answers and this response are saved in this browser without encryption.'
               : 'Your transcript remains available, but this response could not be saved in browser storage.';
           analysisStorageStatus.textContent = pendingDeletionStatus()
             || analysisDeletionNotice?.message
@@ -1624,21 +1809,28 @@
 
     function resetAnalysisDeleteConfirmation() {
       analysisDeleteReflection.dataset.confirmDelete = 'false';
-      analysisDeleteReflection.textContent = 'Delete this reflection';
+      analysisDeleteReflection.textContent = 'Delete answers & reflection';
     }
 
     function restoreDeletedAnalysisSnapshot(deleted) {
       const snapshotRaw = JSON.stringify(deleted.snapshot);
       const durableRaw = appStorage.getDurable(deleted.key);
+      const durableInterviewRaw = deleted.interviewKey ? appStorage.getDurable(deleted.interviewKey) : null;
+      const interviewConflict = deleted.interviewRaw !== null
+        && durableInterviewRaw !== null
+        && durableInterviewRaw !== deleted.interviewRaw;
+      const interviewRestored = deleted.interviewRaw === null
+        || interviewConflict
+        || appStorage.set(deleted.interviewKey, deleted.interviewRaw);
       if (durableRaw !== null && durableRaw !== snapshotRaw && durableRaw !== deleted.tombstoneRaw) {
         return {
           conflict: true,
-          restoredDurably: appStorage.set(deleted.key, durableRaw)
+          restoredDurably: appStorage.set(deleted.key, durableRaw) && interviewRestored
         };
       }
       return {
-        conflict: false,
-        restoredDurably: appStorage.set(deleted.key, snapshotRaw)
+        conflict: interviewConflict,
+        restoredDurably: appStorage.set(deleted.key, snapshotRaw) && interviewRestored
       };
     }
 
@@ -1685,7 +1877,7 @@
       if (analysisDeleteReflection.dataset.confirmDelete !== 'true') {
         analysisDeleteReflection.dataset.confirmDelete = 'true';
         analysisDeleteReflection.textContent = 'Delete permanently? Tap again';
-        analysisStorageStatus.textContent = 'Tap again when ready to delete this reflection. The original dream account will remain.';
+        analysisStorageStatus.textContent = 'Tap again when ready to delete the interview answers and reflection. The original dream account will remain.';
         return;
       }
       resetAnalysisDeleteConfirmation();
@@ -1700,6 +1892,8 @@
       });
       pendingDeletedAnalysis = {
         key: analysisStorageKey,
+        interviewKey: `dreamworld:interview:${activeAnalysisDreamID}`,
+        interviewRaw: appStorage.getDurable(`dreamworld:interview:${activeAnalysisDreamID}`),
         dreamID: activeAnalysisDreamID,
         title: analysisTitle.textContent,
         removedDurably: false,
@@ -1707,8 +1901,10 @@
         snapshot: analysisSession.snapshot()
       };
       const responseRemoved = appStorage.remove(analysisStorageKey);
+      const interviewRemoved = pendingDeletedAnalysis.interviewRaw === null
+        || appStorage.remove(pendingDeletedAnalysis.interviewKey);
       const tombstoneStored = responseRemoved && appStorage.set(analysisStorageKey, tombstoneRaw);
-      pendingDeletedAnalysis.removedDurably = Boolean(responseRemoved && tombstoneStored);
+      pendingDeletedAnalysis.removedDurably = Boolean(responseRemoved && interviewRemoved && tombstoneStored);
       if (!pendingDeletedAnalysis.removedDurably) restoreDeletedAnalysisSnapshot(pendingDeletedAnalysis);
       openAnalysis(pendingDeletedAnalysis.dreamID);
       showAnalysisPanel(analysisControlsPanel);
@@ -1753,6 +1949,17 @@
       if (!dream) return;
       const eligibility = DreamAnalysis.assessTranscriptEligibility(dream.transcript);
       if (!eligibility.analyzable) return;
+      if (dream.source !== 'sample-content') {
+        const tombstoneRemoved = appStorage.remove(analysisStorageKey);
+        if (!tombstoneRemoved) {
+          analysisStorageStatus.textContent = 'The deleted-response marker could not be cleared, so a new interview was not started.';
+          return;
+        }
+        analysisDeletionNotice = null;
+        openAnalysis(dream.id);
+        analysisStorageStatus.textContent = 'Answer The Listener’s questions to create a new personal reflection.';
+        return;
+      }
       let freshSession;
       try {
         freshSession = DreamAnalysis.createAnalysisSession({
@@ -2118,7 +2325,7 @@
       setTextDraftLocked(false);
       renderLatestDreamRow();
       if (navigator.vibrate) navigator.vibrate([30, 30, 60]);
-      startAnalysisPreparation(record);
+      openAnalysis(record.id);
     }
 
     function logNoDream() {
@@ -2145,12 +2352,15 @@
       try {
         const stored = JSON.parse(appStorage.get('dreamworld:alarms') || 'null');
         if (Array.isArray(stored)) {
-          alarms = stored.filter(alarm => /^([01]\d|2[0-3]):[0-5]\d$/.test(alarm.time)).map(alarm => ({
-            id: String(alarm.id),
-            time: alarm.time,
-            days: Array.isArray(alarm.days) ? alarm.days.filter(day => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].includes(day)) : [],
-            enabled: alarm.enabled !== false
-          }));
+          alarms = stored.filter(alarm => alarm && /^([01]\d|2[0-3]):[0-5]\d$/.test(alarm.time)).map((alarm, index) => {
+            const rawID = String(alarm.id ?? '');
+            return {
+              id: /^[a-z0-9-]{1,80}$/i.test(rawID) ? rawID : `recovered-alarm-${index + 1}`,
+              time: alarm.time,
+              days: Array.isArray(alarm.days) ? alarm.days.filter(day => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].includes(day)) : [],
+              enabled: alarm.enabled !== false
+            };
+          });
         }
       } catch (_) {
         appStorage.remove('dreamworld:alarms');
@@ -2165,18 +2375,46 @@
     }
 
     function renderAlarms() {
+      alarmList.replaceChildren();
       if (!alarms.length) {
-        alarmList.innerHTML = '<div class="alarm-empty">No alarms yet. Add a wake time when you want Dreamworld ready for capture.</div>';
+        const empty = document.createElement('div');
+        empty.className = 'alarm-empty';
+        empty.textContent = 'No alarms yet. Add a wake time when you want Dreamworld ready for capture.';
+        alarmList.append(empty);
         return;
       }
-      alarmList.innerHTML = alarms.map(alarm => `
-        <div class="alarm-row" data-alarm-id="${alarm.id}">
-          <div><span class="alarm-time">${formatAlarmTime(alarm.time)}</span><span class="alarm-detail">${alarm.days.length ? alarm.days.join(' · ') : 'Once'} · Dreamworld</span></div>
-          <div class="alarm-row-actions">
-            <button class="alarm-preview-button" data-preview-alarm="${alarm.id}" aria-label="Preview ${formatAlarmTime(alarm.time)} alarm">▶</button>
-            <button class="toggle ${alarm.enabled ? 'on' : ''}" data-toggle-alarm="${alarm.id}" aria-label="Toggle ${formatAlarmTime(alarm.time)} alarm" aria-pressed="${alarm.enabled}"></button>
-          </div>
-        </div>`).join('');
+      const fragment = document.createDocumentFragment();
+      alarms.forEach(alarm => {
+        const row = document.createElement('div');
+        row.className = 'alarm-row';
+        row.dataset.alarmId = alarm.id;
+
+        const copy = document.createElement('div');
+        const time = document.createElement('span');
+        time.className = 'alarm-time';
+        time.textContent = formatAlarmTime(alarm.time);
+        const detail = document.createElement('span');
+        detail.className = 'alarm-detail';
+        detail.textContent = `${alarm.days.length ? alarm.days.join(' · ') : 'Once'} · Dreamworld`;
+        copy.append(time, detail);
+
+        const actions = document.createElement('div');
+        actions.className = 'alarm-row-actions';
+        const preview = document.createElement('button');
+        preview.className = 'alarm-preview-button';
+        preview.dataset.previewAlarm = alarm.id;
+        preview.setAttribute('aria-label', `Preview ${formatAlarmTime(alarm.time)} alarm`);
+        preview.textContent = '▶';
+        const toggle = document.createElement('button');
+        toggle.className = `toggle${alarm.enabled ? ' on' : ''}`;
+        toggle.dataset.toggleAlarm = alarm.id;
+        toggle.setAttribute('aria-label', `Toggle ${formatAlarmTime(alarm.time)} alarm`);
+        toggle.setAttribute('aria-pressed', String(alarm.enabled));
+        actions.append(preview, toggle);
+        row.append(copy, actions);
+        fragment.append(row);
+      });
+      alarmList.append(fragment);
     }
 
     function resetAlarmEditor() {
@@ -2244,10 +2482,89 @@
       }, 560);
     }
 
+    function closeActiveAnalysisAfterExternalSourceLoss({ removedRecord = null, storageCleared = false } = {}) {
+      if (!activeAnalysisDreamID || SAMPLE_ANALYSIS_DREAMS[activeAnalysisDreamID]) return false;
+      const removedDreamID = activeAnalysisDreamID;
+      if (!storageCleared) removeMatchingLegacyDreamMirrors(removedRecord);
+      window.clearTimeout(deleteUndoTimer);
+      window.clearTimeout(analysisPreparationTimer);
+      analysisPreparationRun += 1;
+      analysisPreparation.classList.remove('visible');
+      analysisPreparation.hidden = true;
+      setPreparationBackgroundInert(false);
+      pendingDeletedAnalysis = null;
+      undoWindowHeld = false;
+      analysisDeletionNotice = null;
+      analysisUndoDelete.hidden = true;
+      analysisKeepUndo.hidden = true;
+      analysisFinishDeletion.hidden = true;
+      analysisUndoDelete.textContent = 'Undo deletion';
+      analysisDeleteReflection.disabled = false;
+      resetAnalysisDeleteConfirmation();
+      analysisInterviewSession = null;
+      analysisInterviewStorageKey = '';
+      analysisSession = null;
+      analysisDialogueController?.destroy();
+      analysisDialogueController = null;
+      activeAnalysisResponseText = '';
+      appStorage.remove(`dreamworld:interview:${removedDreamID}`);
+      appStorage.remove(`dreamworld:analysis:${removedDreamID}`);
+      activeAnalysisDreamID = '';
+      analysisStorageKey = '';
+      analysisInterviewForm.hidden = true;
+      analysisDialogueAdvance.hidden = false;
+      analysisDeleteReflection.hidden = true;
+      analysisRegenerateResponse.hidden = true;
+      const removalMessage = storageCleared
+        ? 'Browser storage was cleared in another tab. This interview and reflection were closed, and stale answers cannot be saved.'
+        : 'This dream was removed in another tab. Its interview and reflection were closed, and stale answers cannot be saved.';
+      analysisStorageDisclosure.textContent = storageCleared
+        ? 'The source dream no longer exists in browser storage. Orphaned interview and response data were cleared.'
+        : 'The source dream no longer exists in local history. Orphaned interview and response data were removed.';
+      analysisStorageStatus.textContent = storageCleared ? 'Cross-tab storage clear applied.' : 'Cross-tab deletion applied.';
+      closeAnalysisPanels();
+      renderLatestDreamRow();
+      if (analysisView.classList.contains('active')) startAnalysisDialogue(removalMessage);
+      return true;
+    }
+
     document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => openView(button.dataset.go)));
     window.addEventListener('storage', event => {
-      if (event.key === null || event.key === 'dreamworld:lastDream' || event.key?.startsWith(DREAM_RECORD_PREFIX)) {
-        renderLatestDreamRow();
+      const dreamHistoryChanged = event.key === null
+        || event.key === 'dreamworld:lastDream'
+        || event.key?.startsWith(DREAM_RECORD_PREFIX);
+      if (dreamHistoryChanged) renderLatestDreamRow();
+      if (!activeAnalysisDreamID) return;
+
+      const activeAnalysisKey = `dreamworld:analysis:${activeAnalysisDreamID}`;
+      const activeInterviewKey = `dreamworld:interview:${activeAnalysisDreamID}`;
+      const activeDreamKey = `${DREAM_RECORD_PREFIX}${activeAnalysisDreamID}`;
+      const activeDreamRemoved = !SAMPLE_ANALYSIS_DREAMS[activeAnalysisDreamID]
+        && event.key === activeDreamKey
+        && event.newValue === null;
+      if (event.key === null && closeActiveAnalysisAfterExternalSourceLoss({ storageCleared: true })) return;
+      if (activeDreamRemoved) {
+        let removedRecord = null;
+        try { removedRecord = normalizeDreamRecord(JSON.parse(event.oldValue || 'null')); } catch (_) {}
+        closeActiveAnalysisAfterExternalSourceLoss({ removedRecord });
+        return;
+      }
+      const activeEvidenceChanged = event.key === null
+        || event.key === activeAnalysisKey
+        || event.key === activeInterviewKey;
+      if (activeEvidenceChanged) {
+        analysisInterviewSession = null;
+        analysisInterviewStorageKey = '';
+        analysisSession = null;
+        analysisDialogueController?.destroy();
+        analysisDialogueController = null;
+        activeAnalysisResponseText = '';
+      }
+      const unfinishedInterviewIsActive = Boolean(analysisInterviewSession) && !analysisInterviewForm.hidden;
+      const unrelatedHistoryChange = dreamHistoryChanged && !activeEvidenceChanged;
+      if (unfinishedInterviewIsActive && unrelatedHistoryChange) return;
+      if (analysisView.classList.contains('active') && (dreamHistoryChanged || activeEvidenceChanged)) {
+        openAnalysis(activeAnalysisDreamID, { externalRefresh: true, changedKey: event.key || '' });
       }
     });
     document.querySelectorAll('.hotspot').forEach(button => button.addEventListener('click', () => {
@@ -2313,6 +2630,11 @@
       window.requestAnimationFrame(() => lastAnalysisTrigger?.focus());
     });
     analysisDialogueAdvance.addEventListener('click', activateAnalysisDialogue);
+    analysisInterviewAnswer.addEventListener('input', () => {
+      analysisInterviewSubmit.disabled = !analysisInterviewAnswer.value.trim();
+    });
+    analysisInterviewForm.addEventListener('submit', submitAnalysisInterviewAnswer);
+    analysisInterviewFinish.addEventListener('click', finishAnalysisInterviewEarly);
     analysisFullOpen.addEventListener('click', () => {
       analysisFullText.textContent = activeAnalysisResponseText;
       showAnalysisPanel(analysisFullPanel);

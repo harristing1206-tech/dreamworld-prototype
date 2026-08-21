@@ -1,9 +1,13 @@
 (function initDreamAnalysis(root, factory) {
-  const api = factory();
+  const jungianMethod = typeof module === 'object' && module.exports
+    ? require('./jungian-method.js')
+    : root.DreamJungianMethod;
+  const api = factory(jungianMethod);
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.DreamAnalysis = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI() {
-  const ANALYSIS_VERSION = 9;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI(jungianMethod) {
+  if (!jungianMethod) throw new Error('DreamJungianMethod is required before DreamAnalysis.');
+  const ANALYSIS_VERSION = 10;
   const CHARACTER_NAME = 'The Listener';
   const UNCLEAR_TRANSCRIPT_MESSAGE = 'I couldn’t find enough clear dream language in this transcript to analyze. Review or replace the text—no analysis was created.';
   const NEEDS_DETAIL_MESSAGE = 'I couldn’t find enough concrete dream detail to analyze responsibly. Your transcript was saved, but no interpretation was created. Add what happened, who was there, or how it felt.';
@@ -63,7 +67,7 @@
     return { analyzable: true, reason: 'clear-enough', message: '' };
   }
 
-  function createCharacterAnalysis(transcript) {
+  function createTranscriptAnalysis(transcript) {
     const account = clean(transcript);
     const eligibility = assessTranscriptEligibility(account);
     if (!eligibility.analyzable) throw new Error(eligibility.message);
@@ -279,7 +283,30 @@
     throw error;
   }
 
-  function createAnalysisSession({ dreamID, title = 'Dream', transcript, transcriptSource = 'unknown', savedState = null } = {}) {
+  function normalizeAssociations(associations) {
+    if (!Array.isArray(associations)) return [];
+    return associations.slice(0, 3).map(item => ({
+      focus: clean(item?.focus).slice(0, 100),
+      question: clean(item?.question).slice(0, 300),
+      answer: clean(item?.answer).slice(0, 600)
+    })).filter(item => item.focus && item.question && item.answer);
+  }
+
+  function createCharacterAnalysis(transcript, { associations = [] } = {}) {
+    const personalEvidence = normalizeAssociations(associations);
+    let response;
+    try {
+      response = createTranscriptAnalysis(transcript);
+    } catch (error) {
+      if (error?.code !== 'DREAM_ANALYSIS_NEEDS_DETAIL' || !personalEvidence.length) throw error;
+      response = 'The transcript alone does not support a responsible symbolic interpretation. Your own associations provide the personal evidence for this reflection instead.';
+    }
+    if (!personalEvidence.length) return response;
+    const statedMeanings = personalEvidence.map(({ focus, answer }) => `When I asked about ${focus}, you said, “${answer}”`).join(' ');
+    return `${response}\n\nYour own associations make this reading more personal than a symbol dictionary could. ${statedMeanings} Those answers do not prove one hidden meaning, but they change which parts of the dream deserve the most weight: your meanings should lead, while my interpretation remains only one possible reflection.`;
+  }
+
+  function createAnalysisSession({ dreamID, title = 'Dream', transcript, transcriptSource = 'unknown', associations = [], priorDreams = [], savedState = null } = {}) {
     const normalizedTranscript = clean(transcript);
     const eligibility = assessTranscriptEligibility(normalizedTranscript);
     if (!eligibility.analyzable) throw new Error(eligibility.message);
@@ -287,13 +314,23 @@
     const evidence = {
       transcript: normalizedTranscript,
       transcriptSource: clean(transcriptSource) || 'unknown',
+      associations: normalizeAssociations(associations),
       author: 'user-record'
     };
+    const methodology = jungianMethod.buildJungianContext({
+      dreamID: clean(dreamID),
+      transcript: normalizedTranscript,
+      associations: evidence.associations,
+      priorDreams
+    });
     const evidenceMatches = savedState
       && savedState.analysisVersion === ANALYSIS_VERSION
       && savedState.dreamID === clean(dreamID)
       && savedState.evidence?.transcript === evidence.transcript
-      && savedState.evidence?.transcriptSource === evidence.transcriptSource;
+      && savedState.evidence?.transcriptSource === evidence.transcriptSource
+      && JSON.stringify(savedState.evidence?.associations || []) === JSON.stringify(evidence.associations)
+      && savedState.methodology?.methodVersion === methodology.methodVersion
+      && savedState.methodology?.historyFingerprint === methodology.historyFingerprint;
     const savedResponse = evidenceMatches && savedState.characterResponse?.speaker === CHARACTER_NAME
       && typeof savedState.characterResponse?.text === 'string'
       && savedState.characterResponse.text.trim()
@@ -305,9 +342,13 @@
       dreamID: clean(dreamID) || 'unspecified-dream',
       title: clean(title) || 'Dream',
       evidence,
+      methodology,
       characterResponse: {
         speaker: CHARACTER_NAME,
-        text: savedResponse || createCharacterAnalysis(normalizedTranscript),
+        text: savedResponse || jungianMethod.appendLongitudinalNote(
+          createCharacterAnalysis(normalizedTranscript, { associations: evidence.associations }),
+          methodology
+        ),
         author: 'character'
       }
     };

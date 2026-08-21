@@ -77,6 +77,32 @@ assert.ok(sequence.every(index => index >= 0), `analysis must contain every step
 assert.deepEqual([...sequence].sort((a, b) => a - b), sequence, 'analysis should preserve departure → admission → reassurance → reunion → crying');
 assert.ok(grandparentsResponse.length >= 500 && grandparentsResponse.length <= 1400, 'layered dreams need a substantive but bounded response');
 
+const childhoodKeyDream = `I was walking through my childhood neighborhood at night, but every house was floating a few feet above the ground. I followed a trail of glowing blue flowers to my old home and found the front door standing open. Inside, the rooms were filled with shallow ocean water, and a giant white moth was resting on the ceiling. My grandmother was sitting at the kitchen table even though I knew she had passed away. She handed me a small golden key and told me, “You already know which door it opens.” When I looked down, a dark staircase had appeared beneath the water. I felt afraid to descend, but also strangely relieved—like something important had been waiting for me there.`;
+const childhoodKeyResponse = createCharacterAnalysis(childhoodKeyDream);
+assert.match(childhoodKeyResponse, /childhood|old home|neighborhood/i, 'analysis should address the transformed childhood setting');
+assert.match(childhoodKeyResponse, /blue flowers|glowing flowers|flower/i, 'analysis should preserve the trail that guides the dreamer home');
+assert.match(childhoodKeyResponse, /grandmother/i, 'analysis should address the grandmother as part of the dream’s emotional logic');
+assert.match(childhoodKeyResponse, /memory|trusted|internal|relationship/i, 'analysis should explain the grandmother’s possible role without claiming a supernatural message');
+assert.match(childhoodKeyResponse, /golden key|key/i, 'analysis should interpret the object she gives the dreamer');
+assert.match(childhoodKeyResponse, /already know/i, 'analysis should preserve the grandmother’s actual message');
+assert.match(childhoodKeyResponse, /staircase[\s\S]{0,100}(water|submerged|beneath)/i, 'analysis should connect the staircase to its position beneath the water');
+assert.match(childhoodKeyResponse, /afraid|fear/i, 'analysis should preserve the fear of descending');
+assert.match(childhoodKeyResponse, /relie(?:f|ved)/i, 'analysis should preserve the simultaneous relief');
+assert.match(childhoodKeyResponse, /white moth|moth/i, 'analysis should acknowledge the unusual secondary image');
+assert.match(childhoodKeyResponse, /not a fixed symbol|could|may|possible/i, 'analysis should keep symbolic claims tentative');
+assert.match(childhoodKeyResponse, /descend|door|already know/i, 'the final question should come from the dream’s actual choice rather than generic insecurity');
+assert.doesNotMatch(childhoodKeyResponse, /distance between the water and the place that should feel like home/i, 'the shallow water-home template must not flatten a layered dream');
+assert.ok(childhoodKeyResponse.length >= 700 && childhoodKeyResponse.length <= 1700, 'a layered dream should receive a substantive but bounded response');
+
+const sparseKeyResponse = createCharacterAnalysis('My dead grandfather gave me a key at the top of a staircase. I felt afraid.');
+assert.match(sparseKeyResponse, /grandfather/i);
+assert.doesNotMatch(sparseKeyResponse, /grandmother|grandparents|childhood|old home|familiar home|kitchen|water|golden key/i, 'analysis must not import absent scene details from the richer branch');
+
+const grandparentsKeyResponse = createCharacterAnalysis('My dead grandmother and grandfather sit at a table and give me a key beside a staircase. I feel afraid.');
+assert.match(grandparentsKeyResponse, /grandparents (?:sit|appear)/i, 'plural relatives require plural grammar');
+assert.match(grandparentsKeyResponse, /grandparents[\s\S]{0,100}give/i, 'plural relatives must give rather than gives');
+assert.doesNotMatch(grandparentsKeyResponse, /grandparents (?:sits|gives)/i);
+
 const oceanResponse = createCharacterAnalysis('I crossed a dark ocean toward a house, but every room was empty.');
 assert.match(oceanResponse, /ocean|water/i, 'the response should reflect concrete dream imagery');
 assert.match(oceanResponse, /house|home|belong/i, 'the response should connect recurring imagery into one coherent reading');

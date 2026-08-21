@@ -3,7 +3,7 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.DreamAnalysis = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI() {
-  const ANALYSIS_VERSION = 5;
+  const ANALYSIS_VERSION = 6;
   const CHARACTER_NAME = 'The Listener';
   const UNCLEAR_TRANSCRIPT_MESSAGE = 'I couldn’t find enough clear dream language in this transcript to analyze. Review or replace the text—no analysis was created.';
   const NEEDS_DETAIL_MESSAGE = 'I couldn’t find enough concrete dream detail to analyze responsibly. Your transcript was saved, but no interpretation was created. Add what happened, who was there, or how it felt.';
@@ -96,6 +96,58 @@
         ? `Crying when your family appears reads less like a warning than grief and love becoming available at the same time.`
         : `Their presence seems to hold the emotion that the earlier departures bring up.`;
       return `The dream places two kinds of separation beside each other: your friends leave one by one while you watch, and then your ${relatives}, who are gone, return. That makes the sadness less about the car and more about being the person who remains after people move out of reach. It may be touching a current sensitivity to change, friendship transitions, or the fact that closeness cannot be held still.\n\n${ageReading}\n\n${messageReading} ${emotionReading} A grounded question is whether some recent departure or transition has reactivated how much you miss them—and whether their way of speaking has become part of how you now comfort yourself.`;
+    }
+
+    const entrustedKey = hasAny(text, ['key', 'golden key']);
+    const goldenKey = hasAny(text, ['golden key']);
+    const descent = hasAny(text, ['staircase', 'stairs', 'stairway', 'steps', 'descend', 'descending']);
+    const childhoodSetting = hasAny(text, ['childhood', 'old home', 'grew up', 'used to live']);
+    const guidingFlowers = hasAny(text, ['glowing blue flowers', 'blue flowers', 'glowing flowers']);
+    const homeSetting = hasAny(text, ['house', 'home', 'room', 'bedroom', 'apartment']);
+    const kitchenSetting = hasAny(text, ['kitchen']);
+    const submerged = hasAny(text, ['water', 'ocean', 'sea', 'flood', 'submerged', 'beneath the water', 'under the water']);
+    const moth = hasAny(text, ['moth', 'white moth']);
+    const fear = hasAny(text, ['afraid', 'fear', 'fearful', 'scared', 'terrified']);
+    const relief = hasAny(text, ['relief', 'relieved', 'comforted', 'release']);
+    const alreadyKnows = hasAny(text, ['already know', 'already knew', 'you know which door', 'knew which door']);
+
+    if (deceased && (grandfather || grandmother) && entrustedKey && descent) {
+      const pluralRelatives = grandfather && grandmother;
+      const relative = pluralRelatives ? 'grandparents' : grandfather ? 'grandfather' : 'grandmother';
+      const keyLabel = goldenKey ? 'golden key' : 'key';
+      const settingReading = childhoodSetting
+        ? guidingFlowers
+          ? `The dream returns you to a childhood neighborhood that is recognizable but physically impossible. The floating houses keep the past visible but out of ordinary reach. Glowing blue flowers lead directly to your open old home, so the return feels guided—an invitation into changed memory rather than exclusion.`
+          : `The dream returns you to a childhood neighborhood that is recognizable but physically impossible. The floating houses keep the past visible but out of ordinary reach. Yet your old home is open, making this feel more like an invitation into changed memory than exclusion.`
+        : homeSetting
+          ? `The familiar home has changed, revisiting something known while acknowledging that you cannot return to it exactly as it was.`
+          : `The dream pairs two concrete actions: receiving a key and facing a staircase. One offers access; the other asks whether you will go deeper.`;
+      const waterReading = submerged
+        ? `The staircase appears beneath the water, so the route is not away from feeling or memory but down through it. Because the steps remain visible, the descent is difficult but available—not a picture of being lost or overwhelmed.`
+        : `The staircase makes the direction explicit: downward, toward something remembered, felt, or partly known beneath the familiar surface.`;
+      const emotionReading = fear && relief
+        ? `Feeling afraid and relieved at once is crucial. Fear suggests that descending carries an emotional cost; relief suggests that remaining above it may also be tiring, and that part of you is ready to stop avoiding what waits there.`
+        : fear
+          ? `Your fear makes the staircase feel consequential rather than merely mysterious: approaching what is below may feel emotionally costly even if the route is open.`
+          : relief
+            ? `The relief suggests recognition—some part of you may experience the descent not as danger, but as finally approaching something that has waited for attention.`
+            : `Your response to the staircase matters more than treating it as a universal symbol; the dream has placed a choice directly in front of you.`;
+      const mothReading = moth
+        ? `The giant white moth could echo change, fragility, or movement toward light, but it is not a fixed symbol. Resting above the room instead of attacking or guiding you, it feels more like a witness than the dream’s explanation.`
+        : '';
+      const relativePresence = kitchenSetting
+        ? `Your ${relative} ${pluralRelatives ? 'sit' : 'sits'} calmly in the kitchen and ${pluralRelatives ? 'give' : 'gives'} you a ${keyLabel} rather than a warning.`
+        : `Your ${relative} ${pluralRelatives ? 'appear and give' : 'appears and gives'} you a ${keyLabel}.`;
+      const knowledgeReading = alreadyKnows
+        ? `“You already know” returns authority to you: the ${keyLabel} is not an answer from outside, but permission or access to something the dream suggests you partly recognize.`
+        : `The ${keyLabel} offers access without opening the way for you, leaving the choice in your hands.`;
+      const summaryReading = childhoodSetting || homeSetting
+        ? `Taken together, this seems less about whether home is secure and more about whether you are ready to enter a familiar part of your own history or emotional life.`
+        : `Taken together, the dream may be exploring what happens when access becomes available but choosing to go deeper still feels consequential.`;
+      const closingQuestion = alreadyKnows
+        ? `What do you suspect you “already know,” but have not yet felt ready to descend toward?`
+        : `What currently feels available to approach, but emotionally difficult to go deeper into?`;
+      return `${settingReading}\n\n${relativePresence} Without treating this as supernatural, the dream may be using the memory of a trusted relationship as a safe guide toward something difficult. ${knowledgeReading}\n\n${waterReading} ${emotionReading}\n\n${mothReading}${mothReading ? ' ' : ''}${summaryReading} ${closingQuestion}`;
     }
 
     const water = hasAny(text, ['ocean', 'water', 'river', 'rain', 'flood', 'wave', 'swim', 'sea']);

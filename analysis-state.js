@@ -3,7 +3,7 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.DreamAnalysis = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function makeDreamAnalysisAPI() {
-  const ANALYSIS_VERSION = 8;
+  const ANALYSIS_VERSION = 9;
   const CHARACTER_NAME = 'The Listener';
   const UNCLEAR_TRANSCRIPT_MESSAGE = 'I couldn’t find enough clear dream language in this transcript to analyze. Review or replace the text—no analysis was created.';
   const NEEDS_DETAIL_MESSAGE = 'I couldn’t find enough concrete dream detail to analyze responsibly. Your transcript was saved, but no interpretation was created. Add what happened, who was there, or how it felt.';
@@ -85,7 +85,7 @@
     const transferVerbs = '(?:hand|handed|hands|give|gave|gives|offer|offered|offers)';
     const transferredVerbs = '(?:handed|given|offered)';
     const instrumentKey = /\b(?:piano|keyboard|computer|typewriter)\s+key\b|\bkey\s+(?:on|from|of)\s+(?:the\s+)?(?:piano|keyboard|computer|typewriter)\b/;
-    const negatedTransfer = /\b(?:did\s+not|didn['’]t|never|not)\s+(?:hand|give|offer)\b|\b(?:was|is)\s+not\s+(?:handed|given|offered)\b/;
+
     const relativeSpecs = [
       {
         key: 'grandparents',
@@ -99,20 +99,33 @@
     const sentenceMarksDeparted = (sentence, spec) => {
       if (sentenceMarksLiving(sentence, spec)) return false;
       return new RegExp(`\\b(?:dead|deceased|late)\\s+${spec.subject}\\b`).test(sentence)
-        || new RegExp(`\\b${spec.subject}\\b\\s*,?\\s*(?:who\\s+(?:is|was)\\s+|now\\s+)?(?:dead|deceased)\\b`).test(sentence)
+        || new RegExp(`\\b${spec.subject}\\b\\s*,?\\s*(?:(?:who\\s+(?:is|was|had)\\s+|now\\s+)?(?:dead|deceased|passed away|died))\\b`).test(sentence)
+        || new RegExp(`\\b${spec.subject}\\b\\s*,?\\s*who\\s+(?:had\\s+)?(?:passed away|died)\\b`).test(sentence)
+        || new RegExp(`\\b${spec.subject}\\b\\s+(?:had\\s+)?(?:passed away|died)\\b`).test(sentence)
         || new RegExp(`\\b${spec.subject}\\b\\s+(?:is|was|are|were)\\s+no\\s+longer\\s+alive\\b`).test(sentence)
         || new RegExp(`\\b${spec.subject}\\b.{0,120}\\b${spec.pronoun}\\s+(?:had\\s+)?(?:passed away|died|is dead|was dead|is deceased|was deceased)\\b`).test(sentence);
     };
     const sentenceTransfersKey = (sentence, spec, usePronoun = false) => {
-      if (instrumentKey.test(sentence) || negatedTransfer.test(sentence)) return false;
+      if (instrumentKey.test(sentence)) return false;
       const subject = usePronoun ? spec.pronoun : spec.subject;
-      const directSubject = new RegExp(`\\b${subject}\\b(?:\\s*,\\s*(?:now\\s+)?deceased\\s*,?)?\\s+(?:(?:then|quietly|gently|carefully|suddenly)\\s+)?${transferVerbs}\\s+(?:me|us)\\s+(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key\\b`).test(sentence);
-      const continuedSubject = new RegExp(`\\b${subject}\\b.{0,50}\\band\\s+${transferVerbs}\\s+(?:me|us)\\s+(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key\\b`).test(sentence);
+      const departedAside = `(?:\\s*,\\s*(?:(?:now\\s+)?deceased|who\\s+(?:(?:had\\s+)?(?:passed away|died)|(?:was|is)\\s+deceased))\\s*,?)?`;
+      const keyForDreamer = `(?:(?:me|us)\\s+(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key|(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key\\s+to\\s+(?:me|us))`;
+      const directSubject = new RegExp(`\\b${subject}\\b${departedAside}\\s+(?:(?:then|quietly|gently|carefully|suddenly)\\s+)?${transferVerbs}\\s+${keyForDreamer}\\b`).test(sentence);
       const passive = new RegExp(`\\b(?:(?:a|the)\\s+)?(?:small\\s+)?(?:golden\\s+)?key\\s+(?:was|is)\\s+${transferredVerbs}\\s+to\\s+(?:me|us)\\s+by\\s+(?:my\\s+)?(?:dead\\s+|deceased\\s+|late\\s+)?${spec.subject}\\b`).test(sentence);
-      return directSubject || continuedSubject || passive;
+      return directSubject || passive;
     };
-    const sentenceHasDescent = sentence => hasAny(sentence, ['staircase', 'stairs', 'stairway', 'descend', 'descending'])
-      || /\bsteps?\s+(?:down|downward|below|beneath|into)\b/.test(sentence);
+    const sentenceHasThreshold = (sentence, transferSentence = false) => {
+      const negated = /\b(?:did\s+not|didn['’]t|never)\s+(?:descend|descended|approach|approached|enter|entered|see|saw|find|found|go|went|walk|walked)\b.{0,40}\b(?:staircase|stairs|stairway|steps)\b|\bno\s+(?:staircase|stairs|stairway|steps)\b|\b(?:staircase|stairs|stairway|steps)\b.{0,24}\b(?:was|were|is|are|wasn['’]t|weren['’]t|isn['’]t|aren['’]t)\s+(?:not\s+)?(?:there|visible|present)\b/.test(sentence);
+      const upward = /\b(?:climbed|climb|climbing|ascended|ascend|ascending|went|walked)\b.{0,24}\b(?:stairs|staircase|stairway|steps)\b.{0,16}\b(?:up|upward)\b|\b(?:climbed|climb|climbing|went|walked)\s+up\s+(?:the\s+)?(?:stairs|staircase|stairway|steps)\b/.test(sentence);
+      const mentioned = /\b(?:discussed|mentioned|described|talked about|read about|drew)\b.{0,40}\b(?:stairs|staircase|stairway|steps)\b/.test(sentence);
+      if (negated || upward || mentioned) return false;
+      if (transferSentence && hasAny(sentence, ['staircase', 'stairs', 'stairway'])) return true;
+      return /\b(?:i|we)\b.{0,32}\b(?:descend|descending|descended|approached|found|saw|stood before|walked toward|looked down)\b.{0,40}\b(?:staircase|stairs|stairway|steps)\b/.test(sentence)
+        || /\b(?:staircase|stairs|stairway|steps)\b.{0,40}\b(?:appeared|stood|opened|led|waited)\b/.test(sentence)
+        || /\bsteps?\s+(?:down|downward|below|beneath|into)\b/.test(sentence);
+    };
+    const sentenceHasDownwardDescent = sentence => !/\b(?:did\s+not|didn['’]t|never)\s+(?:descend|descended|go|went|walk|walked)\b.{0,24}\b(?:down|staircase|stairs|stairway|steps)\b/.test(sentence)
+      && /\b(?:descend|descending|descended|steps?\s+down|walked down|went down)\b/.test(sentence);
     const findThresholdGuide = spec => {
       const departedIndices = sentences
         .map((sentence, index) => sentenceMarksDeparted(sentence, spec) ? index : -1)
@@ -123,8 +136,15 @@
         const directTransfer = sentenceTransfersKey(sentences[index], spec, false);
         const pronounTransfer = departedImmediatelyBefore && sentenceTransfersKey(sentences[index], spec, true);
         if (!(directTransfer && (departedHere || departedImmediatelyBefore)) && !pronounTransfer) continue;
-        const hasNearbyDescent = sentences.slice(index, index + 3).some(sentenceHasDescent);
-        if (hasNearbyDescent) return { ...spec, transferIndex: index };
+        const nearbySentences = sentences.slice(index, index + 3);
+        const hasNearbyThreshold = nearbySentences.some((sentence, offset) => sentenceHasThreshold(sentence, offset === 0));
+        if (hasNearbyThreshold) {
+          return {
+            ...spec,
+            transferIndex: index,
+            downwardDescent: nearbySentences.some(sentenceHasDownwardDescent)
+          };
+        }
       }
       return null;
     };
@@ -154,12 +174,20 @@
     const homeSetting = hasAny(text, ['house', 'home', 'room', 'bedroom', 'apartment']);
     const kitchenSetting = hasAny(text, ['kitchen']);
     const floatingHome = sentences.some(sentence => /\b(?:floating|floated|levitating)\s+(?:house|houses|home|homes)\b|\b(?:house|houses|home|homes)\s+(?:was|were|is|are|had been)?\s*(?:floating|floated|levitating)\b/.test(sentence));
-    const openHome = sentences.some(sentence => /\b(?:open|opened)\s+(?:door|home|house)\b|\b(?:door|home|house)\b.{0,24}\b(?:stood|standing|was|is|were|are)?\s*open\b/.test(sentence));
-    const submergedStaircase = sentences.some(sentence => /\b(?:underwater|submerged)\s+(?:staircase|stairs|stairway|steps)\b|\b(?:staircase|stairs|stairway|steps)\b.{0,56}\b(?:beneath|under|below)\s+(?:the\s+)?(?:water|ocean|sea)\b|\b(?:beneath|under|below)\s+(?:the\s+)?(?:water|ocean|sea)\b.{0,56}\b(?:staircase|stairs|stairway|steps)\b|\b(?:staircase|stairs|stairway|steps)\b\s+(?:(?:was|is|appeared|stood|lay)\s+)?in\s+(?:the\s+)?(?:water|ocean|sea)\b/.test(sentence));
+    const openHome = sentences.some(sentence => {
+      const explicitlyClosed = /\b(?:door|home|house)\b.{0,20}(?:\b(?:was|is|were|are)\s+(?:not|never)\s+open\b|\b(?:wasn['’]t|isn['’]t|weren['’]t|aren['’]t)\s+open\b)|\b(?:not|never)\s+open\b.{0,20}\b(?:door|home|house)\b|\b(?:closed|shut)\s+(?:door|home|house)\b/.test(sentence);
+      return !explicitlyClosed
+        && /\b(?:open|opened)\s+(?:door|home|house)\b|\b(?:door|home|house)\b.{0,24}\b(?:stood|standing|was|is|were|are)?\s*open\b/.test(sentence);
+    });
+    const submergedStaircase = sentences.some(sentence => {
+      const explicitlyDry = /\b(?:staircase|stairs|stairway|steps)\b.{0,24}(?:\b(?:was|were|is|are)\s+(?:not|never)\s+(?:beneath|under|below|in)\s+(?:the\s+)?(?:water|ocean|sea)\b|\b(?:wasn['’]t|weren['’]t|isn['’]t|aren['’]t)\s+(?:beneath|under|below|in)\s+(?:the\s+)?(?:water|ocean|sea)\b)/.test(sentence);
+      return !explicitlyDry
+        && /\b(?:underwater|submerged)\s+(?:staircase|stairs|stairway|steps)\b|\b(?:staircase|stairs|stairway|steps)\b.{0,56}\b(?:beneath|under|below)\s+(?:the\s+)?(?:water|ocean|sea)\b|\b(?:beneath|under|below)\s+(?:the\s+)?(?:water|ocean|sea)\b.{0,56}\b(?:staircase|stairs|stairway|steps)\b|\b(?:staircase|stairs|stairway|steps)\b\s+(?:(?:was|is|appeared|stood|lay)\s+)?in\s+(?:the\s+)?(?:water|ocean|sea)\b/.test(sentence);
+    });
     const moth = hasAny(text, ['moth', 'white moth']);
     const whiteMoth = hasAny(text, ['white moth']);
     const giantMoth = hasAny(text, ['giant moth', 'giant white moth', 'huge moth', 'large moth']);
-    const mothRestingAbove = sentences.some(sentence => /\b(?:moth|white moth)\b\s+(?:was|is|had been)?\s*(?:resting|rested|sitting|perched)\s+(?:on|against|near|above)\s+(?:the\s+)?(?:ceiling|wall|room)|\b(?:moth|white moth)\b\s+(?:was|is|had been)?\s*(?:resting|rested|sitting|perched)\s+(?:above|overhead)\b/.test(sentence));
+    const mothRestingAbove = sentences.some(sentence => /\b(?:moth|white moth)\b\s+(?:was|is|had been)?\s*(?:resting|rested|sitting|perched)\s+(?:on|near|against)\s+(?:the\s+)?ceiling\b|\b(?:moth|white moth)\b\s+(?:was|is|had been)?\s*(?:resting|rested|sitting|perched)\s+(?:above|overhead)\b/.test(sentence));
     const fear = hasAny(text, ['afraid', 'fear', 'fearful', 'scared', 'terrified']);
     const relief = hasAny(text, ['relief', 'relieved', 'comforted', 'release']);
     const alreadyKnows = hasAny(text, ['already know', 'already knew', 'you know which door', 'knew which door']);
@@ -180,7 +208,9 @@
         : `The dream pairs two concrete actions: receiving a key and facing a staircase. One offers access; the other asks whether you will go deeper.`;
       const waterReading = submergedStaircase
         ? `The staircase appears beneath the water, so the route is not away from feeling or memory but down through it. Because the steps remain visible, the descent is difficult but available—not a picture of being lost or overwhelmed.`
-        : `The staircase makes the direction explicit: downward, toward something remembered, felt, or partly known beneath the familiar surface.`;
+        : thresholdGuide.downwardDescent
+          ? `The staircase makes the downward direction explicit, pointing toward something remembered, felt, or partly known beneath the familiar surface.`
+          : `The staircase presents a route or threshold without showing that you have taken it. Its importance may lie in the choice becoming visible rather than in assuming what is below.`;
       const emotionReading = fear && relief
         ? `Feeling afraid and relieved at once is crucial. Fear suggests that descending carries an emotional cost; relief suggests that remaining above it may also be tiring, and that part of you is ready to stop avoiding what waits there.`
         : fear

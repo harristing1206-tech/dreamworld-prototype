@@ -158,8 +158,10 @@ test('game dialogue types one page, reveals it, then advances without exposing t
     const card = document.getElementById('analysisCharacterCard');
     const text = document.getElementById('analysisCharacterResponse');
     const advance = document.getElementById('analysisDialogueAdvance');
+    const fullOpen = document.getElementById('analysisFullOpen');
     const stored = JSON.parse(storage.values.get('dreamworld:analysis:ocean-house'));
     assert.equal(card.dataset.typing, 'true');
+    assert.equal(fullOpen.hidden, true);
     assert.ok(text.textContent.length < stored.characterResponse.text.length, 'the full reflection must not appear at once');
     assert.match(document.getElementById('analysisDialoguePage').textContent, /^1 \/ [2-9]/);
 
@@ -180,9 +182,18 @@ test('game dialogue types one page, reveals it, then advances without exposing t
     assert.equal(card.dataset.complete, 'true');
     assert.equal(document.getElementById('analysisDialogueHint').textContent, 'Reflection complete');
     assert.equal(advance.disabled, true, 'the completed dialogue target must not remain actionable');
+    assert.equal(fullOpen.hidden, false, 'the full-analysis option appears only after dialogue completion');
     const finalText = text.textContent;
     advance.click();
     assert.equal(text.textContent, finalText, 'tapping a completed reflection must remain a no-op');
+
+    fullOpen.click();
+    assert.equal(document.getElementById('analysisFullPanel').hidden, false);
+    assert.equal(document.getElementById('analysisFullText').textContent, stored.characterResponse.text, 'full analysis uses the canonical complete response');
+    assert.equal(document.activeElement, document.getElementById('analysisFullClose'));
+    document.getElementById('analysisFullClose').click();
+    assert.equal(document.getElementById('analysisFullPanel').hidden, true);
+    assert.equal(document.activeElement, fullOpen);
 
     const transcriptToggle = document.getElementById('analysisTranscriptToggle');
     transcriptToggle.click();
@@ -196,6 +207,26 @@ test('game dialogue types one page, reveals it, then advances without exposing t
     assert.equal(document.getElementById('analysisTranscriptPanel').hidden, true);
     assert.equal(document.querySelector('.analysis-hud').inert, false);
     assert.equal(document.activeElement, transcriptToggle);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('analysis dreamscape changes with transcript evidence while remaining stable per dream', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage);
+  try {
+    const document = dom.window.document;
+    const view = document.getElementById('analysisView');
+    assert.equal(view.dataset.scene, 'tide');
+    const oceanSky = view.style.getPropertyValue('--scene-sky-top');
+    const oceanSignature = view.dataset.sceneSignature;
+    assert.ok(oceanSky);
+    document.querySelector('[data-go="dreams"]').click();
+    document.querySelector('[data-open-analysis="quiet-gate"]').click();
+    assert.equal(view.dataset.scene, 'passage');
+    assert.notEqual(view.style.getPropertyValue('--scene-sky-top'), oceanSky);
+    assert.notEqual(view.dataset.sceneSignature, oceanSignature);
   } finally {
     dom.window.close();
   }

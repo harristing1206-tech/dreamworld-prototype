@@ -225,18 +225,30 @@
     .sample-tag { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
     button.dream-row { width: 100%; padding: 0; background: transparent; text-align: left; cursor: pointer; }
     button.dream-row[hidden] { display: none !important; }
-    .analysis-view { overflow: hidden; padding: 0; background: #08111b; }
-    .analysis-game-scene { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(#101c2b 0 54%, #16283a 54% 100%); image-rendering: pixelated; }
+    .analysis-view { --scene-sky-top: #101c2b; --scene-sky-bottom: #16283a; --scene-horizon: #1e3843; --scene-ground: #142a31; --scene-accent: #b69a63; --scene-glow: #e7dfc5; --scene-panel: #203d3f; --scene-panel-deep: #0d1b27; --scene-listener: #29494a; --scene-dreamer: #6f647f; --scene-ridge: polygon(0 54%, 11% 36%, 24% 48%, 38% 20%, 52% 43%, 68% 10%, 82% 38%, 100% 22%, 100% 100%, 0 100%); --scene-drift: 12s; --scene-pulse: 5s; --scene-stars: .6; overflow: hidden; padding: 0; background: var(--scene-sky-top); }
+    .analysis-game-scene { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(var(--scene-sky-top) 0 50%, var(--scene-sky-bottom) 70%, var(--scene-horizon) 100%); image-rendering: pixelated; transition: background 700ms ease; }
     .analysis-game-scene::before { content: ""; position: absolute; inset: 0; opacity: .5; background: linear-gradient(90deg, transparent 0 7%, rgba(231,223,197,.035) 7% 8%, transparent 8% 21%, rgba(231,223,197,.025) 21% 22%, transparent 22%), linear-gradient(rgba(255,255,255,.025) 0 1px, transparent 1px 12px); background-size: 100% 100%, 12px 12px; }
-    .analysis-game-scene::after { content: ""; position: absolute; left: -12%; right: -12%; bottom: 20%; height: 38%; background: #1e3843; clip-path: polygon(0 54%, 11% 36%, 24% 48%, 38% 20%, 52% 43%, 68% 10%, 82% 38%, 100% 22%, 100% 100%, 0 100%); box-shadow: inset 0 10px 0 rgba(142,160,150,.12); }
-    .analysis-stars { position: absolute; inset: 10% 7% 45%; z-index: 1; opacity: .65; background: radial-gradient(circle at 12% 20%, var(--paper) 0 1px, transparent 2px), radial-gradient(circle at 72% 12%, var(--gold) 0 1px, transparent 2px), radial-gradient(circle at 88% 48%, var(--paper) 0 1px, transparent 2px), radial-gradient(circle at 42% 38%, var(--sage) 0 1px, transparent 2px), radial-gradient(circle at 24% 72%, var(--paper) 0 1px, transparent 2px); }
-    .analysis-moon { position: absolute; z-index: 1; width: 78px; height: 78px; top: 16%; right: 12%; border: 8px solid rgba(231,223,197,.82); border-left-color: transparent; border-bottom-color: transparent; border-radius: 50%; transform: rotate(-18deg); filter: drop-shadow(0 0 14px rgba(231,223,197,.15)); }
-    .analysis-path { position: absolute; z-index: 2; width: 54%; height: 54%; left: 23%; top: 37%; background: linear-gradient(90deg, transparent, rgba(182,154,99,.2) 24% 76%, transparent); clip-path: polygon(42% 0, 58% 0, 92% 100%, 8% 100%); }
-    .analysis-scene-name { position: absolute; z-index: 3; top: max(78px, calc(env(safe-area-inset-top) + 62px)); left: 50%; transform: translateX(-50%); color: rgba(231,223,197,.68); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .18em; text-transform: uppercase; white-space: nowrap; }
+    .analysis-game-scene::after { content: ""; position: absolute; left: -12%; right: -12%; bottom: 20%; height: 38%; background: var(--scene-ground); clip-path: var(--scene-ridge); box-shadow: inset 0 10px 0 color-mix(in srgb, var(--scene-horizon), transparent 55%); transition: background 700ms ease, clip-path 700ms ease; }
+    .analysis-stars { position: absolute; inset: 10% 7% 45%; z-index: 1; opacity: var(--scene-stars); background: radial-gradient(circle at 12% 20%, var(--scene-glow) 0 1px, transparent 2px), radial-gradient(circle at 72% 12%, var(--scene-accent) 0 1px, transparent 2px), radial-gradient(circle at 88% 48%, var(--scene-glow) 0 1px, transparent 2px), radial-gradient(circle at 42% 38%, var(--scene-accent) 0 1px, transparent 2px), radial-gradient(circle at 24% 72%, var(--scene-glow) 0 1px, transparent 2px); animation: dream-stars var(--scene-pulse) steps(2, end) infinite; }
+    .analysis-moon { position: absolute; z-index: 1; width: 78px; height: 78px; top: 16%; right: 12%; border: 8px solid var(--scene-glow); border-left-color: transparent; border-bottom-color: transparent; border-radius: 50%; transform: rotate(-18deg); filter: drop-shadow(0 0 14px color-mix(in srgb, var(--scene-glow), transparent 75%)); animation: celestial-drift var(--scene-drift) ease-in-out infinite alternate; }
+    .analysis-path { position: absolute; z-index: 2; width: 54%; height: 54%; left: 23%; top: 37%; background: linear-gradient(90deg, transparent, rgba(182,154,99,.28) 24% 76%, transparent); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--scene-accent), transparent 72%) 24% 76%, transparent); clip-path: polygon(42% 0, 58% 0, 92% 100%, 8% 100%); }
+    .analysis-scene-name { position: absolute; z-index: 3; top: max(78px, calc(env(safe-area-inset-top) + 62px)); left: 50%; transform: translateX(-50%); color: rgba(231,223,197,.72); color: color-mix(in srgb, var(--scene-glow), transparent 28%); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .18em; text-transform: uppercase; white-space: nowrap; }
+    .analysis-atmosphere, .analysis-memory-lights { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+    .analysis-atmosphere::before, .analysis-atmosphere::after { content: ""; position: absolute; }
+    .analysis-view[data-scene="tide"] .analysis-atmosphere::before { left: -20%; right: -20%; bottom: 29%; height: 15%; opacity: .45; background: repeating-linear-gradient(0deg, transparent 0 9px, color-mix(in srgb, var(--scene-accent), transparent 56%) 10px 12px); transform: skewY(-2deg); animation: tide-shift var(--scene-drift) linear infinite; }
+    .analysis-view[data-scene="echo"] .analysis-memory-lights { inset: 20% 10% 38%; opacity: .72; background: radial-gradient(circle at 15% 72%, var(--scene-glow) 0 3px, transparent 4px), radial-gradient(circle at 37% 24%, var(--scene-accent) 0 2px, transparent 3px), radial-gradient(circle at 69% 58%, var(--scene-glow) 0 3px, transparent 4px), radial-gradient(circle at 88% 18%, var(--scene-accent) 0 2px, transparent 3px); animation: memory-lights var(--scene-pulse) steps(3, end) infinite; }
+    .analysis-view[data-scene="ember"] .analysis-atmosphere::before { inset: 18% 12% 32%; opacity: .62; background: radial-gradient(circle at 18% 80%, var(--scene-accent) 0 2px, transparent 3px), radial-gradient(circle at 46% 54%, var(--scene-glow) 0 1px, transparent 2px), radial-gradient(circle at 74% 74%, var(--scene-accent) 0 2px, transparent 3px), radial-gradient(circle at 88% 36%, var(--scene-glow) 0 1px, transparent 2px); animation: ember-rise 5s linear infinite; }
+    .analysis-view[data-scene="grove"] .analysis-atmosphere::before { inset: 14% 6% 34%; opacity: .48; background: radial-gradient(ellipse at 12% 20%, var(--scene-accent) 0 4px, transparent 5px), radial-gradient(ellipse at 62% 34%, var(--scene-glow) 0 3px, transparent 4px), radial-gradient(ellipse at 84% 72%, var(--scene-accent) 0 4px, transparent 5px); animation: leaf-drift var(--scene-drift) ease-in-out infinite alternate; }
+    .analysis-view[data-scene="sky"] .analysis-atmosphere::before, .analysis-view[data-scene="sky"] .analysis-atmosphere::after { width: 110px; height: 20px; border-radius: 50%; background: color-mix(in srgb, var(--scene-glow), transparent 78%); filter: blur(2px); animation: cloud-pass var(--scene-drift) linear infinite; }
+    .analysis-view[data-scene="sky"] .analysis-atmosphere::before { left: -25%; top: 24%; }
+    .analysis-view[data-scene="sky"] .analysis-atmosphere::after { left: -45%; top: 39%; animation-delay: calc(var(--scene-drift) / -2); }
+    .analysis-view[data-scene="passage"] .analysis-moon { width: 68px; height: 82px; border: 7px solid var(--scene-glow); border-bottom: 0; border-radius: 38px 38px 0 0; transform: none; }
+    .analysis-view[data-scene="passage"] .analysis-path { width: 66%; left: 17%; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--scene-accent), transparent 70%)); }
     .analysis-world-listener { position: absolute; z-index: 3; width: 42px; height: 64px; left: calc(50% - 21px); top: 29%; filter: drop-shadow(9px 10px 0 rgba(4,9,15,.22)); animation: listener-breathe 2.8s steps(2, end) infinite; }
-    .analysis-world-listener::before { content: ""; position: absolute; width: 30px; height: 28px; left: 6px; top: 4px; background: #203d3f; clip-path: polygon(50% 0, 100% 30%, 88% 100%, 12% 100%, 0 30%); box-shadow: inset 0 -8px 0 #b69a63; }
-    .analysis-world-listener::after { content: ""; position: absolute; width: 36px; height: 34px; left: 3px; top: 30px; background: #29494a; clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%); box-shadow: inset 0 -6px 0 #142a31; }
-    .analysis-dreamer-sprite { position: absolute; z-index: 3; width: 24px; height: 36px; left: calc(50% - 12px); top: 50%; background: #6f647f; clip-path: polygon(28% 0, 72% 0, 84% 28%, 100% 100%, 0 100%, 16% 28%); box-shadow: inset 0 -8px 0 #39344d, 6px 7px 0 rgba(4,9,15,.22); }
+    .analysis-view[data-speaking="true"] .analysis-world-listener { animation: world-listener-speak 520ms steps(2, end) infinite; }
+    .analysis-world-listener::before { content: ""; position: absolute; width: 30px; height: 28px; left: 6px; top: 4px; background: var(--scene-panel); clip-path: polygon(50% 0, 100% 30%, 88% 100%, 12% 100%, 0 30%); box-shadow: inset 0 -8px 0 var(--scene-accent); }
+    .analysis-world-listener::after { content: ""; position: absolute; width: 36px; height: 34px; left: 3px; top: 30px; background: var(--scene-listener); clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%); box-shadow: inset 0 -6px 0 var(--scene-panel-deep); }
+    .analysis-dreamer-sprite { position: absolute; z-index: 3; width: 24px; height: 36px; left: calc(50% - 12px); top: 50%; background: var(--scene-dreamer); clip-path: polygon(28% 0, 72% 0, 84% 28%, 100% 100%, 0 100%, 16% 28%); box-shadow: inset 0 -8px 0 color-mix(in srgb, var(--scene-dreamer), #000 45%), 6px 7px 0 rgba(4,9,15,.22); }
     .analysis-hud { position: absolute; z-index: 7; top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; min-height: 48px; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 9px; margin: 0; }
     .analysis-back, .analysis-hud-button { min-width: 44px; height: 44px; border: 1px solid rgba(231,223,197,.24); background: rgba(8,17,27,.88); color: var(--paper); cursor: pointer; backdrop-filter: blur(8px); }
     .analysis-heading { min-width: 0; padding: 0; }
@@ -244,14 +256,18 @@
     .analysis-heading .panel-title { overflow: hidden; font-size: 15px; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
     .analysis-hud-actions { display: flex; gap: 6px; }
     .analysis-hud-button { width: auto; padding: 0 10px; font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
-    .character-response { position: absolute; z-index: 6; left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); min-height: 228px; display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 12px; margin: 0; padding: 13px; overflow: hidden; border: 2px solid rgba(231,223,197,.88); outline: 3px solid rgba(8,17,27,.84); background: linear-gradient(135deg, rgba(32,61,63,.98), rgba(13,27,39,.98)); box-shadow: 0 12px 30px rgba(0,0,0,.38), inset 0 0 0 2px rgba(182,154,99,.25); }
-    .listener-portrait { position: relative; width: 78px; height: 116px; align-self: end; overflow: hidden; background: linear-gradient(#142a31 0 25%, #203d3f 25% 100%); border: 1px solid rgba(182,154,99,.55); image-rendering: pixelated; }
-    .listener-portrait::before { content: ""; position: absolute; width: 68px; height: 86px; left: 5px; top: 8px; background: #29494a; clip-path: polygon(50% 0, 88% 18%, 100% 70%, 80% 100%, 20% 100%, 0 70%, 12% 18%); box-shadow: inset 0 -18px 0 #142a31; }
+    .character-response { position: absolute; z-index: 6; left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); min-height: 228px; display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 12px; margin: 0; padding: 13px; overflow: hidden; border: 2px solid rgba(231,223,197,.88); border: 2px solid color-mix(in srgb, var(--scene-glow), transparent 12%); outline: 3px solid rgba(8,17,27,.84); outline: 3px solid color-mix(in srgb, var(--scene-panel-deep), transparent 12%); background: linear-gradient(135deg, rgba(32,61,63,.98), rgba(13,27,39,.98)); background: linear-gradient(135deg, color-mix(in srgb, var(--scene-panel), transparent 2%), color-mix(in srgb, var(--scene-panel-deep), transparent 2%)); box-shadow: 0 12px 30px rgba(0,0,0,.38), inset 0 0 0 2px rgba(182,154,99,.25); box-shadow: 0 12px 30px rgba(0,0,0,.38), inset 0 0 0 2px color-mix(in srgb, var(--scene-accent), transparent 68%); transition: background 700ms ease, border-color 700ms ease; }
+    .listener-portrait { position: relative; width: 78px; height: 116px; align-self: end; overflow: hidden; background: linear-gradient(var(--scene-panel-deep) 0 25%, var(--scene-panel) 25% 100%); border: 1px solid color-mix(in srgb, var(--scene-accent), transparent 45%); image-rendering: pixelated; transform-origin: bottom; }
+    .listener-portrait::before { content: ""; position: absolute; width: 68px; height: 86px; left: 5px; top: 8px; background: var(--scene-listener); clip-path: polygon(50% 0, 88% 18%, 100% 70%, 80% 100%, 20% 100%, 0 70%, 12% 18%); box-shadow: inset 0 -18px 0 var(--scene-panel-deep); }
     .listener-portrait::after { content: ""; position: absolute; width: 42px; height: 38px; left: 18px; top: 32px; background: #b8a88a; clip-path: polygon(12% 0, 88% 0, 100% 42%, 78% 100%, 22% 100%, 0 42%); box-shadow: inset 0 -10px 0 #8f7a66; }
     .listener-eye { position: absolute; z-index: 2; width: 22px; height: 8px; left: 28px; top: 45px; border-top: 3px solid #16252d; border-bottom: 2px solid #b69a63; }
     .listener-eye::before, .listener-eye::after { content: ""; position: absolute; width: 4px; height: 4px; top: -1px; background: #e7dfc5; }
     .listener-eye::before { left: 3px; }
     .listener-eye::after { right: 3px; }
+    .listener-mouth { position: absolute; z-index: 3; width: 14px; height: 3px; left: 32px; top: 66px; background: #4f3d3c; transform-origin: center; }
+    .character-response[data-typing="true"] .listener-portrait { animation: portrait-speak 700ms steps(2, end) infinite; }
+    .character-response[data-typing="true"] .listener-mouth { animation: listener-speak 260ms steps(2, end) infinite; }
+    .character-response[data-typing="true"] .listener-eye { animation: listener-blink 2.4s steps(1, end) infinite; }
     .analysis-dialogue-content { min-width: 0; display: flex; flex-direction: column; }
     .character-identity { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 1px 0 7px; }
     .character-name { color: var(--paper); font: 750 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
@@ -263,11 +279,15 @@
     .character-response[data-complete="true"] .analysis-dialogue-cue { display: none; }
     .analysis-dialogue-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 7px; border-top: 1px solid rgba(231,223,197,.15); color: var(--sage); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .analysis-dialogue-advance:disabled { cursor: default; }
+    .analysis-full-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px solid rgba(182,154,99,.76); border: 1px solid color-mix(in srgb, var(--scene-accent), transparent 24%); background: rgba(8,17,27,.9); background: color-mix(in srgb, var(--scene-panel-deep), transparent 10%); color: var(--scene-glow); cursor: pointer; font: 750 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
     .analysis-dialogue-page { color: var(--gold); }
-    .analysis-panel { position: absolute; z-index: 10; top: max(66px, calc(env(safe-area-inset-top) + 58px)); left: 10px; right: 10px; bottom: 10px; padding: 18px; overflow-y: auto; border: 1px solid rgba(231,223,197,.35); background: rgba(8,17,27,.98); box-shadow: 0 20px 50px rgba(0,0,0,.55); }
+    .analysis-panel { position: absolute; z-index: 10; top: max(66px, calc(env(safe-area-inset-top) + 58px)); left: 10px; right: 10px; bottom: 10px; padding: 18px; overflow-y: auto; border: 1px solid rgba(231,223,197,.35); border: 1px solid color-mix(in srgb, var(--scene-accent), transparent 50%); background: var(--scene-panel-deep); box-shadow: 0 20px 50px rgba(0,0,0,.55); }
     .analysis-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
     .analysis-panel-title { margin: 0; font-size: 17px; }
     .analysis-panel-close { width: 44px; height: 44px; border: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; }
+    .analysis-full { bottom: auto; max-height: calc(100% - max(76px, calc(env(safe-area-inset-top) + 68px))); }
+    .analysis-full-copy { margin: 0; color: var(--paper); font-size: 16px; line-height: 1.72; white-space: pre-wrap; }
+    .analysis-full-note { margin: 18px 0 0; color: var(--sage); font-size: 11px; line-height: 1.5; }
     .analysis-label { display: block; margin-bottom: 11px; color: var(--sage); font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .13em; text-transform: uppercase; }
     .analysis-transcript p { margin: 0; color: var(--paper); font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
     .analysis-source, .analysis-storage-note, .analysis-status { margin: 12px 0; color: var(--sage); font-size: 11px; line-height: 1.45; }
@@ -515,6 +535,17 @@
     .icon-settings::after { width: 5px; height: 5px; top: 3px; left: 5px; border: 2px solid currentColor; border-radius: 50%; background: var(--night); box-shadow: 8px 9px 0 -1px var(--night), 8px 9px 0 1px currentColor; }
 
     @keyframes listener-breathe { 50% { transform: translateY(-2px); } }
+    @keyframes world-listener-speak { 50% { transform: translateY(-3px) scaleY(1.03); filter: drop-shadow(0 0 8px var(--scene-accent)); } }
+    @keyframes portrait-speak { 50% { transform: translateY(-2px) scaleY(1.015); } }
+    @keyframes listener-speak { 50% { transform: scaleY(2.2) scaleX(.72); } }
+    @keyframes listener-blink { 46%, 50% { transform: scaleY(.2); } }
+    @keyframes dream-stars { 50% { opacity: .32; } }
+    @keyframes celestial-drift { to { translate: -8px 5px; } }
+    @keyframes tide-shift { to { transform: translateX(44px) skewY(-2deg); } }
+    @keyframes memory-lights { 50% { opacity: .34; filter: blur(1px); } }
+    @keyframes ember-rise { to { transform: translateY(-42px); opacity: .12; } }
+    @keyframes leaf-drift { to { transform: translate(22px, 18px) rotate(5deg); } }
+    @keyframes cloud-pass { to { transform: translateX(560px); } }
     @keyframes dialogue-cue { 50% { translate: 0 3px; } }
     @keyframes typing-cursor { 50% { opacity: 0; } }
     @keyframes boot-away {
@@ -653,12 +684,14 @@
       </div>
     </section>
 
-    <section class="view analysis-view" id="analysisView" data-view="analysis" aria-labelledby="analysisTitle">
+    <section class="view analysis-view" id="analysisView" data-view="analysis" data-scene="nocturne" data-speaking="false" aria-labelledby="analysisTitle">
       <div class="analysis-game-scene" aria-hidden="true">
         <span class="analysis-stars"></span>
         <span class="analysis-moon"></span>
         <span class="analysis-path"></span>
-        <span class="analysis-scene-name">The listening place</span>
+        <span class="analysis-atmosphere"></span>
+        <span class="analysis-memory-lights"></span>
+        <span class="analysis-scene-name" id="analysisSceneName">The listening place</span>
         <span class="analysis-world-listener"></span>
         <span class="analysis-dreamer-sprite"></span>
       </div>
@@ -673,7 +706,7 @@
       </header>
 
       <article class="character-response" id="analysisCharacterCard" aria-labelledby="analysisCharacterName" data-typing="false">
-        <div class="listener-portrait" aria-hidden="true"><span class="listener-eye"></span></div>
+        <div class="listener-portrait" aria-hidden="true"><span class="listener-eye"></span><span class="listener-mouth"></span></div>
         <div class="analysis-dialogue-content">
           <div class="character-identity">
             <strong class="character-name" id="analysisCharacterName">The Listener</strong>
@@ -687,9 +720,16 @@
             <span id="analysisDialogueHint">Tap to reveal</span>
             <span class="analysis-dialogue-page" id="analysisDialoguePage">1 / 1</span>
           </div>
+          <button type="button" class="analysis-full-open" id="analysisFullOpen" hidden>Read full analysis</button>
         </div>
       </article>
       <p class="sr-only" id="analysisDialogueStatus" aria-live="polite"></p>
+
+      <section class="analysis-panel analysis-full" id="analysisFullPanel" role="dialog" aria-modal="true" aria-labelledby="analysisFullTitle" hidden>
+        <header class="analysis-panel-head"><h2 class="analysis-panel-title" id="analysisFullTitle">The Listener’s full analysis</h2><button class="analysis-panel-close" id="analysisFullClose" aria-label="Close full analysis">×</button></header>
+        <p class="analysis-full-copy" id="analysisFullText"></p>
+        <p class="analysis-full-note">One possible reflection grounded in your transcript—not a diagnosis, prediction, or definitive hidden meaning.</p>
+      </section>
 
       <section class="analysis-panel analysis-transcript" id="analysisTranscriptPanel" role="dialog" aria-modal="true" aria-labelledby="analysisTranscriptLabel" hidden>
         <header class="analysis-panel-head"><h2 class="analysis-panel-title" id="analysisTranscriptLabel">Your transcript</h2><button class="analysis-panel-close" id="analysisTranscriptClose" aria-label="Close transcript">×</button></header>
@@ -848,10 +888,11 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=23"></script>
-  <script src="./analysis-state.js?v=23"></script>
-  <script src="./analysis-dialogue.js?v=23"></script>
-  <script src="./browser-transcriber.js?v=23"></script>
+  <script src="./dialogue-state.js?v=24"></script>
+  <script src="./analysis-state.js?v=24"></script>
+  <script src="./analysis-dialogue.js?v=24"></script>
+  <script src="./dream-scene.js?v=24"></script>
+  <script src="./browser-transcriber.js?v=24"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -900,6 +941,11 @@
     const analysisDialogueHint = document.getElementById('analysisDialogueHint');
     const analysisDialoguePage = document.getElementById('analysisDialoguePage');
     const analysisDialogueStatus = document.getElementById('analysisDialogueStatus');
+    const analysisSceneName = document.getElementById('analysisSceneName');
+    const analysisFullOpen = document.getElementById('analysisFullOpen');
+    const analysisFullPanel = document.getElementById('analysisFullPanel');
+    const analysisFullClose = document.getElementById('analysisFullClose');
+    const analysisFullText = document.getElementById('analysisFullText');
     const analysisTranscriptToggle = document.getElementById('analysisTranscriptToggle');
     const analysisTranscriptPanel = document.getElementById('analysisTranscriptPanel');
     const analysisTranscriptClose = document.getElementById('analysisTranscriptClose');
@@ -956,6 +1002,7 @@
     let alarms = [];
     let analysisSession = null;
     let analysisDialogueController = null;
+    let activeAnalysisResponseText = '';
     let announcedAnalysisPage = -1;
     let activeAnalysisDreamID = '';
     let analysisStorageKey = '';
@@ -1219,8 +1266,10 @@
     }
 
     function closeAnalysisPanels({ restoreFocus = false } = {}) {
+      const fullWasOpen = !analysisFullPanel.hidden;
       const transcriptWasOpen = !analysisTranscriptPanel.hidden;
       const controlsWereOpen = !analysisControlsPanel.hidden;
+      analysisFullPanel.hidden = true;
       analysisTranscriptPanel.hidden = true;
       analysisControlsPanel.hidden = true;
       analysisTranscriptToggle.setAttribute('aria-expanded', 'false');
@@ -1228,26 +1277,53 @@
       analysisHud.inert = false;
       analysisCharacterCard.inert = false;
       primaryNavigation.inert = false;
-      if (restoreFocus && transcriptWasOpen) analysisTranscriptToggle.focus();
+      if (restoreFocus && fullWasOpen) analysisFullOpen.focus();
+      else if (restoreFocus && transcriptWasOpen) analysisTranscriptToggle.focus();
       else if (restoreFocus && controlsWereOpen) analysisControlsToggle.focus();
     }
 
     function showAnalysisPanel(panel) {
       closeAnalysisPanels();
       const transcript = panel === analysisTranscriptPanel;
+      const controls = panel === analysisControlsPanel;
       panel.hidden = false;
       analysisHud.inert = true;
       analysisCharacterCard.inert = true;
       primaryNavigation.inert = true;
       analysisTranscriptToggle.setAttribute('aria-expanded', String(transcript));
-      analysisControlsToggle.setAttribute('aria-expanded', String(!transcript));
-      (transcript ? analysisTranscriptClose : analysisControlsClose).focus();
+      analysisControlsToggle.setAttribute('aria-expanded', String(controls));
+      (transcript ? analysisTranscriptClose : controls ? analysisControlsClose : analysisFullClose).focus();
+    }
+
+    function applyDreamScene(dream) {
+      const profile = DreamScene.createDreamScene(dream.transcript, dream.id);
+      analysisView.dataset.scene = profile.motif;
+      analysisView.dataset.sceneSignature = profile.signature;
+      analysisSceneName.textContent = profile.label;
+      const variables = {
+        '--scene-sky-top': profile.palette.skyTop,
+        '--scene-sky-bottom': profile.palette.skyBottom,
+        '--scene-horizon': profile.palette.horizon,
+        '--scene-ground': profile.palette.ground,
+        '--scene-accent': profile.palette.accent,
+        '--scene-glow': profile.palette.glow,
+        '--scene-panel': profile.palette.panel,
+        '--scene-panel-deep': profile.palette.panelDeep,
+        '--scene-listener': profile.palette.listener,
+        '--scene-dreamer': profile.palette.dreamer,
+        '--scene-ridge': profile.ridge,
+        '--scene-drift': `${profile.motion.driftSeconds}s`,
+        '--scene-pulse': `${profile.motion.pulseSeconds}s`,
+        '--scene-stars': String(profile.motion.starOpacity)
+      };
+      Object.entries(variables).forEach(([name, value]) => analysisView.style.setProperty(name, value));
     }
 
     function renderAnalysisDialogue(state) {
       analysisCharacterResponse.textContent = state.visibleText;
       analysisCharacterCard.dataset.typing = String(state.typing);
       analysisCharacterCard.dataset.complete = String(state.complete);
+      analysisView.dataset.speaking = String(state.typing);
       analysisDialoguePage.textContent = `${state.pageIndex + 1} / ${state.pageCount}`;
       analysisDialogueHint.textContent = state.typing
         ? 'Tap to reveal'
@@ -1260,6 +1336,7 @@
           ? 'Reflection complete'
           : `Continue to dialogue page ${state.pageIndex + 2} of ${state.pageCount}`);
       analysisDialogueAdvance.disabled = state.complete;
+      analysisFullOpen.hidden = !(state.complete && analysisSession);
       if (!state.typing && state.visibleText === state.pageText && announcedAnalysisPage !== state.pageIndex) {
         announcedAnalysisPage = state.pageIndex;
         analysisDialogueStatus.textContent = `Dialogue page ${state.pageIndex + 1} of ${state.pageCount} complete.`;
@@ -1270,6 +1347,7 @@
       analysisDialogueController?.destroy();
       announcedAnalysisPage = -1;
       analysisDialogueStatus.textContent = '';
+      analysisFullOpen.hidden = true;
       const pages = DreamAnalysisDialogue.paginateResponse(responseText, { maxCharacters: 280 });
       analysisDialogueController = DreamAnalysisDialogue.createTypewriterDialogue({
         pages,
@@ -1288,6 +1366,7 @@
     function openAnalysis(dreamID) {
       const dream = getAnalysisDream(dreamID);
       if (!dream) return;
+      applyDreamScene(dream);
       resetAnalysisDeleteConfirmation();
       analysisUndoDelete.hidden = !pendingDeletedAnalysis;
       analysisUndoDelete.textContent = pendingDeletedAnalysis
@@ -1340,6 +1419,8 @@
           || analysisDeletionNotice?.message
           || (storedDurably ? '' : 'This response is available only in the open page because browser storage is unavailable.');
       }
+      activeAnalysisResponseText = analysisSession ? responseText : '';
+      analysisFullText.textContent = activeAnalysisResponseText;
       closeAnalysisPanels();
       openView('analysis');
       startAnalysisDialogue(responseText);
@@ -1988,6 +2069,10 @@
       window.requestAnimationFrame(() => lastAnalysisTrigger?.focus());
     });
     analysisDialogueAdvance.addEventListener('click', activateAnalysisDialogue);
+    analysisFullOpen.addEventListener('click', () => {
+      analysisFullText.textContent = activeAnalysisResponseText;
+      showAnalysisPanel(analysisFullPanel);
+    });
     analysisTranscriptToggle.addEventListener('click', () => {
       if (analysisTranscriptPanel.hidden) showAnalysisPanel(analysisTranscriptPanel);
       else closeAnalysisPanels({ restoreFocus: true });
@@ -1998,12 +2083,15 @@
     });
     analysisTranscriptClose.addEventListener('click', () => closeAnalysisPanels({ restoreFocus: true }));
     analysisControlsClose.addEventListener('click', () => closeAnalysisPanels({ restoreFocus: true }));
+    analysisFullClose.addEventListener('click', () => closeAnalysisPanels({ restoreFocus: true }));
     document.addEventListener('keydown', event => {
-      const openPanel = !analysisTranscriptPanel.hidden
-        ? analysisTranscriptPanel
-        : !analysisControlsPanel.hidden
-          ? analysisControlsPanel
-          : null;
+      const openPanel = !analysisFullPanel.hidden
+        ? analysisFullPanel
+        : !analysisTranscriptPanel.hidden
+          ? analysisTranscriptPanel
+          : !analysisControlsPanel.hidden
+            ? analysisControlsPanel
+            : null;
       if (!openPanel) return;
       if (event.key === 'Escape') {
         event.preventDefault();

@@ -7,7 +7,7 @@ const serviceWorker = fs.readFileSync(path.join(__dirname, '..', 'service-worker
 
 const cacheVersion = serviceWorker.match(/dreamworld-world-v(\d+)/)?.[1];
 assert.ok(cacheVersion, 'service worker cache must be versioned');
-for (const asset of ['dialogue-state.js', 'analysis-state.js', 'analysis-dialogue.js', 'browser-transcriber.js']) {
+for (const asset of ['dialogue-state.js', 'analysis-state.js', 'analysis-dialogue.js', 'dream-scene.js', 'browser-transcriber.js']) {
   assert.match(html, new RegExp(`<script src="\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}"><\\/script>`), `${asset} must be cache-busted with the release version`);
   assert.match(serviceWorker, new RegExp(`\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}`), `${asset} must be cached under the same release-versioned URL`);
 }
@@ -29,6 +29,9 @@ assert.match(html, /\.character-response\[data-complete="true"\][^{]+\{[^}]*disp
 assert.match(html, /id="analysisDialogueStatus"[^>]+aria-live="polite"/, 'page completion should be announced without reading every typed character');
 assert.match(html, /id="analysisTranscriptToggle"/, 'the transcript must remain available without dominating the scene');
 assert.match(html, /id="analysisControlsToggle"/, 'privacy controls must remain reachable');
+assert.match(html, /id="analysisFullOpen"[^>]+hidden/, 'full analysis stays hidden until the dialogue completes');
+assert.match(html, /id="analysisFullPanel"[^>]+role="dialog"[^>]+aria-modal="true"[^>]+hidden/);
+assert.match(html, /id="analysisFullText"/);
 assert.match(html, /id="analysisTranscriptPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
 assert.match(html, /id="analysisControlsPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
 assert.match(html, /id="analysisCharacterResponse"[^>]+aria-live="off"/);
@@ -36,6 +39,10 @@ assert.match(html, /A reflection, not a diagnosis/);
 assert.match(html, /DreamAnalysis\.createAnalysisSession/);
 assert.match(html, /DreamAnalysisDialogue\.paginateResponse/);
 assert.match(html, /DreamAnalysisDialogue\.createTypewriterDialogue/);
+assert.match(html, /DreamScene\.createDreamScene/);
+assert.match(html, /\.character-response\[data-typing="true"\][^{]+\.listener-mouth/s, 'the Listener portrait should visibly speak while text types');
+assert.match(html, /data-scene/, 'the analysis view should expose its active dreamscape motif');
+assert.match(html, /\.character-response\s*\{[^}]*border:\s*2px solid rgba[^}]*border:\s*2px solid color-mix[^}]*background:\s*linear-gradient\([^;]*rgba[^}]*background:\s*linear-gradient\([^;]*color-mix/s, 'the dialogue card needs readable fallbacks before enhanced color-mix styling');
 assert.match(html, /maxCharacters:\s*280/, 'long reflections should use the reviewed adaptive page size');
 assert.match(html, /characterResponse/);
 assert.match(html, /window\.setTimeout\(\(\) => openAnalysis\(record\.id\), 220\)/, 'logging should route directly to the character response');

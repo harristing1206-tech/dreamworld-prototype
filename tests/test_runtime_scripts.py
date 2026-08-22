@@ -260,6 +260,34 @@ class RootOrchestrationTests(unittest.TestCase):
                 ("bun", "/home/hermes/.bun/bin/gbrain", "serve", "--http", "--evil"),
             )
 
+    def test_transient_process_disappearance_is_ignored_but_owner_check_remains_fail_closed(self):
+        active = subprocess.CompletedProcess([], 0, stdout="active\n", stderr="")
+        rows = [(201, 1, "bun /home/hermes/.bun/bin/gbrain serve --http --port 3131 --suppress-bootstrap-token"), (999, 1, "stale")]
+        def cmdline(pid):
+            if pid == 999:
+                raise RuntimeError("Cannot verify argv")
+            return ("bun", *self.orchestrator.HTTP_ARGUMENTS)
+        with patch.object(self.orchestrator, "wait_gateway_health"), \
+             patch.object(self.orchestrator, "run", return_value=active), \
+             patch.object(self.orchestrator, "process_rows", return_value=rows), \
+             patch.object(self.orchestrator, "process_cmdline", side_effect=cmdline), \
+             patch.object(self.orchestrator, "pglite_owner_pids", return_value={201}):
+            self.orchestrator.verify_http_topology()
+        with patch.object(self.orchestrator, "wait_gateway_health"), \
+             patch.object(self.orchestrator, "run", return_value=active), \
+             patch.object(self.orchestrator, "process_rows", return_value=rows), \
+             patch.object(self.orchestrator, "process_cmdline", side_effect=cmdline), \
+             patch.object(self.orchestrator, "pglite_owner_pids", return_value={201, 999}):
+            with self.assertRaisesRegex(RuntimeError, "sole verified PGLite owner"):
+                self.orchestrator.verify_http_topology()
+
+    def test_migration_failure_diagnostic_redacts_gbrain_tokens(self):
+        failed = subprocess.CompletedProcess([], 1, stdout="", stderr="command failed with gbrain_secret123")
+        with patch.object(self.orchestrator, "run", return_value=failed):
+            with self.assertRaisesRegex(RuntimeError, r"\[REDACTED\]") as raised:
+                self.orchestrator.run_migration("prepare")
+        self.assertNotIn("gbrain_secret123", str(raised.exception))
+
     def test_success_orders_stop_prepare_start_finalize_and_topology_probe(self):
         events = []
         def fake_run(args, check=True):

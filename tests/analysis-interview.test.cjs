@@ -18,6 +18,16 @@ assert.match(state.currentQuestion.text, /to you|personally/i, 'the question sho
 assert.doesNotMatch(state.currentQuestion.text, /childhood|must|means that|represents your/i, 'the question must not plant a suggested interpretation');
 assert.equal(state.reflectionContext, '', 'no interpretation context exists before the user answers');
 
+const fakeDream = `I was walking through my childhood neighborhood at night, but every house was floating a few feet above the ground. The streets were covered in shallow, perfectly still water that reflected a sky full of unfamiliar stars.
+I reached my old home and found the front door standing by itself with no house behind it. When I opened it, I stepped into a crowded train moving through a forest. Everyone on board was asleep except an older woman holding a small silver key. She told me, “You keep arriving before the place is ready.”
+The train stopped beside a dark lake. I got off and saw my reflection standing on the opposite shore, wearing clothes I didn’t recognize. It raised its hand like it wanted me to follow, but the silver key in my pocket suddenly became very hot.
+Then I heard an alarm ringing from somewhere beneath the water, and I woke up.`;
+const fakeDreamQuestion = createInterviewSession({ dreamID: 'dream-fake-example', transcript: fakeDream }).snapshot().currentQuestion;
+assert.equal(fakeDreamQuestion.focus, 'the key', 'the repeated object at the climactic change should outrank incidental scene objects');
+assert.match(fakeDreamQuestion.text, /silver key in my pocket suddenly became very hot/i, 'the question should cite the exact dream moment needing clarification');
+assert.match(fakeDreamQuestion.text, /what did the key bring up for you personally/i);
+assert.doesNotMatch(fakeDreamQuestion.text, /detail that stands out most|say what this detail means/i);
+
 assert.throws(() => session.submit('   '), /answer|response/i, 'blank answers are not accepted');
 state = session.submit('It reminds me of learning to drive with my older sister.');
 assert.equal(state.answers.length, 1);

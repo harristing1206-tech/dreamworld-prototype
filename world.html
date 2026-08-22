@@ -280,6 +280,7 @@
     .analysis-dialogue-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 7px; border-top: 1px solid rgba(231,223,197,.15); color: var(--sage); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .analysis-dialogue-advance:disabled { cursor: default; }
     .analysis-interview { display: grid; gap: 9px; margin-top: 10px; }
+    .analysis-interview-question { margin: 0; color: var(--paper); font: 600 15px/1.48 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; white-space: pre-wrap; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
     .analysis-interview-answer { width: 100%; min-height: 76px; max-height: 150px; resize: vertical; padding: 11px 12px; border: 1px solid rgba(231,223,197,.3); border-radius: 4px; background: rgba(4,12,20,.78); color: var(--cream); font: 500 15px/1.45 Georgia, serif; }
     .analysis-interview-answer:focus { outline: 2px solid var(--scene-glow); outline-offset: 2px; }
     .analysis-interview-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
@@ -788,8 +789,9 @@
             <span class="analysis-dialogue-page" id="analysisDialoguePage">1 / 1</span>
           </div>
           <form class="analysis-interview" id="analysisInterviewForm" hidden>
+            <p class="analysis-interview-question" id="analysisInterviewQuestion" aria-live="polite"></p>
             <label class="sr-only" for="analysisInterviewAnswer">Your answer to The Listener</label>
-            <textarea class="analysis-interview-answer" id="analysisInterviewAnswer" maxlength="600" placeholder="Say what this detail means to you…"></textarea>
+            <textarea class="analysis-interview-answer" id="analysisInterviewAnswer" maxlength="600" placeholder="Write your answer…"></textarea>
             <div class="analysis-interview-actions">
               <button class="analysis-interview-submit" id="analysisInterviewSubmit" type="submit" disabled>Answer</button>
               <button class="analysis-interview-finish" id="analysisInterviewFinish" type="button" hidden>Reflect now</button>
@@ -983,13 +985,13 @@
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=33"></script>
-  <script src="./jungian-method.js?v=33"></script>
-  <script src="./analysis-state.js?v=33"></script>
-  <script src="./analysis-interview.js?v=33"></script>
-  <script src="./analysis-dialogue.js?v=33"></script>
-  <script src="./dream-scene.js?v=33"></script>
-  <script src="./browser-transcriber.js?v=33"></script>
+  <script src="./dialogue-state.js?v=34"></script>
+  <script src="./jungian-method.js?v=34"></script>
+  <script src="./analysis-state.js?v=34"></script>
+  <script src="./analysis-interview.js?v=34"></script>
+  <script src="./analysis-dialogue.js?v=34"></script>
+  <script src="./dream-scene.js?v=34"></script>
+  <script src="./browser-transcriber.js?v=34"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -1043,6 +1045,7 @@
     const analysisDialoguePage = document.getElementById('analysisDialoguePage');
     const analysisDialogueStatus = document.getElementById('analysisDialogueStatus');
     const analysisInterviewForm = document.getElementById('analysisInterviewForm');
+    const analysisInterviewQuestion = document.getElementById('analysisInterviewQuestion');
     const analysisInterviewAnswer = document.getElementById('analysisInterviewAnswer');
     const analysisInterviewSubmit = document.getElementById('analysisInterviewSubmit');
     const analysisInterviewFinish = document.getElementById('analysisInterviewFinish');
@@ -1600,8 +1603,9 @@
       analysisInterviewAnswer.value = '';
       analysisInterviewSubmit.disabled = true;
       analysisInterviewFinish.hidden = state.answers.length === 0;
+      analysisInterviewQuestion.textContent = state.currentQuestion.text;
       analysisInterviewProgress.textContent = `Question ${state.questionIndex + 1} of ${state.questionCount} · Your answers stay on this device`;
-      analysisCharacterResponse.textContent = state.currentQuestion.text;
+      analysisCharacterResponse.textContent = '';
       analysisCharacterCard.dataset.typing = 'false';
       analysisCharacterCard.dataset.complete = 'false';
       analysisView.dataset.speaking = 'false';

@@ -36,18 +36,72 @@
     return text.length <= limit ? text : `${text.slice(0, limit - 1).trimEnd()}…`;
   }
 
+  const CHANGE_CUES = /\b(?:afraid|became|changed|felt|follow|hot|nervous|realized|stopped|suddenly|turned|woke)\b/gi;
+
+  function splitSentences(transcript) {
+    return clean(transcript).match(/[^.!?]+[.!?]?/g)?.map(sentence => clean(sentence)).filter(Boolean) || [];
+  }
+
+  function countMatches(pattern, text) {
+    const flags = pattern.flags.includes('g') ? pattern.flags : `${pattern.flags}g`;
+    return [...text.matchAll(new RegExp(pattern.source, flags))].length;
+  }
+
+  function sentenceCueCount(sentence) {
+    return [...sentence.matchAll(new RegExp(CHANGE_CUES.source, CHANGE_CUES.flags))].length;
+  }
+
   function detectDetails(transcript) {
-    return DETAIL_PATTERNS.filter(detail => detail.pattern.test(transcript)).map(detail => detail.label).slice(0, 4);
+    const sentences = splitSentences(transcript);
+    const targets = DETAIL_PATTERNS.map((detail, order) => {
+      const matchingSentences = sentences
+        .map((sentence, index) => ({
+          sentence,
+          index,
+          occurrences: countMatches(detail.pattern, sentence),
+          cues: sentenceCueCount(sentence)
+        }))
+        .filter(candidate => candidate.occurrences > 0)
+        .sort((left, right) => right.cues - left.cues || right.occurrences - left.occurrences || right.index - left.index);
+      if (!matchingSentences.length) return null;
+      const occurrenceCount = matchingSentences.reduce((total, candidate) => total + candidate.occurrences, 0);
+      const evidence = matchingSentences[0];
+      return {
+        focus: detail.label,
+        evidence: evidence.sentence,
+        occurrenceCount,
+        score: occurrenceCount * 4 + Math.min(evidence.cues, 3) * 5 + evidence.index / Math.max(sentences.length, 1),
+        order
+      };
+    }).filter(Boolean).sort((left, right) => right.score - left.score || left.order - right.order);
+
+    if (targets.length) return targets.slice(0, 4);
+    const fallback = sentences
+      .map((sentence, index) => ({ sentence, index, cues: sentenceCueCount(sentence) }))
+      .sort((left, right) => right.cues - left.cues || right.index - left.index)[0];
+    return [{ focus: 'this moment', evidence: fallback?.sentence || clean(transcript), occurrenceCount: 1, score: 0, order: 0 }];
+  }
+
+  function capitalize(value) {
+    return value ? `${value[0].toUpperCase()}${value.slice(1)}` : '';
   }
 
   function createQuestion(details, answers) {
     const index = answers.length;
-    const focus = details[index] || details[0] || 'the detail that stands out most';
+    const target = details[index] || details[0];
+    const focus = target.focus;
     if (index === 0) {
+      const recurrence = target.occurrenceCount > 1
+        ? `${capitalize(focus)} appears ${target.occurrenceCount} times. `
+        : '';
+      const text = focus === 'this moment'
+        ? `I want to clarify this moment from your dream: “${excerpt(target.evidence, 170)}” Which part of it felt most important to you, if any?`
+        : `${recurrence}I want to clarify ${focus} around this moment: “${excerpt(target.evidence, 170)}” What did ${focus} bring up for you personally, if anything?`;
       return {
         id: 'personal-association',
         focus,
-        text: `When you think about ${focus} in this dream, what does it mean to you personally, if anything?`
+        evidence: target.evidence,
+        text
       };
     }
     if (index === 1) {
@@ -55,13 +109,15 @@
       return {
         id: 'association-connection',
         focus,
-        text: `You connected ${answers[0].focus} with “${prior}” When ${focus} appeared, did it feel connected to that association or different?`
+        evidence: target.evidence,
+        text: `You connected ${answers[0].focus} with “${prior}.” In the dream: “${excerpt(target.evidence, 140)}” Did ${focus} feel connected to that association or different?`
       };
     }
     return {
       id: 'felt-relevance',
       focus,
-      text: `Thinking about ${focus} and the feelings in this dream, does anything connect with your life right now? It’s okay if the answer is no.`
+      evidence: target.evidence,
+      text: `One more moment I want to clarify is: “${excerpt(target.evidence, 140)}” Thinking about ${focus} and the feelings in this dream, does anything connect with your life right now? It’s okay if the answer is no.`
     };
   }
 

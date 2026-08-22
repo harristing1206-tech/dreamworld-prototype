@@ -99,6 +99,31 @@ test('persisted alarm IDs cannot create executable markup', async () => {
   }
 });
 
+test('the Listener visibly names and quotes the clarification target before asking for an answer', async () => {
+  const storage = createStorage();
+  const dom = await loadPage(storage, '');
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I saw an older woman holding a silver key on a train. Later, the silver key in my pocket suddenly became very hot when my reflection asked me to follow.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+
+    const question = document.getElementById('analysisInterviewQuestion');
+    assert.ok(question, 'the interview needs a dedicated visible question element');
+    assert.equal(question.hidden, false);
+    assert.notEqual(dom.window.getComputedStyle(question).display, 'none');
+    assert.match(question.textContent, /silver key in my pocket suddenly became very hot/i);
+    assert.match(question.textContent, /what did the key bring up for you personally/i);
+    assert.equal(document.getElementById('analysisDialogueAdvance').hidden, true, 'the hidden paginated-response button is not the question container');
+    assert.equal(document.getElementById('analysisInterviewAnswer').placeholder, 'Write your answer…');
+  } finally {
+    dom.window.close();
+  }
+});
+
 test('analysis flow shows one character response and preserves deletion recovery', async () => {
   const storage = createStorage();
   let dom = await loadPage(storage);
@@ -331,7 +356,7 @@ test('plausible but unsupported content is saved and clarified without a fabrica
     assert.equal([...storage.values.keys()].filter(key => key.startsWith('dreamworld:dream:')).length, 1, 'plausible text remains saved for later review');
     assert.equal([...storage.values.keys()].filter(key => key.startsWith('dreamworld:analysis:')).length, 0, 'unsupported content must not gain analysis state');
     assert.equal(document.getElementById('analysisView').classList.contains('active'), true);
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /what does it mean to you personally/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /clarify this moment|most important/i);
     assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
     assert.equal(document.getElementById('analysisFullOpen').hidden, true);
   } finally {
@@ -389,7 +414,7 @@ test('deleted plausible but unsupported content may restart a personal interview
     assert.equal(regenerate.hidden, false, 'unfamiliar but plausible language must not be permanently barred by an English-only gate');
     regenerate.click();
     assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /detail that stands out most|personally/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /clarify this moment|most important/i);
     assert.equal(storage.values.has(`dreamworld:analysis:${record.id}`), false, 'clearing the tombstone starts an interview but does not fabricate a response');
     assert.equal(storage.values.has(`dreamworld:interview:${record.id}`), true, 'the empty local interview is durably recoverable');
   } finally {
@@ -420,7 +445,7 @@ test('deleted personal reflection restarts the interview instead of regenerating
     assert.equal(regenerate.hidden, false);
     regenerate.click();
     assert.equal(document.getElementById('analysisInterviewForm').hidden, false);
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /car/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /car/i);
     assert.equal(storage.values.has(analysisKey), false, 'no replacement response exists before new answers');
   } finally {
     dom.window.close();
@@ -539,23 +564,23 @@ test('durable logging enters a one-question-at-a-time personal interview before 
     assert.equal(document.getElementById('analysisView').classList.contains('active'), true, 'logging should enter The Listener encounter');
     assert.equal(document.getElementById('analysisPreparation').hidden, true, 'preparation belongs after the questions, before reflection');
     assert.equal(form.hidden, false, 'the answer control should be visible for the current question');
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /car/i);
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /to you|personally/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /car/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /to you|personally/i);
     assert.equal(storage.values.has(analysisKey), false, 'no interpretation may be created before answers');
     assert.equal(document.activeElement, answer, 'keyboard focus should move to the answer field');
 
     answer.value = 'It reminds me of learning to drive with my older sister.';
     answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
     submit.click();
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /learning to drive with my older sister/i);
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /hat/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /learning to drive with my older sister/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /hat/i);
     assert.equal(JSON.parse(storage.values.get(interviewKey)).answers.length, 1);
     assert.equal(storage.values.has(analysisKey), false);
 
     answer.value = "It felt out of place, like I wasn't ready.";
     answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
     submit.click();
-    assert.match(document.getElementById('analysisCharacterResponse').textContent, /feeling|right now|life/i);
+    assert.match(document.getElementById('analysisInterviewQuestion').textContent, /feeling|right now|life/i);
 
     answer.value = 'I am nervous about making a decision on my own.';
     answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));

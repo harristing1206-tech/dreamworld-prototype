@@ -1,13 +1,14 @@
-const CACHE_NAME = 'dreamworld-world-v34';
+const CACHE_NAME = 'dreamworld-world-v35';
 const ASSETS = [
   './world.html',
-  './dialogue-state.js?v=34',
-  './jungian-method.js?v=34',
-  './analysis-state.js?v=34',
-  './analysis-interview.js?v=34',
-  './analysis-dialogue.js?v=34',
-  './dream-scene.js?v=34',
-  './browser-transcriber.js?v=34',
+  './dialogue-state.js?v=35',
+  './jungian-method.js?v=35',
+  './analysis-state.js?v=35',
+  './analysis-interview.js?v=35',
+  './analysis-dialogue.js?v=35',
+  './dream-scene.js?v=35',
+  './gbrain-analysis.js?v=35',
+  './browser-transcriber.js?v=35',
   './transcription-worker.js',
   './manifest.webmanifest',
   './icon-180.png',

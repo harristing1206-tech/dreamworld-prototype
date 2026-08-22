@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const { after, before, test } = require('node:test');
-const { JSDOM, VirtualConsole } = require('jsdom');
+const { JSDOM, ResourceLoader, VirtualConsole } = require('jsdom');
 
 const root = path.resolve(__dirname, '..');
 let server;
@@ -40,10 +40,14 @@ after(async () => {
 function createStorage(values = new Map()) {
   return {
     values,
+    failSetForPrefix: '',
     get length() { return values.size; },
     key(index) { return [...values.keys()][index] ?? null; },
     getItem(key) { return values.has(String(key)) ? values.get(String(key)) : null; },
-    setItem(key, value) { values.set(String(key), String(value)); },
+    setItem(key, value) {
+      if (this.failSetForPrefix && String(key).startsWith(this.failSetForPrefix)) throw new Error('blocked storage');
+      values.set(String(key), String(value));
+    },
     removeItem(key) { values.delete(String(key)); }
   };
 }
@@ -55,26 +59,57 @@ function storedDreams(storage) {
     .sort((left, right) => Date.parse(left.loggedAt) - Date.parse(right.loggedAt));
 }
 
-async function loadPage(storage, query = '?analysis=preview', { reducedMotion = true, preparationTimings = [8, 8, 8] } = {}) {
+class PrivateOriginResourceLoader extends ResourceLoader {
+  fetch(url) {
+    const parsed = new URL(url);
+    const relative = parsed.pathname.replace(/^\/dreamworld\//, '').replace(/^\/+/, '');
+    const file = path.resolve(root, relative);
+    if (!file.startsWith(`${root}${path.sep}`) || !fs.existsSync(file) || !fs.statSync(file).isFile()) return null;
+    return Promise.resolve(fs.readFileSync(file));
+  }
+}
+
+async function loadPage(storage, query = '?analysis=preview', { reducedMotion = true, preparationTimings = [8, 8, 8], fetchImpl = null, privateOrigin = false } = {}) {
   const virtualConsole = new VirtualConsole();
   const errors = [];
   virtualConsole.on('jsdomError', error => errors.push(error));
-  const dom = await JSDOM.fromURL(`${origin}/world.html${query}`, {
-    resources: 'usable',
+  const options = {
+    resources: privateOrigin ? new PrivateOriginResourceLoader() : 'usable',
     runScripts: 'dangerously',
     pretendToBeVisual: true,
     virtualConsole,
     beforeParse(window) {
       Object.defineProperty(window, 'localStorage', { value: storage });
+      Object.defineProperty(window.crypto, 'subtle', { value: require('node:crypto').webcrypto.subtle });
+      window.TextEncoder = require('node:util').TextEncoder;
+      if (fetchImpl) window.fetch = fetchImpl;
       window.__DREAMWORLD_TEST_TIMINGS__ = { analysisPreparation: preparationTimings };
       window.matchMedia = mediaQuery => ({ matches: reducedMotion && mediaQuery.includes('prefers-reduced-motion'), addListener() {}, removeListener() {} });
       window.HTMLElement.prototype.scrollIntoView = function () {};
     }
-  });
+  };
+  const dom = privateOrigin
+    ? new JSDOM(fs.readFileSync(path.join(root, 'world.html'), 'utf8'), { ...options, url: `https://hermes-vps.taildf1e1e.ts.net/dreamworld/world.html${query}` })
+    : await JSDOM.fromURL(`${origin}/world.html${query}`, options);
   await new Promise(resolve => dom.window.addEventListener('load', () => setTimeout(resolve, 30), { once: true }));
   assert.deepEqual(errors, [], `page emitted jsdom errors: ${errors.map(error => error.message).join('; ')}`);
   return dom;
 }
+
+test('primary navigation exposes one current page without invalid button ARIA', async () => {
+  const dom = await loadPage(createStorage(), '');
+  try {
+    const { document } = dom.window;
+    const buttons = [...document.querySelectorAll('.nav-button')];
+    assert.equal(buttons.some(button => button.hasAttribute('aria-selected')), false);
+    assert.equal(document.querySelector('.nav-button[aria-current="page"]')?.dataset.go, 'world');
+    document.querySelector('.nav-button[data-go="dreams"]').click();
+    assert.equal(document.querySelector('.nav-button[aria-current="page"]')?.dataset.go, 'dreams');
+    assert.equal(document.querySelectorAll('.nav-button[aria-current="page"]').length, 1);
+  } finally {
+    dom.window.close();
+  }
+});
 
 test('persisted alarm IDs cannot create executable markup', async () => {
   const hostileID = '\"><img id="alarmXssProbe" src="x" onerror="window.__alarmXss = true">';
@@ -484,6 +519,7 @@ test('durable capture writes one atomic dream record and clears only after succe
     document.getElementById('analysisInterviewSubmit').click();
     document.getElementById('analysisInterviewFinish').click();
     await new Promise(resolve => dom.window.setTimeout(resolve, 250));
+    document.getElementById('analysisLocalFallback').click();
     assert.equal(document.getElementById('analysisView').classList.contains('active'), true, 'successful interview routes to the response after preparation');
     assert.equal(document.getElementById('analysisTranscript').textContent, record.transcript);
     const firstResponse = document.getElementById('analysisCharacterResponse').textContent;
@@ -502,6 +538,7 @@ test('durable capture writes one atomic dream record and clears only after succe
     document.getElementById('analysisInterviewSubmit').click();
     document.getElementById('analysisInterviewFinish').click();
     await new Promise(resolve => dom.window.setTimeout(resolve, 250));
+    document.getElementById('analysisLocalFallback').click();
     const secondRecord = JSON.parse(storage.values.get('dreamworld:lastDream'));
     const secondResponse = document.getElementById('analysisCharacterResponse').textContent;
     const secondStoredAnalysis = JSON.parse(storage.values.get(`dreamworld:analysis:${secondRecord.id}`));
@@ -591,6 +628,8 @@ test('durable logging enters a one-question-at-a-time personal interview before 
     await new Promise(resolve => dom.window.setTimeout(resolve, 45));
     assert.equal(document.getElementById('analysisPreparation').hidden, true);
     assert.equal(form.hidden, true);
+    assert.equal(document.getElementById('analysisAIChoice').hidden, false, 'completed answers pause for explicit AI consent or local fallback');
+    document.getElementById('analysisLocalFallback').click();
     assert.equal(storage.values.has(analysisKey), true);
     const savedAnalysis = JSON.parse(storage.values.get(analysisKey));
     assert.equal(savedAnalysis.evidence.associations.length, 3);
@@ -601,9 +640,132 @@ test('durable logging enters a one-question-at-a-time personal interview before 
   }
 });
 
+test('private GBrain analysis is opt-in, evidence-bound, attributed, cached, and remotely deletable', async () => {
+  const storage = createStorage();
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    const request = JSON.parse(options.body);
+    calls.push({ url, request });
+    if (url.endsWith('/delete')) {
+      return { ok: true, status: 200, json: async () => ({ deleted: true, operationID: request.operationID }) };
+    }
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        schemaVersion: 1,
+        operationID: request.operationID,
+        dreamID: request.dreamID,
+        transcriptFingerprint: request.transcriptFingerprint,
+        evidenceFingerprint: request.evidenceFingerprint,
+        analysis: 'Your association with responsibility changes how the key can be approached. The dream places it beside a staircase and pairs it with fear, so one tentative reading is that a new capacity or obligation is present while the next step still feels consequential. This follows your own association rather than assigning the key a universal meaning.',
+        closingQuestion: 'Where does responsibility currently feel like both access and a difficult next step?',
+        evidence: [{
+          quote: 'I found a key beside a staircase and felt afraid.',
+          observation: 'The key, staircase, and fear occur in the same remembered moment.',
+          hypothesis: 'The scene may hold tension between gaining responsibility and taking the next step.'
+        }],
+        provenance: {
+          service: 'dreamworld-gbrain', model: 'gpt-5.6-sol', gbrainSource: 'dreamworld',
+          gbrainSlug: `dreams/dreamworld/${request.dreamID}`, storedInGBrain: true,
+          generatedAt: '2026-08-22T08:00:00Z'
+        }
+      })
+    };
+  };
+  const dom = await loadPage(storage, '', { reducedMotion: true, preparationTimings: [8, 8, 8], fetchImpl, privateOrigin: true });
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I found a key beside a staircase and felt afraid.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const answer = document.getElementById('analysisInterviewAnswer');
+    answer.value = 'The key feels like responsibility.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    document.getElementById('analysisInterviewFinish').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 50));
+
+    assert.equal(calls.length, 0, 'opening the choice must not transmit dream data');
+    assert.equal(document.getElementById('analysisAIChoice').hidden, false);
+    assert.match(document.querySelector('.analysis-ai-disclosure').textContent, /Nothing is sent until you choose it/i);
+    assert.equal(storage.values.has(`dreamworld:gbrain-analysis:${dream.id}`), false);
+
+    document.getElementById('analysisGBrainStart').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 40));
+    assert.equal(calls.length, 1);
+    assert.match(calls[0].url, /\/v1\/analyze$/);
+    assert.equal(calls[0].request.associations[0].answer, 'The key feels like responsibility.');
+    assert.match(document.getElementById('analysisFullText').textContent, /tentative reading/i);
+    assert.match(document.getElementById('analysisGBrainProvenance').textContent, /gpt-5\.6-sol.*private GBrain source dreamworld/i);
+    assert.equal(document.getElementById('analysisDeleteGBrain').hidden, false);
+    assert.equal(document.getElementById('analysisDeleteReflection').hidden, true);
+    assert.equal(storage.values.has(`dreamworld:gbrain-analysis:${dream.id}`), true);
+
+    const remove = document.getElementById('analysisDeleteGBrain');
+    remove.click();
+    assert.match(remove.textContent, /Tap again/i);
+    storage.failSetForPrefix = 'dreamworld:gbrain-delete:';
+    remove.click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 20));
+    assert.equal(calls.length, 1, 'blocked pending-operation persistence sends no deletion request');
+    assert.match(document.getElementById('analysisStorageStatus').textContent, /No deletion was sent/i);
+    storage.failSetForPrefix = '';
+    remove.click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 30));
+    assert.equal(calls.length, 2);
+    assert.match(calls[1].url, /\/v1\/delete$/);
+    assert.equal(storage.values.has(`dreamworld:gbrain-analysis:${dream.id}`), false);
+    assert.equal(storage.values.has(`dreamworld:gbrain-delete:${dream.id}`), false, 'verified deletion clears the persisted retry identity');
+    assert.equal(document.getElementById('analysisAIChoice').hidden, false);
+    assert.match(document.getElementById('analysisGBrainStatus').textContent, /deleted and verified/i);
+  } finally {
+    dom.window.close();
+  }
+});
+
+test('failed private analysis preserves evidence and keeps the local reflection path available', async () => {
+  const storage = createStorage();
+  const fetchImpl = async () => { throw new Error('tailnet unavailable'); };
+  const dom = await loadPage(storage, '', { reducedMotion: true, preparationTimings: [8, 8, 8], fetchImpl, privateOrigin: true });
+  try {
+    const document = dom.window.document;
+    document.querySelector('[data-go="capture"]').click();
+    const input = document.getElementById('dreamTextInput');
+    input.value = 'I crossed a dark ocean toward a house.';
+    input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('saveButton').click();
+    document.getElementById('dialogueFinish').click();
+    const dream = JSON.parse(storage.values.get('dreamworld:lastDream'));
+    const answer = document.getElementById('analysisInterviewAnswer');
+    answer.value = 'The moving house feels connected to uncertainty about where I belong.';
+    answer.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    document.getElementById('analysisInterviewSubmit').click();
+    document.getElementById('analysisInterviewFinish').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 50));
+    document.getElementById('analysisGBrainStart').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 30));
+
+    assert.match(document.getElementById('analysisGBrainStatus').textContent, /not replaced/i);
+    assert.equal(storage.values.has(`dreamworld:gbrain-analysis:${dream.id}`), false);
+    assert.equal(storage.values.has(`dreamworld:interview:${dream.id}`), true);
+    const local = document.getElementById('analysisLocalFallback');
+    assert.equal(local.disabled, false);
+    local.click();
+    assert.equal(storage.values.has(`dreamworld:analysis:${dream.id}`), true);
+    assert.match(document.getElementById('analysisFullText').textContent, /moving house|uncertainty|belong/i);
+  } finally {
+    dom.window.close();
+  }
+});
+
 test('reflection preparation advances through all stages before analysis opens', async () => {
   const storage = createStorage();
-  const dom = await loadPage(storage, '', { reducedMotion: false, preparationTimings: [35, 35, 35] });
+  const dom = await loadPage(storage, '', { reducedMotion: false, preparationTimings: [35, 35, 35], privateOrigin: true });
   try {
     const document = dom.window.document;
     document.querySelector('[data-go="capture"]').click();
@@ -635,7 +797,7 @@ test('reflection preparation advances through all stages before analysis opens',
     await new Promise(resolve => dom.window.setTimeout(resolve, 45));
     assert.equal(preparation.hidden, true);
     assert.equal(document.getElementById('analysisView').classList.contains('active'), true);
-    assert.equal(document.activeElement, document.getElementById('analysisBack'), 'analysis establishes the next valid focus target');
+    assert.equal(document.activeElement, document.getElementById('analysisGBrainStart'), 'the explicit AI consent choice receives focus');
     assert.equal(document.getElementById('dialogueOverlay').inert, false);
     assert.equal(document.getElementById('alarmsView').inert, true, 'pre-existing inert state is restored rather than flattened');
     document.getElementById('alarmsView').inert = false;
@@ -931,6 +1093,7 @@ test('active source removal cancels held Undo so deleted evidence cannot be rest
     document.getElementById('analysisInterviewSubmit').click();
     document.getElementById('analysisInterviewFinish').click();
     await new Promise(resolve => dom.window.setTimeout(resolve, 45));
+    document.getElementById('analysisLocalFallback').click();
     const deleteButton = document.getElementById('analysisDeleteReflection');
     deleteButton.click();
     deleteButton.click();
@@ -1053,6 +1216,7 @@ test('a cross-tab dream record refreshes the active longitudinal response', asyn
     document.getElementById('analysisInterviewSubmit').click();
     document.getElementById('analysisInterviewFinish').click();
     await new Promise(resolve => dom.window.setTimeout(resolve, 100));
+    document.getElementById('analysisLocalFallback').click();
     const analysisKey = `dreamworld:analysis:${dream.id}`;
     assert.doesNotMatch(JSON.parse(storage.values.get(analysisKey)).characterResponse.text, /Across your saved history/i);
 

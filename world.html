@@ -226,7 +226,7 @@
     button.dream-row { width: 100%; padding: 0; background: transparent; text-align: left; cursor: pointer; }
     button.dream-row[hidden] { display: none !important; }
     .analysis-view { --scene-sky-top: #101c2b; --scene-sky-bottom: #16283a; --scene-horizon: #1e3843; --scene-ground: #142a31; --scene-accent: #b69a63; --scene-glow: #e7dfc5; --scene-panel: #203d3f; --scene-panel-deep: #0d1b27; --scene-listener: #29494a; --scene-dreamer: #6f647f; --scene-ridge: polygon(0 54%, 11% 36%, 24% 48%, 38% 20%, 52% 43%, 68% 10%, 82% 38%, 100% 22%, 100% 100%, 0 100%); --scene-drift: 12s; --scene-pulse: 5s; --scene-stars: .6; overflow: hidden; padding: 0; background: var(--scene-sky-top); }
-    .analysis-game-scene { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(var(--scene-sky-top) 0 50%, var(--scene-sky-bottom) 70%, var(--scene-horizon) 100%); image-rendering: pixelated; transition: background 700ms ease; }
+    .analysis-game-scene { position: absolute; inset: 0; overflow: hidden; pointer-events: none; background: linear-gradient(var(--scene-sky-top) 0 50%, var(--scene-sky-bottom) 70%, var(--scene-horizon) 100%); image-rendering: pixelated; transition: background 700ms ease; }
     .analysis-game-scene::before { content: ""; position: absolute; inset: 0; opacity: .5; background: linear-gradient(90deg, transparent 0 7%, rgba(231,223,197,.035) 7% 8%, transparent 8% 21%, rgba(231,223,197,.025) 21% 22%, transparent 22%), linear-gradient(rgba(255,255,255,.025) 0 1px, transparent 1px 12px); background-size: 100% 100%, 12px 12px; }
     .analysis-game-scene::after { content: ""; position: absolute; left: -12%; right: -12%; bottom: 20%; height: 38%; background: var(--scene-ground); clip-path: var(--scene-ridge); box-shadow: inset 0 10px 0 color-mix(in srgb, var(--scene-horizon), transparent 55%); transition: background 700ms ease, clip-path 700ms ease; }
     .analysis-stars { position: absolute; inset: 10% 7% 45%; z-index: 1; opacity: var(--scene-stars); background: radial-gradient(circle at 12% 20%, var(--scene-glow) 0 1px, transparent 2px), radial-gradient(circle at 72% 12%, var(--scene-accent) 0 1px, transparent 2px), radial-gradient(circle at 88% 48%, var(--scene-glow) 0 1px, transparent 2px), radial-gradient(circle at 42% 38%, var(--scene-accent) 0 1px, transparent 2px), radial-gradient(circle at 24% 72%, var(--scene-glow) 0 1px, transparent 2px); animation: dream-stars var(--scene-pulse) steps(2, end) infinite; }
@@ -287,6 +287,15 @@
     .analysis-interview-submit, .analysis-interview-finish { min-height: 44px; padding: 0 14px; border: 1px solid var(--scene-accent); background: var(--scene-panel-deep); color: var(--cream); font: 750 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .analysis-interview-submit:disabled { opacity: .45; }
     .analysis-interview-progress { color: var(--sage); font: 650 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .05em; }
+    .analysis-ai-choice { display: grid; gap: 10px; margin-top: 10px; }
+    .analysis-ai-copy { margin: 0; color: var(--paper); font: 600 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    .analysis-ai-disclosure { margin: 0; color: var(--sage); font-size: 11px; line-height: 1.45; }
+    .analysis-ai-actions { display: grid; gap: 8px; }
+    .analysis-ai-start, .analysis-ai-local { min-height: 44px; padding: 0 14px; cursor: pointer; font: 750 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .analysis-ai-start { border: 1px solid var(--scene-accent); background: var(--scene-panel-deep); color: var(--cream); }
+    .analysis-ai-local { border: 1px solid rgba(231,223,197,.35); background: transparent; color: var(--paper); }
+    .analysis-ai-start:disabled, .analysis-ai-local:disabled { opacity: .45; cursor: default; }
+    .analysis-ai-status { min-height: 1.45em; margin: 0; color: var(--sage); font-size: 11px; line-height: 1.45; }
     .analysis-full-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px solid rgba(182,154,99,.76); border: 1px solid color-mix(in srgb, var(--scene-accent), transparent 24%); background: rgba(8,17,27,.9); background: color-mix(in srgb, var(--scene-panel-deep), transparent 10%); color: var(--scene-glow); cursor: pointer; font: 750 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
     .analysis-dialogue-page { color: var(--gold); }
     .analysis-panel { position: absolute; z-index: 10; top: max(66px, calc(env(safe-area-inset-top) + 58px)); left: 10px; right: 10px; bottom: 10px; padding: 18px; overflow-y: auto; border: 1px solid rgba(231,223,197,.35); border: 1px solid color-mix(in srgb, var(--scene-accent), transparent 50%); background: var(--scene-panel-deep); box-shadow: 0 20px 50px rgba(0,0,0,.55); }
@@ -576,15 +585,15 @@
       min-height: 60px;
       border: 0;
       background: transparent;
-      color: #65746f;
+      color: var(--sage);
       cursor: pointer;
       display: grid;
       place-items: center;
       align-content: center;
       gap: 6px;
     }
-    .nav-button[aria-selected="true"] { color: var(--paper); }
-    .nav-button[aria-selected="true"]::before { content: ""; position: absolute; top: 0; width: 18px; height: 2px; background: var(--gold); }
+    .nav-button[aria-current="page"] { color: var(--paper); }
+    .nav-button[aria-current="page"]::before { content: ""; position: absolute; top: 0; width: 18px; height: 2px; background: var(--gold); }
     .nav-label { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
     .nav-icon { position: relative; width: 22px; height: 22px; }
     .icon-world { border: 2px solid currentColor; border-radius: 50%; }
@@ -798,6 +807,15 @@
             </div>
             <span class="analysis-interview-progress" id="analysisInterviewProgress">Question 1 of 3 · Your answers stay on this device</span>
           </form>
+          <section class="analysis-ai-choice" id="analysisAIChoice" aria-labelledby="analysisAIChoiceTitle" hidden>
+            <p class="analysis-ai-copy" id="analysisAIChoiceTitle">Your associations are ready.</p>
+            <p class="analysis-ai-disclosure">Owner alpha only. If you choose private AI, the full transcript and all personal associations are written to the private Dreamworld source in GBrain. A bounded block of relevant prior private GBrain history/context, this transcript, and the associations are sent to the configured OpenAI model through the private bridge. The GBrain page and browser response cache remain until you delete them; verified remote deletion is soft-deleted under GBrain’s recovery/retention policy, while blocked browser-cache removal is reported honestly. Nothing is sent until you choose it. On public or offline copies, private AI is unavailable and local reflection remains available.</p>
+            <div class="analysis-ai-actions">
+              <button class="analysis-ai-start" id="analysisGBrainStart" type="button">Analyze privately with GBrain</button>
+              <button class="analysis-ai-local" id="analysisLocalFallback" type="button">Use local reflection instead</button>
+            </div>
+            <p class="analysis-ai-status" id="analysisGBrainStatus" aria-live="polite"></p>
+          </section>
           <button type="button" class="analysis-full-open" id="analysisFullOpen" hidden>Read full analysis</button>
         </div>
       </article>
@@ -821,6 +839,8 @@
         <p class="analysis-storage-note" id="analysisMethodDisclosure"><strong>Method:</strong> Context-first Jungian reflection · interpretive hypothesis, not a diagnosis or prediction.</p>
         <p class="analysis-storage-note" id="analysisMethodSources"><strong>Sources:</strong> Jung, CW 7 §§123–140 and §§188–190; <em>Man and His Symbols</em>, pp. 28–31 and 52–53; CW 8 §§443–569.</p>
         <p class="analysis-storage-note">Your associations lead. Recurrence never creates a fixed symbol meaning, and later dreams may revise this reflection.</p>
+        <p class="analysis-storage-note" id="analysisGBrainProvenance" hidden></p>
+        <button class="analysis-delete" id="analysisDeleteGBrain" type="button" hidden>Delete private GBrain copy</button>
         <button class="analysis-delete" id="analysisDeleteReflection">Delete answers &amp; reflection</button>
         <button class="analysis-undo" id="analysisRegenerateResponse" hidden>Create response again</button>
         <button class="analysis-undo" id="analysisUndoDelete" hidden>Undo deletion</button>
@@ -977,21 +997,22 @@
     </div>
 
     <nav class="nav" aria-label="Primary navigation">
-      <button class="nav-button" data-go="world" aria-selected="true"><span class="nav-icon icon-world"></span><span class="nav-label">World</span></button>
-      <button class="nav-button" data-go="dreams" aria-selected="false"><span class="nav-icon icon-dreams"></span><span class="nav-label">Dreams</span></button>
-      <button class="nav-button" data-go="capture" aria-selected="false"><span class="nav-icon icon-capture"></span><span class="nav-label">Capture</span></button>
-      <button class="nav-button" data-go="alarms" aria-selected="false"><span class="nav-icon icon-alarm"></span><span class="nav-label">Alarms</span></button>
-      <button class="nav-button" data-go="settings" aria-selected="false"><span class="nav-icon icon-settings"></span><span class="nav-label">Settings</span></button>
+      <button class="nav-button" data-go="world" aria-current="page"><span class="nav-icon icon-world"></span><span class="nav-label">World</span></button>
+      <button class="nav-button" data-go="dreams"><span class="nav-icon icon-dreams"></span><span class="nav-label">Dreams</span></button>
+      <button class="nav-button" data-go="capture"><span class="nav-icon icon-capture"></span><span class="nav-label">Capture</span></button>
+      <button class="nav-button" data-go="alarms"><span class="nav-icon icon-alarm"></span><span class="nav-label">Alarms</span></button>
+      <button class="nav-button" data-go="settings"><span class="nav-icon icon-settings"></span><span class="nav-label">Settings</span></button>
     </nav>
   </main>
 
-  <script src="./dialogue-state.js?v=34"></script>
-  <script src="./jungian-method.js?v=34"></script>
-  <script src="./analysis-state.js?v=34"></script>
-  <script src="./analysis-interview.js?v=34"></script>
-  <script src="./analysis-dialogue.js?v=34"></script>
-  <script src="./dream-scene.js?v=34"></script>
-  <script src="./browser-transcriber.js?v=34"></script>
+  <script src="./dialogue-state.js?v=35"></script>
+  <script src="./jungian-method.js?v=35"></script>
+  <script src="./analysis-state.js?v=35"></script>
+  <script src="./analysis-interview.js?v=35"></script>
+  <script src="./analysis-dialogue.js?v=35"></script>
+  <script src="./dream-scene.js?v=35"></script>
+  <script src="./gbrain-analysis.js?v=35"></script>
+  <script src="./browser-transcriber.js?v=35"></script>
   <script>
     const views = [...document.querySelectorAll('.view')];
     const navButtons = [...document.querySelectorAll('.nav-button')];
@@ -1050,6 +1071,10 @@
     const analysisInterviewSubmit = document.getElementById('analysisInterviewSubmit');
     const analysisInterviewFinish = document.getElementById('analysisInterviewFinish');
     const analysisInterviewProgress = document.getElementById('analysisInterviewProgress');
+    const analysisAIChoice = document.getElementById('analysisAIChoice');
+    const analysisGBrainStart = document.getElementById('analysisGBrainStart');
+    const analysisLocalFallback = document.getElementById('analysisLocalFallback');
+    const analysisGBrainStatus = document.getElementById('analysisGBrainStatus');
     const analysisSceneName = document.getElementById('analysisSceneName');
     const analysisFullOpen = document.getElementById('analysisFullOpen');
     const analysisFullPanel = document.getElementById('analysisFullPanel');
@@ -1065,6 +1090,10 @@
     const primaryNavigation = document.querySelector('.nav');
     const analysisStorageDisclosure = document.getElementById('analysisStorageDisclosure');
     const analysisStorageStatus = document.getElementById('analysisStorageStatus');
+    const analysisMethodDisclosure = document.getElementById('analysisMethodDisclosure');
+    const analysisMethodSources = document.getElementById('analysisMethodSources');
+    const analysisGBrainProvenance = document.getElementById('analysisGBrainProvenance');
+    const analysisDeleteGBrain = document.getElementById('analysisDeleteGBrain');
     const analysisDeleteReflection = document.getElementById('analysisDeleteReflection');
     const analysisRegenerateResponse = document.getElementById('analysisRegenerateResponse');
     const analysisUndoDelete = document.getElementById('analysisUndoDelete');
@@ -1132,6 +1161,12 @@
     let analysisPreparationTimer = null;
     let analysisPreparationRun = 0;
     let analysisPreparationInertSnapshot = null;
+    let activeGBrainRequest = null;
+    let activeGBrainResult = null;
+    let activeGBrainRun = 0;
+    let activeGBrainAbortController = null;
+    let activeGBrainDeleteAbortController = null;
+    let forceLocalAnalysisForDreamID = '';
 
     function getTimePhase(hour) {
       if (hour >= 5 && hour < 6) return { id: 'blue-hour', label: 'Blue hour' };
@@ -1173,11 +1208,19 @@
 
     function openView(name) {
       if (name !== 'analysis') {
+        activeGBrainRun += 1;
+        activeGBrainAbortController?.abort();
+        activeGBrainAbortController = null;
+        activeGBrainDeleteAbortController?.abort();
+        activeGBrainDeleteAbortController = null;
         analysisDialogueController?.destroy();
         closeAnalysisPanels();
       }
       views.forEach(view => view.classList.toggle('active', view.dataset.view === name));
-      navButtons.forEach(button => button.setAttribute('aria-selected', String(button.dataset.go === name)));
+      navButtons.forEach(button => {
+        if (button.dataset.go === name) button.setAttribute('aria-current', 'page');
+        else button.removeAttribute('aria-current');
+      });
     }
 
     function createDreamID() {
@@ -1551,7 +1594,7 @@
           ? 'Reflection complete'
           : `Continue to dialogue page ${state.pageIndex + 2} of ${state.pageCount}`);
       analysisDialogueAdvance.disabled = state.complete;
-      analysisFullOpen.hidden = !(state.complete && analysisSession);
+      analysisFullOpen.hidden = !(state.complete && activeAnalysisResponseText);
       if (!state.typing && state.visibleText === state.pageText && announcedAnalysisPage !== state.pageIndex) {
         announcedAnalysisPage = state.pageIndex;
         analysisDialogueStatus.textContent = `Dialogue page ${state.pageIndex + 1} of ${state.pageCount} complete.`;
@@ -1598,6 +1641,7 @@
       activeAnalysisResponseText = '';
       analysisFullText.textContent = '';
       analysisFullOpen.hidden = true;
+      analysisAIChoice.hidden = true;
       analysisDialogueAdvance.hidden = true;
       analysisInterviewForm.hidden = false;
       analysisInterviewAnswer.value = '';
@@ -1649,9 +1693,244 @@
       completeAnalysisInterview(analysisInterviewSession.finish());
     }
 
+    function resetGBrainAnalysisUI() {
+      activeGBrainRun += 1;
+      activeGBrainAbortController?.abort();
+      activeGBrainAbortController = null;
+      activeGBrainDeleteAbortController?.abort();
+      activeGBrainDeleteAbortController = null;
+      activeGBrainRequest = null;
+      activeGBrainResult = null;
+      analysisAIChoice.hidden = true;
+      analysisGBrainStart.disabled = false;
+      analysisLocalFallback.disabled = false;
+      analysisGBrainStatus.textContent = '';
+      analysisDeleteGBrain.hidden = true;
+      analysisDeleteGBrain.disabled = false;
+      analysisDeleteGBrain.dataset.confirmDelete = 'false';
+      analysisDeleteGBrain.textContent = 'Delete private GBrain copy';
+      analysisGBrainProvenance.hidden = true;
+      analysisGBrainProvenance.textContent = '';
+      analysisMethodDisclosure.textContent = 'Method: Context-first Jungian reflection · interpretive hypothesis, not a diagnosis or prediction.';
+      analysisMethodSources.textContent = 'Sources: Jung, CW 7 §§123–140 and §§188–190; Man and His Symbols, pp. 28–31 and 52–53; CW 8 §§443–569.';
+    }
+
+    function renderGBrainResult(result, { cached = false } = {}) {
+      activeGBrainResult = result;
+      analysisSession = null;
+      analysisInterviewForm.hidden = true;
+      analysisAIChoice.hidden = true;
+      analysisDialogueAdvance.hidden = false;
+      analysisDeleteReflection.hidden = true;
+      analysisDeleteGBrain.hidden = false;
+      analysisGBrainProvenance.hidden = false;
+      activeAnalysisResponseText = `${result.analysis}\n\n${result.closingQuestion}`;
+      analysisFullText.textContent = activeAnalysisResponseText;
+      analysisMethodDisclosure.textContent = 'Method: AI-assisted, context-first Jungian reflection. Personal associations lead; every cited quote is checked against this transcript.';
+      analysisMethodSources.textContent = 'Sources: your transcript and interview answers; relevant private GBrain history when found; Jung, CW 7 §§123–140 and §§188–190; Man and His Symbols, pp. 28–31 and 52–53; CW 8 §§443–569.';
+      const generated = result.provenance.generatedAt ? ` · ${result.provenance.generatedAt}` : '';
+      analysisGBrainProvenance.textContent = `AI provenance: ${result.provenance.model} via Hermes · private GBrain source ${result.provenance.gbrainSource} · ${result.provenance.gbrainSlug}${generated}`;
+      analysisStorageDisclosure.textContent = cached
+        ? 'This AI reflection was restored from this browser. Its evidence page remains in the owner’s private GBrain until you delete that private copy.'
+        : 'This transcript and your interview answers were sent through the owner’s Tailscale-protected service. The response is cached in this browser and its evidence page is stored in the owner’s private GBrain.';
+      analysisStorageStatus.textContent = 'AI-generated reflection · one evidence-grounded hypothesis, not a diagnosis, prediction, or definitive hidden meaning.';
+      startAnalysisDialogue(activeAnalysisResponseText);
+      analysisBack.focus();
+    }
+
+    async function offerGBrainAnalysis(dream, associations) {
+      const run = ++activeGBrainRun;
+      analysisSession = null;
+      activeAnalysisResponseText = '';
+      analysisFullText.textContent = '';
+      analysisFullOpen.hidden = true;
+      analysisDialogueController?.destroy();
+      analysisDialogueController = null;
+      analysisDialogueAdvance.hidden = true;
+      analysisInterviewForm.hidden = true;
+      analysisAIChoice.hidden = false;
+      analysisDeleteReflection.hidden = true;
+      analysisDeleteGBrain.hidden = true;
+      analysisCharacterResponse.textContent = '';
+      analysisDialogueHint.textContent = 'Choose how to reflect';
+      analysisDialoguePage.textContent = 'Ready';
+      analysisCharacterCard.dataset.typing = 'false';
+      analysisCharacterCard.dataset.complete = 'false';
+      analysisStorageDisclosure.textContent = 'Your transcript and answers remain local unless you explicitly choose private GBrain analysis.';
+      analysisStorageStatus.textContent = 'Local reflection remains available without network access.';
+      closeAnalysisPanels();
+      openView('analysis');
+      try {
+        const request = await DreamworldGBrain.buildRequest({
+          dreamID: dream.id,
+          title: dream.title,
+          transcript: dream.transcript,
+          source: dream.source,
+          associations
+        });
+        if (run !== activeGBrainRun || activeAnalysisDreamID !== dream.id) return;
+        activeGBrainRequest = request;
+        const privateAIAvailable = DreamworldGBrain.isPrivateOrigin(window.location.origin);
+        analysisGBrainStart.hidden = !privateAIAvailable;
+        analysisGBrainStart.disabled = !privateAIAvailable;
+        if (!privateAIAvailable) {
+          analysisGBrainStatus.textContent = 'Private AI is available only in the owner alpha. This copy stays local/offline and will not transmit dream data.';
+          analysisStorageDisclosure.textContent = 'Local/offline reflection only on this origin. No transcript, associations, or GBrain context will be transmitted.';
+          analysisLocalFallback.focus();
+          return;
+        }
+        let cached = null;
+        try { cached = JSON.parse(appStorage.get(DreamworldGBrain.cacheKey(dream.id)) || 'null'); } catch (_) {}
+        if (cached && DreamworldGBrain.isMatchingResult(cached, request)) {
+          renderGBrainResult(cached, { cached: true });
+          return;
+        }
+        analysisGBrainStart.focus();
+      } catch (error) {
+        if (run !== activeGBrainRun) return;
+        analysisGBrainStatus.textContent = error?.message || 'Private GBrain analysis is unavailable. Use the local reflection instead.';
+      }
+    }
+
+    async function requestGBrainAnalysis() {
+      if (!activeGBrainRequest || analysisGBrainStart.disabled || !DreamworldGBrain.isPrivateOrigin(window.location.origin)) return;
+      const request = activeGBrainRequest;
+      const run = ++activeGBrainRun;
+      const controller = new AbortController();
+      activeGBrainAbortController?.abort();
+      activeGBrainAbortController = controller;
+      analysisGBrainStart.disabled = true;
+      analysisLocalFallback.disabled = true;
+      analysisGBrainStatus.textContent = 'The Listener is consulting private GBrain…';
+      analysisStorageStatus.textContent = 'Writing the full transcript and associations to private GBrain; sending them with bounded relevant prior context to the configured OpenAI model.';
+      const stillCurrent = () => run === activeGBrainRun
+        && activeAnalysisDreamID === request.dreamID
+        && activeGBrainRequest?.transcriptFingerprint === request.transcriptFingerprint
+        && activeGBrainRequest?.evidenceFingerprint === request.evidenceFingerprint;
+      try {
+        const result = await DreamworldGBrain.analyze(request, {
+          signal: controller.signal,
+          currentOrigin: DreamworldGBrain.PRIVATE_ORIGIN
+        });
+        if (!stillCurrent()) return;
+        const storedDurably = appStorage.set(DreamworldGBrain.cacheKey(request.dreamID), JSON.stringify(result));
+        renderGBrainResult(result);
+        if (!storedDurably) analysisStorageStatus.textContent = 'AI analysis completed, but its local cache could not be saved. The verified private GBrain evidence page remains stored.';
+      } catch (error) {
+        if (!stillCurrent()) return;
+        analysisGBrainStart.disabled = false;
+        analysisLocalFallback.disabled = false;
+        analysisGBrainStatus.textContent = `${error?.message || 'Private GBrain analysis failed.'} Your local dream and answers were not replaced.`;
+        analysisStorageStatus.textContent = 'No AI response was cached. You can retry on Tailscale or use the local reflection.';
+        analysisGBrainStart.focus();
+      } finally {
+        if (activeGBrainAbortController === controller) activeGBrainAbortController = null;
+      }
+    }
+
+    function useLocalAnalysis() {
+      if (!activeAnalysisDreamID) return;
+      activeGBrainRun += 1;
+      activeGBrainAbortController?.abort();
+      activeGBrainAbortController = null;
+      forceLocalAnalysisForDreamID = activeAnalysisDreamID;
+      openAnalysis(activeAnalysisDreamID);
+    }
+
+    async function deleteActiveGBrainCopy() {
+      if (!activeGBrainRequest || !activeGBrainResult || analysisDeleteGBrain.disabled || !DreamworldGBrain.isPrivateOrigin(window.location.origin)) return;
+      if (analysisDeleteGBrain.dataset.confirmDelete !== 'true') {
+        analysisDeleteGBrain.dataset.confirmDelete = 'true';
+        analysisDeleteGBrain.textContent = 'Delete from GBrain? Tap again';
+        analysisStorageStatus.textContent = 'This requests verified soft-deletion of the private GBrain page and removal of the local AI cache. Your original local dream remains.';
+        return;
+      }
+      const request = activeGBrainRequest;
+      const result = activeGBrainResult;
+      const dreamID = request.dreamID;
+      const transcriptFingerprint = request.transcriptFingerprint;
+      const evidenceFingerprint = request.evidenceFingerprint;
+      const analysisOperationID = result.operationID;
+      const pendingDeleteKey = DreamworldGBrain.deleteOperationKey(dreamID);
+      let existingDelete = null;
+      const savedDelete = appStorage.get(pendingDeleteKey);
+      if (savedDelete) {
+        try { existingDelete = JSON.parse(savedDelete); } catch (_) {
+          analysisStorageStatus.textContent = 'The saved deletion identity is unreadable. Clear this site’s storage before retrying; no deletion was sent.';
+          return;
+        }
+      }
+      let deleteOperation;
+      try {
+        deleteOperation = DreamworldGBrain.buildDeleteOperation({
+          dreamID, transcriptFingerprint, evidenceFingerprint, analysisOperationID
+        }, existingDelete);
+      } catch (error) {
+        analysisStorageStatus.textContent = `${error?.message || 'The pending deletion identity is invalid.'} No deletion was sent.`;
+        return;
+      }
+      if (!appStorage.set(pendingDeleteKey, JSON.stringify(deleteOperation))) {
+        analysisStorageStatus.textContent = 'Browser storage could not preserve a restart-safe deletion identity. No deletion was sent.';
+        return;
+      }
+      const run = ++activeGBrainRun;
+      const controller = new AbortController();
+      activeGBrainDeleteAbortController?.abort();
+      activeGBrainDeleteAbortController = controller;
+      const stillCurrent = () => run === activeGBrainRun
+        && activeAnalysisDreamID === dreamID
+        && activeGBrainRequest === request
+        && activeGBrainResult === result
+        && request.transcriptFingerprint === transcriptFingerprint
+        && request.evidenceFingerprint === evidenceFingerprint;
+      analysisDeleteGBrain.disabled = true;
+      analysisStorageStatus.textContent = 'Deleting and verifying the private GBrain copy…';
+      try {
+        await DreamworldGBrain.deleteRemote(
+          { ...request, operationID: analysisOperationID },
+          { deleteOperation, signal: controller.signal, currentOrigin: DreamworldGBrain.PRIVATE_ORIGIN }
+        );
+        if (!stillCurrent()) return;
+        const pendingDeleteRemoved = appStorage.remove(pendingDeleteKey);
+        const cacheRemovedDurably = appStorage.remove(DreamworldGBrain.cacheKey(dreamID));
+        activeGBrainResult = null;
+        activeAnalysisResponseText = '';
+        analysisFullText.textContent = '';
+        analysisFullOpen.hidden = true;
+        analysisDeleteGBrain.hidden = true;
+        analysisGBrainProvenance.hidden = true;
+        analysisDialogueController?.destroy();
+        analysisDialogueController = null;
+        analysisDialogueAdvance.hidden = true;
+        analysisCharacterResponse.textContent = '';
+        analysisAIChoice.hidden = false;
+        analysisGBrainStart.disabled = false;
+        analysisLocalFallback.disabled = false;
+        analysisGBrainStatus.textContent = cacheRemovedDurably && pendingDeleteRemoved
+          ? 'Private GBrain copy deleted and verified. Your local transcript and interview answers remain.'
+          : 'Private GBrain copy deleted and verified, but browser storage blocked complete local cleanup.';
+        analysisStorageDisclosure.textContent = cacheRemovedDurably && pendingDeleteRemoved
+          ? 'The private GBrain evidence page was soft-deleted and the local AI response cache was removed.'
+          : 'Remote deletion was verified. A local AI cache or pending deletion record may remain; clear this site’s storage to remove it.';
+        analysisStorageStatus.textContent = cacheRemovedDurably && pendingDeleteRemoved
+          ? 'Choose a new private analysis or use the local reflection.'
+          : 'Remote copy deleted; local cleanup was blocked.';
+        analysisGBrainStart.focus();
+      } catch (error) {
+        if (!stillCurrent()) return;
+        analysisDeleteGBrain.disabled = false;
+        analysisDeleteGBrain.dataset.confirmDelete = 'false';
+        analysisDeleteGBrain.textContent = 'Delete private GBrain copy';
+        analysisStorageStatus.textContent = `${error?.message || 'Private deletion failed.'} The app is not claiming that remote data was deleted.`;
+      } finally {
+        if (activeGBrainDeleteAbortController === controller) activeGBrainDeleteAbortController = null;
+      }
+    }
+
     function openAnalysis(dreamID, { externalRefresh = false, changedKey = '' } = {}) {
       const dream = getAnalysisDream(dreamID);
       if (!dream) return;
+      resetGBrainAnalysisUI();
       analysisInterviewForm.hidden = true;
       analysisDialogueAdvance.hidden = false;
       analysisInterviewSession = null;
@@ -1740,6 +2019,18 @@
           analysisDeleteReflection.hidden = false;
           analysisRegenerateResponse.hidden = true;
         }
+      }
+
+      const localReflectionRequested = forceLocalAnalysisForDreamID === dream.id;
+      if (localReflectionRequested) forceLocalAnalysisForDreamID = '';
+      if (dream.source !== 'sample-content'
+        && eligibility.analyzable
+        && !responseWasDeleted
+        && !savedState
+        && associations.length
+        && !localReflectionRequested) {
+        void offerGBrainAnalysis(dream, associations);
+        return;
       }
 
       if (!eligibility.analyzable) {
@@ -2639,6 +2930,9 @@
     });
     analysisInterviewForm.addEventListener('submit', submitAnalysisInterviewAnswer);
     analysisInterviewFinish.addEventListener('click', finishAnalysisInterviewEarly);
+    analysisGBrainStart.addEventListener('click', requestGBrainAnalysis);
+    analysisLocalFallback.addEventListener('click', useLocalAnalysis);
+    analysisDeleteGBrain.addEventListener('click', deleteActiveGBrainCopy);
     analysisFullOpen.addEventListener('click', () => {
       analysisFullText.textContent = activeAnalysisResponseText;
       showAnalysisPanel(analysisFullPanel);

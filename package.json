@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "node --test tests/*.test.cjs"
+    "test": "node --test tests/*.test.cjs && python3 -m unittest -v tests/test_dreamworld_ai.py tests/test_runtime_scripts.py"
   },
   "repository": {
     "type": "git",

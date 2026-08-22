@@ -7,7 +7,7 @@ const serviceWorker = fs.readFileSync(path.join(__dirname, '..', 'service-worker
 
 const cacheVersion = serviceWorker.match(/dreamworld-world-v(\d+)/)?.[1];
 assert.ok(cacheVersion, 'service worker cache must be versioned');
-for (const asset of ['dialogue-state.js', 'jungian-method.js', 'analysis-state.js', 'analysis-interview.js', 'analysis-dialogue.js', 'dream-scene.js', 'browser-transcriber.js']) {
+for (const asset of ['dialogue-state.js', 'jungian-method.js', 'analysis-state.js', 'analysis-interview.js', 'analysis-dialogue.js', 'dream-scene.js', 'gbrain-analysis.js', 'browser-transcriber.js']) {
   assert.match(html, new RegExp(`<script src="\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}"><\\/script>`), `${asset} must be cache-busted with the release version`);
   assert.match(serviceWorker, new RegExp(`\\./${asset.replace('.', '\\.') }\\?v=${cacheVersion}`), `${asset} must be cached under the same release-versioned URL`);
 }
@@ -55,6 +55,13 @@ assert.match(html, /function completeAnalysisInterview[\s\S]+startAnalysisPrepar
 assert.match(html, /id="analysisInterviewForm"[^>]+hidden/, 'the one-question answer form starts hidden');
 assert.match(html, /id="analysisInterviewAnswer"[^>]+maxlength="600"/);
 assert.match(html, /id="analysisInterviewFinish"[^>]+hidden>Reflect now/, 'the user may end the interview early after answering');
+assert.match(html, /id="analysisAIChoice"[^>]+hidden/, 'AI analysis begins behind an explicit consent choice');
+assert.match(html, /\.analysis-game-scene\s*\{[^}]*pointer-events:\s*none/s, 'the decorative dream scene cannot intercept navigation or controls');
+assert.match(html, /Analyze privately with GBrain/);
+assert.match(html, /Use local reflection instead/);
+assert.match(html, /Nothing is sent until you choose it/);
+assert.match(html, /id="analysisGBrainProvenance"[^>]+hidden/);
+assert.match(html, /id="analysisDeleteGBrain"[^>]+hidden/);
 assert.match(html, /Your answers stay on this device/);
 assert.match(html, /\.character-response\[data-typing="true"\][^{]+\.listener-mouth/s, 'the Listener portrait should visibly speak while text types');
 assert.match(html, /data-scene/, 'the analysis view should expose its active dreamscape motif');

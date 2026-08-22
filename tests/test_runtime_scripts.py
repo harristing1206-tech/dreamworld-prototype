@@ -168,9 +168,10 @@ class MigrationTests(unittest.TestCase):
 
     def test_rollback_disables_http_and_restores_snapshot(self):
         self._prepared()
-        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive") as stopped:
+        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive") as stopped, patch.object(self.migration, "revoke_gateway_token") as revoked:
             self.migration.rollback()
         stopped.assert_called_once_with()
+        revoked.assert_called_once_with()
         self.assertIn("private-token-value-long", self.migration.HERMES_ENV.read_text())
         self.assertFalse(self.migration.PENDING.exists())
         self.assertTrue((self.migration.BACKUP_DIR / "rolled-back.json").is_file())
@@ -181,7 +182,7 @@ class MigrationTests(unittest.TestCase):
         payload = self.migration.load_pending()
         payload["phase"] = "committed"
         self.migration._write_private_json(self.migration.PENDING, payload)
-        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive"):
+        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive"), patch.object(self.migration, "revoke_gateway_token"):
             self.migration.rollback()
         self.assertTrue((self.migration.BACKUP_DIR / "rolled-back.json").is_file())
 
@@ -221,11 +222,58 @@ class MigrationTests(unittest.TestCase):
              patch.object(self.migration, "_snapshot", return_value={}), \
              patch.object(self.migration, "run", side_effect=RuntimeError("prepare failed")), \
              patch.object(self.migration, "ensure_http_inactive", side_effect=lambda: events.append("stop")), \
+             patch.object(self.migration, "revoke_gateway_token", side_effect=lambda: events.append("revoke")), \
              patch.object(self.migration, "_restore_snapshot", side_effect=lambda _originals: events.append("restore")), \
              patch.object(self.migration.shutil, "rmtree"):
             with self.assertRaisesRegex(RuntimeError, "prepare failed"):
                 self.migration.prepare()
-        self.assertEqual(events, ["stop", "restore"])
+        self.assertEqual(events, ["stop", "stop", "revoke", "restore"])
+
+    def test_gateway_token_helper_atomically_rotates_fixed_scoped_token(self):
+        helper = (RUNTIME / "scope_gateway_token.ts").read_text(encoding="utf-8")
+        migration = (RUNTIME / "migrate_gbrain_http.py").read_text(encoding="utf-8")
+        self.assertIn("randomBytes(32)", helper)
+        self.assertIn("ON CONFLICT (name) DO UPDATE", helper)
+        self.assertIn("token_hash = EXCLUDED.token_hash", helper)
+        self.assertIn("revoked_at = NULL", helper)
+        self.assertIn("source_id: ['default', 'gerri', 'dreamworld']", helper)
+        self.assertIn("SCOPED_GATEWAY_TOKEN=", helper)
+        self.assertIn('TOKEN_NAME, "rotate"], sensitive=True', migration)
+        self.assertIn("revoke_gateway_token()", migration)
+        self.assertIn("GATEWAY_TOKEN_REVOKE_OK", helper)
+
+    def test_scoped_gateway_token_parser_is_exact_and_bounded(self):
+        token = "gbrain_" + "a" * 64
+        self.assertEqual(self.migration.parse_scoped_gateway_token(f"GATEWAY_TOKEN_SCOPE_OK\nSCOPED_GATEWAY_TOKEN={token}\n"), token)
+        malformed = [
+            f"prefix\nGATEWAY_TOKEN_SCOPE_OK\nSCOPED_GATEWAY_TOKEN={token}\n",
+            f"GATEWAY_TOKEN_SCOPE_OK suffix\nSCOPED_GATEWAY_TOKEN={token}\n",
+            "GATEWAY_TOKEN_SCOPE_OK\nSCOPED_GATEWAY_TOKEN=gbrain_a\n",
+            f"GATEWAY_TOKEN_SCOPE_OK\nSCOPED_GATEWAY_TOKEN={token}\nSCOPED_GATEWAY_TOKEN={token}\n",
+            f"GATEWAY_TOKEN_SCOPE_OK\nSCOPED_GATEWAY_TOKEN={token.upper()}\n",
+        ]
+        for value in malformed:
+            with self.subTest(value=value[:40]):
+                with self.assertRaises(RuntimeError):
+                    self.migration.parse_scoped_gateway_token(value)
+
+    def test_prepare_refuses_before_snapshot_when_http_is_not_inactive(self):
+        with patch.object(self.migration, "gateway_running", return_value=False), \
+             patch.object(self.migration, "ensure_http_inactive", side_effect=RuntimeError("not inactive")), \
+             patch.object(self.migration, "_snapshot") as snapshot:
+            with self.assertRaisesRegex(RuntimeError, "not inactive"):
+                self.migration.prepare()
+        snapshot.assert_not_called()
+
+    def test_rollback_revocation_failure_blocks_restoration(self):
+        self._prepared()
+        with patch.object(self.migration, "gateway_running", return_value=False), \
+             patch.object(self.migration, "ensure_http_inactive"), \
+             patch.object(self.migration, "revoke_gateway_token", side_effect=RuntimeError("revoke unverified")), \
+             patch.object(self.migration, "_restore_snapshot") as restore:
+            with self.assertRaisesRegex(RuntimeError, "revoke unverified"):
+                self.migration.rollback()
+        restore.assert_not_called()
 
     def test_dreamworld_oauth_probe_exercises_scoped_query_and_exact_crud(self):
         calls = []

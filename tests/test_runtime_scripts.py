@@ -27,6 +27,7 @@ class RuntimeTokenTests(unittest.TestCase):
     def test_gbrain_http_never_prints_bootstrap_token(self):
         unit = (SYSTEMD / "gbrain-http.service").read_text(encoding="utf-8")
         self.assertIn("--suppress-bootstrap-token", unit)
+        self.assertIn("SuccessExitStatus=143", unit)
         env_path = Path.home() / ".config/gbrain-http/service.env"
         if env_path.exists():
             mode = stat.S_IMODE(env_path.stat().st_mode)
@@ -167,19 +168,20 @@ class MigrationTests(unittest.TestCase):
 
     def test_rollback_disables_http_and_restores_snapshot(self):
         self._prepared()
-        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration.subprocess, "run") as run_mock:
+        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive") as stopped:
             self.migration.rollback()
+        stopped.assert_called_once_with()
         self.assertIn("private-token-value-long", self.migration.HERMES_ENV.read_text())
         self.assertFalse(self.migration.PENDING.exists())
         self.assertTrue((self.migration.BACKUP_DIR / "rolled-back.json").is_file())
-        self.assertIn("disable", run_mock.call_args.args[0])
+
 
     def test_rollback_accepts_committed_manifest_defensively(self):
         self._prepared()
         payload = self.migration.load_pending()
         payload["phase"] = "committed"
         self.migration._write_private_json(self.migration.PENDING, payload)
-        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration.subprocess, "run"):
+        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive"):
             self.migration.rollback()
         self.assertTrue((self.migration.BACKUP_DIR / "rolled-back.json").is_file())
 
@@ -188,6 +190,42 @@ class MigrationTests(unittest.TestCase):
         with patch.object(self.migration, "gateway_running", return_value=True):
             with self.assertRaisesRegex(RuntimeError, "stop it externally"):
                 self.migration.rollback()
+
+    def test_strict_http_stop_requires_inactive_before_restoration(self):
+        with patch.object(self.migration.subprocess, "run") as run_mock, patch.object(self.migration, "_user_service_state", return_value="active"):
+            with self.assertRaisesRegex(RuntimeError, "did not stop"):
+                self.migration.ensure_http_inactive()
+        commands = [call.args[0] for call in run_mock.call_args_list]
+        self.assertTrue(any("disable" in command for command in commands))
+        self.assertFalse(any("reset-failed" in command for command in commands))
+
+    def test_strict_http_stop_resets_failed_then_requires_inactive(self):
+        with patch.object(self.migration.subprocess, "run") as run_mock, patch.object(self.migration, "_user_service_state", side_effect=["failed", "inactive"]):
+            self.migration.ensure_http_inactive()
+        commands = [call.args[0] for call in run_mock.call_args_list]
+        self.assertTrue(any("disable" in command for command in commands))
+        self.assertTrue(any("reset-failed" in command for command in commands))
+
+    def test_rollback_never_restores_snapshot_when_http_stop_is_unverified(self):
+        self._prepared()
+        with patch.object(self.migration, "gateway_running", return_value=False), \
+             patch.object(self.migration, "ensure_http_inactive", side_effect=RuntimeError("did not stop")), \
+             patch.object(self.migration, "_restore_snapshot") as restore:
+            with self.assertRaisesRegex(RuntimeError, "did not stop"):
+                self.migration.rollback()
+        restore.assert_not_called()
+
+    def test_prepare_failure_proves_http_inactive_before_restoring_snapshot(self):
+        events = []
+        with patch.object(self.migration, "gateway_running", return_value=False), \
+             patch.object(self.migration, "_snapshot", return_value={}), \
+             patch.object(self.migration, "run", side_effect=RuntimeError("prepare failed")), \
+             patch.object(self.migration, "ensure_http_inactive", side_effect=lambda: events.append("stop")), \
+             patch.object(self.migration, "_restore_snapshot", side_effect=lambda _originals: events.append("restore")), \
+             patch.object(self.migration.shutil, "rmtree"):
+            with self.assertRaisesRegex(RuntimeError, "prepare failed"):
+                self.migration.prepare()
+        self.assertEqual(events, ["stop", "restore"])
 
     def test_dreamworld_oauth_probe_exercises_scoped_query_and_exact_crud(self):
         calls = []
@@ -415,9 +453,13 @@ class RootOrchestrationTests(unittest.TestCase):
                  patch.object(self.orchestrator, "run", side_effect=lambda args, check=True: events.append(tuple(args)) or subprocess.CompletedProcess(args, 0, stdout="", stderr="")), \
                  patch.object(self.orchestrator, "run_migration", side_effect=lambda phase: events.append(("migration", phase))), \
                  patch.object(self.orchestrator, "wait_gateway_health", side_effect=lambda: events.append(("health",))), \
+                 patch.object(self.orchestrator, "user_service_state", return_value="inactive"), \
                  patch.object(self.orchestrator, "verify_restored_stdio_owner", side_effect=lambda: events.append(("stdio-owner",))):
                 self.orchestrator.rollback_and_verify()
-            self.assertEqual(events[:3], [("systemctl", "stop", self.orchestrator.SERVICE), ("migration", "rollback"), ("systemctl", "start", self.orchestrator.SERVICE)])
+            self.assertEqual(events[0], ("systemctl", "stop", self.orchestrator.SERVICE))
+            self.assertEqual(events[1], ("migration", "rollback"))
+            self.assertIn("reset-failed", events[2])
+            self.assertEqual(events[3], ("systemctl", "start", self.orchestrator.SERVICE))
             self.assertIn(("health",), events)
             self.assertIn(("stdio-owner",), events)
 

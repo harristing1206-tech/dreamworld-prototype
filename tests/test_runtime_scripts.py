@@ -29,6 +29,13 @@ class RuntimeTokenTests(unittest.TestCase):
         unit = (SYSTEMD / "gbrain-http.service").read_text(encoding="utf-8")
         self.assertIn("--suppress-bootstrap-token", unit)
         self.assertIn("SuccessExitStatus=143", unit)
+        self.assertIn("OLLAMA_BASE_URL=http://127.0.0.1:11434/v1", unit)
+        self.assertIn("OLLAMA_EMBEDDING_MODEL=embeddinggemma:300m", unit)
+        self.assertIn("ExecStartPre=%h/.local/lib/dreamworld/gbrain-ollama-embedding-preflight.py", unit)
+        preflight = (RUNTIME / "gbrain-ollama-embedding-preflight.py").read_text(encoding="utf-8")
+        self.assertIn('len(embedding) == 768', preflight)
+        self.assertIn('math.isfinite(value)', preflight)
+        self.assertNotIn('print(embedding', preflight)
         env_path = Path.home() / ".config/gbrain-http/service.env"
         if env_path.exists():
             mode = stat.S_IMODE(env_path.stat().st_mode)

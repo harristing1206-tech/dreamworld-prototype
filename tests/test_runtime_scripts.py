@@ -5,6 +5,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -291,6 +292,28 @@ class MigrationTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "required isolation"):
                 self.migration.ensure_dreamworld_source()
 
+    def test_oauth_token_mint_uses_registered_scopes_and_requires_write(self):
+        with patch.object(self.migration, "_http_json", return_value={"access_token": "gbrain_at_" + "a" * 32, "scope": "read write"}) as http:
+            token = self.migration.mint_client_token("client", "secret")
+        self.assertTrue(token.startswith("gbrain_at_"))
+        request = http.call_args.args[0]
+        form = urllib.parse.parse_qs(request.data.decode())
+        self.assertNotIn("scope", form)
+        with patch.object(self.migration, "_http_json", return_value={"access_token": "gbrain_at_" + "b" * 32, "scope": "read"}):
+            with self.assertRaisesRegex(RuntimeError, "scope mismatch"):
+                self.migration.mint_client_token("client", "secret")
+
+    def test_mcp_error_diagnostic_is_bounded_and_redacts_tokens(self):
+        payload = {"result": {"isError": True, "content": [{"type": "text", "text": '{"error":"insufficient_scope","token":"gbrain_secretvalue","message":"write required"}' + "x" * 700}]}}
+        with patch.object(self.migration, "_http_json", return_value=payload):
+            with self.assertRaises(RuntimeError) as raised:
+                self.migration.mcp_call("token-not-logged", "put_page", {}, rpc_id=2)
+        message = str(raised.exception)
+        self.assertIn("insufficient_scope", message)
+        self.assertIn("[REDACTED]", message)
+        self.assertNotIn("gbrain_secretvalue", message)
+        self.assertLessEqual(len(message), 560)
+
     def test_dreamworld_oauth_probe_exercises_scoped_query_and_exact_crud(self):
         calls = []
         content_holder = {}
@@ -312,6 +335,8 @@ class MigrationTests(unittest.TestCase):
         self.assertEqual(calls[4][1]["source_id"], "dreamworld")
         self.assertTrue(calls[-1][1]["include_deleted"])
         self.assertIn("transcriptFingerprint", calls[1][1]["content"])
+        self.assertIn("/migration-probes/", calls[1][1]["slug"])
+        self.assertNotIn("/.migration", calls[1][1]["slug"])
 
     def test_legacy_gateway_bearer_queries_every_expected_source(self):
         calls = []

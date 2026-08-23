@@ -333,6 +333,19 @@ class MigrationTests(unittest.TestCase):
         self.assertNotIn("gbrain_secretvalue", message)
         self.assertLessEqual(len(message), 560)
 
+    def test_probe_readback_requires_exact_compiled_truth_source_and_slug(self):
+        content = json.dumps({"probe": "abc", "source": "dreamworld"}, sort_keys=True, separators=(",", ":"))
+        valid = {"slug": "dreams/dreamworld/migration-probes/abc", "compiled_truth": content, "source_id": "dreamworld", "deleted_at": None}
+        self.migration._verify_probe_page(valid, slug=valid["slug"], content=content, deleted=False)
+        for changed in (
+            {**valid, "compiled_truth": json.dumps({"probe": "other", "source": "dreamworld"})},
+            {**valid, "source_id": "gerri"},
+            {**valid, "slug": "dreams/dreamworld/migration-probes/other"},
+            {**valid, "compiled_truth": "not-json"},
+        ):
+            with self.assertRaises(RuntimeError):
+                self.migration._verify_probe_page(changed, slug=valid["slug"], content=content, deleted=False)
+
     def test_dreamworld_oauth_probe_exercises_scoped_query_and_exact_crud(self):
         calls = []
         content_holder = {}
@@ -343,7 +356,7 @@ class MigrationTests(unittest.TestCase):
                 content_holder.update(slug=arguments["slug"], content=arguments["content"])
                 return {"ok": True}
             if name == "get_page":
-                return {"slug": content_holder["slug"], "content": content_holder["content"], "source_id": "dreamworld", "deleted_at": "now" if arguments.get("include_deleted") else None}
+                return {"slug": content_holder["slug"], "compiled_truth": content_holder["content"], "source_id": "dreamworld", "deleted_at": "now" if arguments.get("include_deleted") else None}
             return {"results": []}
 
         with patch.object(self.migration, "mint_client_token", return_value="token-value-long-enough"), patch.object(self.migration.secrets, "token_hex", return_value="a" * 32), patch.object(self.migration, "mcp_call", side_effect=fake_call):

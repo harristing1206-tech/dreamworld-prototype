@@ -36,6 +36,18 @@ class RuntimeTokenTests(unittest.TestCase):
         self.assertIn('len(embedding) == 768', preflight)
         self.assertIn('math.isfinite(value)', preflight)
         self.assertNotIn('print(embedding', preflight)
+        ollama_unit = (SYSTEMD / "ollama.service").read_text(encoding="utf-8")
+        self.assertIn("ExecStart=/home/hermes/.local/bin/ollama serve", ollama_unit)
+        self.assertIn("OLLAMA_HOST=127.0.0.1:11434", ollama_unit)
+        self.assertIn("KillMode=control-group", ollama_unit)
+        self.assertIn("ProtectSystem=strict", ollama_unit)
+        self.assertIn("ProtectHome=read-only", ollama_unit)
+        self.assertIn("ReadWritePaths=%h/.ollama", ollama_unit)
+        self.assertIn("OLLAMA_MODELS=/home/hermes/.ollama/models", ollama_unit)
+        self.assertNotIn("PartOf=", ollama_unit)
+        self.assertNotIn("BindsTo=", ollama_unit)
+        self.assertIn("Wants=network-online.target ollama.service", unit)
+        self.assertIn("After=network-online.target ollama.service", unit)
         env_path = Path.home() / ".config/gbrain-http/service.env"
         if env_path.exists():
             mode = stat.S_IMODE(env_path.stat().st_mode)
@@ -430,10 +442,13 @@ class RootOrchestrationTests(unittest.TestCase):
         with patch.object(self.orchestrator.os, "geteuid", return_value=0), \
              patch.object(self.orchestrator, "run", side_effect=fake_run), \
              patch.object(self.orchestrator, "run_migration", side_effect=lambda phase: events.append(("migration", phase))), \
+             patch.object(self.orchestrator, "verify_ollama_independence", side_effect=lambda _pid: events.append(("ollama-independent",))), \
              patch.object(self.orchestrator, "wait_gateway_health", side_effect=lambda: events.append(("health",))), \
              patch.object(self.orchestrator, "verify_http_topology", side_effect=lambda: events.append(("http-topology",))):
             self.orchestrator.migrate()
         self.assertLess(events.index(("systemctl", "stop", self.orchestrator.SERVICE)), events.index(("migration", "prepare")))
+        self.assertLess(events.index(("systemctl", "stop", self.orchestrator.SERVICE)), events.index(("ollama-independent",)))
+        self.assertLess(events.index(("ollama-independent",)), events.index(("migration", "prepare")))
         self.assertLess(events.index(("migration", "prepare")), events.index(("systemctl", "start", self.orchestrator.SERVICE)))
         self.assertLess(events.index(("systemctl", "start", self.orchestrator.SERVICE)), events.index(("http-topology",)))
         self.assertLess(events.index(("http-topology",)), events.index(("migration", "finalize")))
@@ -448,12 +463,44 @@ class RootOrchestrationTests(unittest.TestCase):
         with patch.object(self.orchestrator.os, "geteuid", return_value=0), \
              patch.object(self.orchestrator, "run", return_value=subprocess.CompletedProcess([], 0, stdout="", stderr="")), \
              patch.object(self.orchestrator, "run_migration", side_effect=migration), \
+             patch.object(self.orchestrator, "user_service_state", return_value="active"), \
+             patch.object(self.orchestrator, "verify_ollama_independence"), \
              patch.object(self.orchestrator, "wait_gateway_health"), \
              patch.object(self.orchestrator, "verify_http_topology"), \
              patch.object(self.orchestrator, "rollback_and_verify") as rollback:
             with self.assertRaisesRegex(RuntimeError, "probe failed"):
                 self.orchestrator.migrate()
         self.assertEqual(phases, ["prepare", "finalize"])
+        rollback.assert_called_once_with()
+
+    def test_ollama_independence_requires_exact_cgroup_executable_and_socket_owner(self):
+        group = "/user.slice/user-1000.slice/user@1000.service/app.slice/ollama.service"
+        success = subprocess.CompletedProcess([], 0, stdout="ollama_embedding_preflight_ok model=embeddinggemma:300m dimensions=768\n", stderr="")
+        with patch.object(self.orchestrator, "user_service_state", return_value="active"), \
+             patch.object(self.orchestrator.Path, "read_text", return_value=f"0::{group}\n"), \
+             patch.object(self.orchestrator, "user_service_control_group", return_value=group), \
+             patch.object(self.orchestrator, "process_executable", return_value=self.orchestrator.OLLAMA_EXECUTABLE), \
+             patch.object(self.orchestrator, "ollama_socket_owner_pids", return_value={201}), \
+             patch.object(self.orchestrator, "run", return_value=success):
+            self.orchestrator.verify_ollama_independence(201)
+        with patch.object(self.orchestrator, "user_service_state", return_value="active"), \
+             patch.object(self.orchestrator.Path, "read_text", return_value=f"0::{group}\n"), \
+             patch.object(self.orchestrator, "user_service_control_group", return_value=group), \
+             patch.object(self.orchestrator, "process_executable", return_value=self.orchestrator.OLLAMA_EXECUTABLE), \
+             patch.object(self.orchestrator, "ollama_socket_owner_pids", return_value={999}):
+            with self.assertRaisesRegex(RuntimeError, "sole loopback listener"):
+                self.orchestrator.verify_ollama_independence(201)
+
+    def test_ollama_independence_failure_rolls_back_before_prepare(self):
+        with patch.object(self.orchestrator.os, "geteuid", return_value=0), \
+             patch.object(self.orchestrator, "user_service_state", return_value="active"), \
+             patch.object(self.orchestrator, "run", return_value=subprocess.CompletedProcess([], 0, stdout="", stderr="")), \
+             patch.object(self.orchestrator, "verify_ollama_independence", side_effect=RuntimeError("ollama ownership failed")), \
+             patch.object(self.orchestrator, "run_migration") as migration, \
+             patch.object(self.orchestrator, "rollback_and_verify") as rollback:
+            with self.assertRaisesRegex(RuntimeError, "ollama ownership failed"):
+                self.orchestrator.migrate()
+        migration.assert_not_called()
         rollback.assert_called_once_with()
 
     def test_restored_stdio_owner_requires_exact_descendant_and_no_competing_pglite_owner(self):

@@ -168,10 +168,11 @@ class MigrationTests(unittest.TestCase):
 
     def test_rollback_disables_http_and_restores_snapshot(self):
         self._prepared()
-        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive") as stopped, patch.object(self.migration, "revoke_gateway_token") as revoked:
+        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive") as stopped, patch.object(self.migration, "revoke_gateway_token") as revoked, patch.object(self.migration, "cleanup_dreamworld_client") as client_cleanup:
             self.migration.rollback()
         stopped.assert_called_once_with()
         revoked.assert_called_once_with()
+        client_cleanup.assert_called_once_with()
         self.assertIn("private-token-value-long", self.migration.HERMES_ENV.read_text())
         self.assertFalse(self.migration.PENDING.exists())
         self.assertTrue((self.migration.BACKUP_DIR / "rolled-back.json").is_file())
@@ -182,7 +183,7 @@ class MigrationTests(unittest.TestCase):
         payload = self.migration.load_pending()
         payload["phase"] = "committed"
         self.migration._write_private_json(self.migration.PENDING, payload)
-        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive"), patch.object(self.migration, "revoke_gateway_token"):
+        with patch.object(self.migration, "gateway_running", return_value=False), patch.object(self.migration, "ensure_http_inactive"), patch.object(self.migration, "revoke_gateway_token"), patch.object(self.migration, "cleanup_dreamworld_client"):
             self.migration.rollback()
         self.assertTrue((self.migration.BACKUP_DIR / "rolled-back.json").is_file())
 
@@ -223,11 +224,12 @@ class MigrationTests(unittest.TestCase):
              patch.object(self.migration, "run", side_effect=RuntimeError("prepare failed")), \
              patch.object(self.migration, "ensure_http_inactive", side_effect=lambda: events.append("stop")), \
              patch.object(self.migration, "revoke_gateway_token", side_effect=lambda: events.append("revoke")), \
+             patch.object(self.migration, "cleanup_dreamworld_client", side_effect=lambda: events.append("client-cleanup")), \
              patch.object(self.migration, "_restore_snapshot", side_effect=lambda _originals: events.append("restore")), \
              patch.object(self.migration.shutil, "rmtree"):
             with self.assertRaisesRegex(RuntimeError, "prepare failed"):
                 self.migration.prepare()
-        self.assertEqual(events, ["stop", "stop", "revoke", "restore"])
+        self.assertEqual(events, ["stop", "stop", "revoke", "client-cleanup", "restore"])
 
     def test_gateway_token_helper_atomically_rotates_fixed_scoped_token(self):
         helper = (RUNTIME / "scope_gateway_token.ts").read_text(encoding="utf-8")
@@ -241,6 +243,8 @@ class MigrationTests(unittest.TestCase):
         self.assertIn('TOKEN_NAME, "rotate"], sensitive=True', migration)
         self.assertIn("revoke_gateway_token()", migration)
         self.assertIn("GATEWAY_TOKEN_REVOKE_OK", helper)
+        self.assertIn("DREAMWORLD_CLIENT_CLEANUP_OK", helper)
+        self.assertIn("cleanup_dreamworld_client()", migration)
 
     def test_scoped_gateway_token_parser_is_exact_and_bounded(self):
         token = "gbrain_" + "a" * 64
@@ -274,6 +278,30 @@ class MigrationTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "revoke unverified"):
                 self.migration.rollback()
         restore.assert_not_called()
+
+    def test_oauth_client_cleanup_failure_blocks_restoration(self):
+        self._prepared()
+        with patch.object(self.migration, "gateway_running", return_value=False), \
+             patch.object(self.migration, "ensure_http_inactive"), \
+             patch.object(self.migration, "revoke_gateway_token"), \
+             patch.object(self.migration, "cleanup_dreamworld_client", side_effect=RuntimeError("client cleanup unverified")), \
+             patch.object(self.migration, "_restore_snapshot") as restore:
+            with self.assertRaisesRegex(RuntimeError, "client cleanup unverified"):
+                self.migration.rollback()
+        restore.assert_not_called()
+
+    def test_existing_dreamworld_source_is_verified_idempotently(self):
+        payload = json.dumps({"sources": [{"id": "dreamworld", "name": "Dreamworld private dreams", "federated": False}]})
+        with patch.object(self.migration.subprocess, "run", return_value=subprocess.CompletedProcess([], 1, stdout="", stderr="already exists")) as add, \
+             patch.object(self.migration, "run", return_value=payload):
+            self.migration.ensure_dreamworld_source()
+        self.assertIn("sources_add", add.call_args.args[0])
+
+    def test_dreamworld_source_verification_rejects_wrong_isolation(self):
+        payload = json.dumps({"sources": [{"id": "dreamworld", "name": "Dreamworld private dreams", "federated": True}]})
+        with patch.object(self.migration.subprocess, "run", return_value=subprocess.CompletedProcess([], 1)), patch.object(self.migration, "run", return_value=payload):
+            with self.assertRaisesRegex(RuntimeError, "required isolation"):
+                self.migration.ensure_dreamworld_source()
 
     def test_dreamworld_oauth_probe_exercises_scoped_query_and_exact_crud(self):
         calls = []

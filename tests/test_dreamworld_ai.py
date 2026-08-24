@@ -572,6 +572,30 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(set(client.OPERATIONS), {"query", "put_page", "get_page", "delete_page"})
         self.assertFalse(hasattr(client, "call_tool"), "callers must not select arbitrary MCP tools")
 
+    def test_gbrain_missing_page_is_a_clean_absence_but_other_tool_errors_fail_closed(self):
+        class Response:
+            def __init__(self, tool_payload):
+                rpc = {"jsonrpc": "2.0", "id": 1, "result": {"content": [{"type": "text", "text": json.dumps(tool_payload)}], "isError": True}}
+                self.raw = json.dumps(rpc).encode()
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self, maximum=-1):
+                return self.raw if maximum < 0 else self.raw[:maximum]
+
+        client = api.GBrainClient("http://127.0.0.1:9999", "client", "secret")
+        client._token = "x" * 32
+        client._token_expires_at = time.monotonic() + 3600
+        with patch.object(api.urllib.request, "urlopen", return_value=Response({"error": "page_not_found", "message": "missing"})):
+            self.assertIsNone(client.get_page("dreams/dreamworld/missing", include_deleted=True))
+        with patch.object(api.urllib.request, "urlopen", return_value=Response({"error": "permission_denied"})):
+            with self.assertRaisesRegex(api.UpstreamError, "operation failed"):
+                client.get_page("dreams/dreamworld/forbidden", include_deleted=True)
+
 
 class HttpBoundaryTests(unittest.TestCase):
     @classmethod

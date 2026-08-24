@@ -1818,10 +1818,36 @@
         if (!storedDurably) analysisStorageStatus.textContent = 'AI analysis completed, but its local cache could not be saved. The verified private GBrain evidence page remains stored.';
       } catch (error) {
         if (!stillCurrent()) return;
+        let cleanupVerified = false;
+        try {
+          cleanupVerified = await DreamworldGBrain.cancelOperation(request, {
+            currentOrigin: DreamworldGBrain.PRIVATE_ORIGIN
+          });
+        } catch (_) {}
+        if (!stillCurrent()) return;
+        let retryReady = false;
+        if (cleanupVerified) {
+          try {
+            const retryRequest = await DreamworldGBrain.buildRequest({
+              dreamID: request.dreamID,
+              title: request.title,
+              transcript: request.transcript,
+              source: request.source,
+              associations: request.associations
+            });
+            if (!stillCurrent()) return;
+            activeGBrainRequest = retryRequest;
+            retryReady = true;
+          } catch (_) {}
+        }
         analysisGBrainStart.disabled = false;
         analysisLocalFallback.disabled = false;
-        analysisGBrainStatus.textContent = `${error?.message || 'Private GBrain analysis failed.'} Your local dream and answers were not replaced.`;
-        analysisStorageStatus.textContent = 'No AI response was cached. You can retry on Tailscale or use the local reflection.';
+        analysisGBrainStatus.textContent = retryReady
+          ? 'Private analysis failed safely. The bridge verified cleanup, and a fresh retry is ready; your local dream and answers were not replaced.'
+          : `${error?.message || 'Private GBrain analysis failed.'} Your local dream and answers were not replaced.`;
+        analysisStorageStatus.textContent = retryReady
+          ? 'No AI response was cached. Retry will use a new operation identity after verified cleanup, or you can use the local reflection.'
+          : 'No AI response was cached. Cleanup could not be verified, so the existing operation identity is retained for safe status recovery; you can retry or use the local reflection.';
         analysisGBrainStart.focus();
       } finally {
         if (activeGBrainAbortController === controller) activeGBrainAbortController = null;

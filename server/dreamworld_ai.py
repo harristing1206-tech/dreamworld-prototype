@@ -423,6 +423,12 @@ class GBrainClient:
             result = payload["result"]
             content = result["content"][0]["text"]
             if result.get("isError"):
+                try:
+                    detail = json.loads(content)
+                except (json.JSONDecodeError, TypeError):
+                    detail = None
+                if operation == "get_page" and isinstance(detail, dict) and detail.get("error") == "page_not_found":
+                    return None
                 raise UpstreamError("GBrain operation failed.")
             return json.loads(content)
         except UpstreamError:

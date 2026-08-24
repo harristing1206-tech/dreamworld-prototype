@@ -728,9 +728,19 @@ test('private GBrain analysis is opt-in, evidence-bound, attributed, cached, and
   }
 });
 
-test('failed private analysis preserves evidence and keeps the local reflection path available', async () => {
+test('failed private analysis rotates retry identity only after verified cleanup and keeps the local reflection path available', async () => {
   const storage = createStorage();
-  const fetchImpl = async () => { throw new Error('tailnet unavailable'); };
+  const analyzeRequests = [];
+  let cleanupAllowed = false;
+  const fetchImpl = async (url, options) => {
+    const request = JSON.parse(options.body);
+    if (url.endsWith('/cancel')) {
+      if (!cleanupAllowed) throw new Error('tailnet unavailable during cleanup');
+      return { ok: true, status: 200, json: async () => ({ cancelled: true, operationID: request.operationID }) };
+    }
+    analyzeRequests.push(request);
+    throw new Error('tailnet unavailable during analysis');
+  };
   const dom = await loadPage(storage, '', { reducedMotion: true, preparationTimings: [8, 8, 8], fetchImpl, privateOrigin: true });
   try {
     const document = dom.window.document;
@@ -751,8 +761,31 @@ test('failed private analysis preserves evidence and keeps the local reflection 
     await new Promise(resolve => dom.window.setTimeout(resolve, 30));
 
     assert.match(document.getElementById('analysisGBrainStatus').textContent, /not replaced/i);
+    assert.match(document.getElementById('analysisStorageStatus').textContent, /cleanup.*not.*verified|not.*verified.*cleanup/i);
     assert.equal(storage.values.has(`dreamworld:gbrain-analysis:${dream.id}`), false);
     assert.equal(storage.values.has(`dreamworld:interview:${dream.id}`), true);
+    assert.equal(analyzeRequests.length, 1);
+    const firstRequest = analyzeRequests[0];
+
+    document.getElementById('analysisGBrainStart').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 30));
+    assert.equal(analyzeRequests.length, 2);
+    assert.equal(analyzeRequests[1].operationID, firstRequest.operationID, 'unverified cleanup must retain the ambiguous operation identity');
+
+    cleanupAllowed = true;
+    document.getElementById('analysisGBrainStart').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 30));
+    assert.equal(analyzeRequests.length, 3);
+    assert.equal(analyzeRequests[2].operationID, firstRequest.operationID, 'the attempt being cleaned still uses the original identity');
+    assert.match(document.getElementById('analysisStorageStatus').textContent, /new operation identity/i);
+
+    document.getElementById('analysisGBrainStart').click();
+    await new Promise(resolve => dom.window.setTimeout(resolve, 30));
+    assert.equal(analyzeRequests.length, 4);
+    assert.notEqual(analyzeRequests[3].operationID, firstRequest.operationID, 'retry may rotate only after the bridge verified cleanup');
+    assert.equal(analyzeRequests[3].dreamID, firstRequest.dreamID);
+    assert.equal(analyzeRequests[3].transcriptFingerprint, firstRequest.transcriptFingerprint);
+    assert.equal(analyzeRequests[3].evidenceFingerprint, firstRequest.evidenceFingerprint);
     const local = document.getElementById('analysisLocalFallback');
     assert.equal(local.disabled, false);
     local.click();

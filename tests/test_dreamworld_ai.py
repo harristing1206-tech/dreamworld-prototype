@@ -194,6 +194,25 @@ class ContractTests(unittest.TestCase):
         self.assertIn(ASSOCIATIONS[0]["answer"], stored_markdown)
         self.assertEqual(result["provenance"]["gbrainSource"], "dreamworld")
 
+    def test_live_gbrain_compiled_truth_readback_verifies_written_record(self):
+        request = api.validate_analysis_request(request_payload("compiled-truth-op-1234"))
+
+        class CompiledTruthGBrain(FakeGBrain):
+            def get_page(self, slug, *, include_deleted=False):
+                page = super().get_page(slug, include_deleted=include_deleted)
+                if not page:
+                    return page
+                converted = dict(page)
+                converted["compiled_truth"] = converted.pop("content")
+                return converted
+
+        result = api.analyze_dream(
+            request,
+            CompiledTruthGBrain(),
+            lambda *_args, **_kwargs: (model_output(), "gpt-5.6-sol"),
+        )
+        self.assertTrue(result["provenance"]["storedInGBrain"])
+
     def test_independent_read_verification_refuses_tampered_write(self):
         request = api.validate_analysis_request(request_payload())
         brain = FakeGBrain()

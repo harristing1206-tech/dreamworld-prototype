@@ -260,11 +260,16 @@ def bound_context(value: Any) -> str:
 
 def _page_content(page: Any) -> str:
     if isinstance(page, dict):
+        if isinstance(page.get("compiled_truth"), str):
+            return page["compiled_truth"]
         if isinstance(page.get("content"), str):
             return page["content"]
         nested = page.get("page")
-        if isinstance(nested, dict) and isinstance(nested.get("content"), str):
-            return nested["content"]
+        if isinstance(nested, dict):
+            if isinstance(nested.get("compiled_truth"), str):
+                return nested["compiled_truth"]
+            if isinstance(nested.get("content"), str):
+                return nested["content"]
     return ""
 
 

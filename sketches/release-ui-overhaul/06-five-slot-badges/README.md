@@ -39,6 +39,14 @@
 - If durable storage fails, the transcript and raw audio remain on the review screen and the app does not report the dream as logged.
 - Other open Dreamworld tabs refresh through a journal update channel.
 
+## Mobbin-informed native visual refinement
+
+- The supplied Mobbin category was inspected directly; it redirects unauthenticated visitors to login, so the redesign uses only publicly accessible Mobbin screen pages for Headspace, Nike Run Club, Calm, How We Feel, and Oura. The complete source/access audit is in `DESIGN-REFERENCE-AUDIT.md`.
+- Dreamworld applies transferable principles rather than copying screens: content-first hierarchy, native list density, purposeful surfaces, quiet navigation, aligned health metrics, a smaller semantic palette, and consistent geometry.
+- Light mode now separates a warm-neutral canvas from near-white grouped surfaces. Dark mode uses deep forest-neutral canvas/surface/raised layers.
+- Major screen titles are normalized, repeated Insight icon tiles are removed, Settings glyphs are unboxed, Profile scale is reduced, and ordinary selected tabs use a quiet 42×38px treatment while preserving the established 58px Log action.
+- Installed/coarse-pointer iPhones hide the simulated status bar and use the real safe-area inset.
+
 ## Swipe, edit, and deletion controls
 
 - Alarm and Dream History each have a top-left **Edit** pill. Like the supplied iOS Clock reference, entering Edit mode morphs it into a circular checkmark, slides in one red minus control per row, replaces alarm switches with chevrons, and keeps row content readable.
@@ -112,6 +120,7 @@ node validate-anarlog-title.cjs
 node validate-tab-history-profile.cjs
 node validate-voice-reactive.cjs
 node validate-swipe-edit-delete.cjs
+node validate-mobbin-refinement.cjs
 ```
 
 The tests verify the five-slot order, center plus treatment, tab routing, interactive Insights calendar and calculations, alarm creation, safe alarm-label rendering, smooth wheel behavior, and the full Log flow.

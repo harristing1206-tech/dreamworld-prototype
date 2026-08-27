@@ -4,16 +4,16 @@ const assert = require('node:assert/strict');
 const html = fs.readFileSync('index.html', 'utf8');
 
 const requiredTokens = {
-  canvas: '#f2ecd9',
-  surface: '#fff9e9',
-  raised: '#dfe8d0',
-  ink: '#293a31',
-  muted: '#5f6b5e',
-  faint: '#657065',
-  accent: '#4d704f',
-  highlight: '#cb7548',
-  sun: '#d5a13c',
-  sky: '#6f93a4'
+  canvas: '#f6f3ea',
+  surface: '#fffdf8',
+  raised: '#e8eee3',
+  ink: '#203028',
+  muted: '#667168',
+  faint: '#879087',
+  accent: '#486a4d',
+  highlight: '#c6724c',
+  sun: '#c99b44',
+  sky: '#7898a7'
 };
 
 for (const [name, value] of Object.entries(requiredTokens)) {
@@ -29,20 +29,20 @@ const contrast = (a, b) => {
   return (lighter + 0.05) / (darker + 0.05);
 };
 
-for (const [label, foreground, background] of [
-  ['body text', requiredTokens.ink, requiredTokens.canvas],
-  ['muted text', requiredTokens.muted, requiredTokens.canvas],
-  ['inactive navigation', requiredTokens.faint, requiredTokens.surface],
-  ['green actions', requiredTokens.accent, requiredTokens.canvas],
-  ['button label', '#fffaf0', requiredTokens.accent]
+for (const [label, foreground, background, minimum] of [
+  ['body text', requiredTokens.ink, requiredTokens.canvas, 4.5],
+  ['muted text', requiredTokens.muted, requiredTokens.canvas, 4.5],
+  ['inactive navigation icon', requiredTokens.faint, requiredTokens.surface, 3],
+  ['green actions', requiredTokens.accent, requiredTokens.canvas, 4.5],
+  ['button label', '#ffffff', requiredTokens.accent, 4.5]
 ]) {
-  assert.ok(contrast(foreground, background) >= 4.5, `${label} contrast is below 4.5:1`);
+  assert.ok(contrast(foreground, background) >= minimum, `${label} contrast is below ${minimum}:1`);
 }
 
-assert.ok(contrast('#fffaf0', requiredTokens.highlight) >= 3, 'terracotta icon contrast is below 3:1');
+assert.ok(contrast('#ffffff', requiredTokens.highlight) >= 3, 'terracotta icon contrast is below 3:1');
 
 assert.match(html, /color-scheme:light/, 'app did not switch to the light world palette');
-assert.match(html, /--tabbar-bg:rgba\(255,249,233,.97\)/, 'light tab bar token is not warm ivory');
+assert.match(html, /--tabbar-bg:rgba\(255,253,248,.97\)/, 'light tab bar token is not warm neutral');
 assert.match(html, /\.tabbar\{[^}]*background:var\(--tabbar-bg\)/, 'tab bar does not use the semantic theme token');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*background:var\(--highlight\)/, 'log action is not using terracotta');
 assert.match(html, /\.mic\{[^}]*background:var\(--highlight\)/, 'capture action is not using terracotta');

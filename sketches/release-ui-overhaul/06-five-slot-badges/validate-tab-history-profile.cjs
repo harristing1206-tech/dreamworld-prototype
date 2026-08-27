@@ -1,9 +1,9 @@
 const assert=require('node:assert/strict');const fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/\.tab\.log-tab\{[^}]*translateY\(-4px\)/,'center plus is not aligned with tab icons');
 assert.match(html,/\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px/,'center plus size changed');
-assert.match(html,/\.history-entry\{[^}]*min-height:66px[^}]*padding:11px 0/,'History rows are not compact');
-assert.match(html,/\.history-entry h2\{[^}]*font-size:18px/,'History title scale is not compact');
-assert.match(html,/\.history-entry-date\{[^}]*margin:4px 0 0[^}]*font-size:13px/,'History date does not sit directly below the title');
+assert.match(html,/\.history-entry\{[^}]*min-height:64px[^}]*padding:10px 0/,'History rows are not compact');
+assert.match(html,/\.history-entry h2\{[^}]*font-size:17px/,'History title scale is not compact');
+assert.match(html,/\.history-entry-date\{[^}]*margin:4px 0 0[^}]*font-size:12px/,'History date does not sit directly below the title');
 assert.match(html,/historyDateLabel=record[\s\S]*month:'short',day:'numeric',year:'numeric'/,'History date format is missing');
 assert.match(html,/button\.append\(title,date\)/,'History row hierarchy is not title then date');
 assert.doesNotMatch(html,/className='entry-foot'|const header=document\.createElement\('header'\)|button\.append\(title,excerpt\)/,'History rows still render obsolete metadata or summary');

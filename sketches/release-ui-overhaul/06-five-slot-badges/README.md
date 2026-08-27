@@ -47,6 +47,13 @@
 - History and the Insights calendar use the generated title; the summary appears as the journal excerpt, while the full reviewed transcript and raw audio remain separately accessible.
 - If private generation is unavailable, the app saves with a deterministic transcript-derived title and summary rather than a generic date. The fallback is visibly disclosed and recorded in provenance.
 
+## Navigation and journal refinements
+
+- The 58px center Log button keeps its established size but sits only 4px above the icon row, so it remains prominent without floating away from the tab bar.
+- History rows use a compact 72px minimum layout containing only the dream title and a two-line summary. Date, duration, transcript, and audio details remain inside the opened dream.
+- Open dream details support a release-time swipe-right exit: horizontal drag feedback follows the finger, swipes under 72px reset, and successful swipes return focus to the matching History row. The visible back button remains available.
+- Profile statistics use a centered divider with 32px of breathing room; Dreams Logged aligns left and Dream Nights aligns right.
+
 ## Appearance
 
 - Dreamworld follows the iPhone’s Light or Dark appearance by default.
@@ -81,6 +88,7 @@ node validate-journal-contract.cjs
 node validate-journal-persistence.cjs
 node validate-dark-mode.cjs
 node validate-anarlog-title.cjs
+node validate-tab-history-profile.cjs
 ```
 
 The tests verify the five-slot order, center plus treatment, tab routing, interactive Insights calendar and calculations, alarm creation, safe alarm-label rendering, smooth wheel behavior, and the full Log flow.

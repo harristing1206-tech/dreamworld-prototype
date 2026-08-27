@@ -23,7 +23,7 @@ assert.match(html, /\.tabbar\{[^}]*height:calc\(var\(--tabbar-height\) \+ env\(s
 assert.match(html, /\.tab\{[^}]*min-height:52px[^}]*align-items:center[^}]*justify-content:center/, 'tab icons are not centered in their grid cells');
 assert.match(html, /\.tab:before\{[^}]*width:60px[^}]*height:46px[^}]*border-radius:23px[^}]*background:var\(--raised\)/, 'selected-tab capsule is missing');
 assert.match(html, /\.tab\.active:not\(\.log-tab\):before\{[^}]*opacity:1[^}]*scale\(1\)/, 'selected-tab capsule does not activate');
-assert.match(html, /\.tab\.log-tab\{[^}]*align-self:center[^}]*translateY\(-12px\)/, 'raised plus is not kept close to the icon row');
+assert.match(html, /\.tab\.log-tab\{[^}]*align-self:center[^}]*translateY\(-4px\)/, 'plus button is not visually aligned with the icon row');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px[^}]*flex:0 0 58px[^}]*aspect-ratio:1\/1[^}]*border-radius:50%/, 'center plus can shrink into an oval');
 assert.match(html, /<header class="alarm-head"><p class="date">Wake schedule<\/p><div class="alarm-title-row"><h1 class="nav-title">Alarms<\/h1><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><\/header>/, 'Alarm header structure does not match the tab system');
 assert.doesNotMatch(html, /id="editAlarms"|Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header controls or copy remain');

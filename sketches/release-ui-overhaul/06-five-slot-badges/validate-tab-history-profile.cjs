@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
+assert.match(html,/\.tab\.log-tab\{[^}]*translateY\(-4px\)/,'center plus is not aligned with tab icons');
+assert.match(html,/\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px/,'center plus size changed');
+assert.match(html,/\.history-entry\{[^}]*min-height:72px[^}]*padding:12px 0/,'History rows are not compact');
+assert.match(html,/\.history-entry h2\{[^}]*font-size:18px/,'History title scale is not compact');
+assert.match(html,/\.history-entry p\{[^}]*-webkit-line-clamp:2/,'History summary is not bounded to two lines');
+assert.doesNotMatch(html,/className='entry-foot'|const header=document\.createElement\('header'\)/,'History rows still render metadata beyond title and summary');
+assert.match(html,/historyFocus\.addEventListener\('touchstart'/,'dream detail swipe start is missing');
+assert.match(html,/historySwipe\.dx>=72/,'swipe-right release threshold is missing');
+assert.match(html,/event\.preventDefault\(\)[\s\S]*translateX/,'horizontal swipe feedback is missing');
+assert.match(html,/\.profile-stats\{[^}]*gap:32px/,'Profile statistics lack center breathing room');
+assert.match(html,/\.profile-stats:after\{[^}]*left:50%/,'Profile center divider is missing');
+assert.match(html,/\.profile-stat:last-child\{text-align:right\}/,'Dream Nights is not balanced away from the center divider');
+console.log('DREAMWORLD_TAB_HISTORY_PROFILE_REFINEMENT_VERIFIED');

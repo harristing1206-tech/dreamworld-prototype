@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
+assert.match(html,/indexedDB\.open\(DRAFT_DB,2\)/,'journal schema upgrade missing');
+assert.match(html,/createObjectStore\(JOURNAL_STORE\)/,'journal object store missing');
+assert.match(html,/db\.transaction\(JOURNAL_STORE,'readwrite'\)/,'journal save is not one durable transaction');
+assert.match(html,/tx\.objectStore\(JOURNAL_STORE\)\.put\(record,record\.id\)/,'complete journal record is not written atomically');
+assert.match(html,/const record=\{id,dateKey:[\s\S]*transcript,[\s\S]*provenance:[\s\S]*audio,mime:/,'journal record does not bind transcript, provenance, and raw audio');
+assert.match(html,/renderHistoryList\(\);renderInsightsCalendar\(\);updateInsights\(\)/,'history and Insights do not refresh from one record source');
+assert.match(html,/journalRecords\.filter\(record=>record\.dateKey\?\.startsWith\(monthPrefix\)\)/,'calendar metrics are not derived from journal records');
+assert.match(html,/records=sortedJournalRecords\(\)\.filter\(record=>record\.dateKey===dateKey\)/,'calendar dates are not connected to exact journal dates');
+assert.match(html,/if\(!stored\)\{showToast\('Dreamworld could not store this journal entry\. Your transcript and audio are still here\.'/,'storage failure does not preserve recoverable source data');
+console.log('DREAMWORLD_JOURNAL_SHARED_SOURCE_CONTRACT_VERIFIED');

@@ -159,6 +159,49 @@ class ContractTests(unittest.TestCase):
         self.assertIsNone(brain.pages[original["gbrain_slug"]]["deleted_at"])
         self.assertNotIn("delete_page", [name for name, _ in brain.calls])
 
+    def test_anarlog_adapted_journal_metadata_is_fingerprint_bound_and_source_grounded(self):
+        transcript = "I crossed a glass river while carrying a warm silver key toward a quiet house."
+        request = api.validate_journal_metadata_request({
+            "clientVersion": 1,
+            "transcript": transcript,
+            "transcriptFingerprint": hashlib.sha256(transcript.encode()).hexdigest(),
+        })
+        observed = {}
+
+        def caller(messages, timeout=0):
+            observed["messages"] = messages
+            observed["timeout"] = timeout
+            return {"title": "Silver Key River", "summary": "The dreamer crossed a glass river carrying a warm silver key toward a quiet house."}, "test-journal-model"
+
+        result = api.generate_journal_metadata(request, caller)
+        self.assertEqual(result["title"], "Silver Key River")
+        self.assertEqual(result["summary"], "The dreamer crossed a glass river carrying a warm silver key toward a quiet house.")
+        self.assertEqual(result["transcriptFingerprint"], request["transcriptFingerprint"])
+        self.assertEqual(result["provenance"]["method"], "anarlog-adapted-dream-title-summary-v1")
+        self.assertTrue(result["provenance"]["sourceGrounded"])
+        self.assertIn("super concise", observed["messages"][1]["content"])
+        self.assertIn("untrusted_dream_transcript", observed["messages"][1]["content"])
+        self.assertIn("Anarlog", observed["messages"][0]["content"])
+
+    def test_journal_metadata_rejects_generic_or_malformed_output(self):
+        with self.assertRaises(api.UpstreamError):
+            api.validate_journal_metadata_output({"title": "Dream Log", "summary": "A concrete enough summary that otherwise passes length validation."})
+        with self.assertRaises(api.UpstreamError):
+            api.validate_journal_metadata_output({"title": "Lake: The Return", "summary": "A concrete enough summary that otherwise passes length validation."})
+        with self.assertRaises(api.UpstreamError):
+            api.validate_journal_metadata_output({"title": "Silver Lake", "summary": "Too short"})
+        with self.assertRaises(api.UpstreamError):
+            api.validate_journal_metadata_output({"title": "Silver Lake", "summary": "A valid summary grounded in source details.", "extra": "no"})
+
+    def test_journal_metadata_request_rejects_tampered_transcript(self):
+        transcript = "I crossed a glass river while carrying a warm silver key toward a quiet house."
+        with self.assertRaises(api.RequestError):
+            api.validate_journal_metadata_request({
+                "clientVersion": 1,
+                "transcript": transcript,
+                "transcriptFingerprint": hashlib.sha256(b"different").hexdigest(),
+            })
+
     def test_model_output_has_no_storage_field_and_is_bounded(self):
         request = api.validate_analysis_request(request_payload())
         self.assertIn("tentative reading", api.validate_model_output(model_output(), request)["analysis"])

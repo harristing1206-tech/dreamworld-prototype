@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
+assert.match(html,/JOURNAL_METADATA_ENDPOINT=`\$\{window\.location\.origin\}\/dreamworld-ai\/v1\/title`/);
+assert.match(html,/crypto\.subtle\.digest\('SHA-256',bytes\)/,'title request is not transcript-fingerprint bound');
+assert.match(html,/JSON\.stringify\(\{clientVersion:1,transcript,transcriptFingerprint\}\)/);
+assert.match(html,/payload\.provenance\?\.method!==\'anarlog-adapted-dream-title-summary-v1\'/,'Anarlog-adapted provenance is not validated');
+assert.match(html,/data-log-state="preparing-journal"/,'journal preparation state missing');
+assert.match(html,/title:metadata\.title,transcript,excerpt:metadata\.summary/,'generated title and summary are not persisted with transcript');
+assert.match(html,/journalMetadataProvenance:metadata\.provenance/,'journal title provenance is not retained');
+assert.match(html,/fallbackJournalTitle=transcript/,'source-grounded local fallback title missing');
+assert.doesNotMatch(html,/titleForDate|Dream from \$\{/,'generic date-based journal title remains');
+console.log('DREAMWORLD_ANARLOG_TITLE_SUMMARY_CONTRACT_VERIFIED');

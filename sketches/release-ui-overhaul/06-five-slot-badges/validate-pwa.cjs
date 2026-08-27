@@ -1,0 +1,25 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const html=fs.readFileSync('index.html','utf8');
+const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
+const worker=fs.readFileSync('service-worker.js','utf8');
+assert.equal(manifest.name,'Dreamworld');
+assert.equal(manifest.id,'./');
+assert.equal(manifest.start_url,'./index.html');
+assert.equal(manifest.scope,'./');
+assert.equal(manifest.display,'standalone');
+assert.equal(manifest.orientation,'portrait');
+assert.deepEqual(manifest.icons.map(icon=>icon.sizes),['192x192','512x512']);
+assert.match(html,/rel="manifest" href="\.\/manifest\.webmanifest"/);
+assert.match(html,/rel="apple-touch-icon" sizes="180x180" href="\.\/icon-180\.png"/);
+assert.match(html,/apple-mobile-web-app-capable" content="yes"/);
+assert.match(html,/serviceWorker\.register\('\.\/service-worker\.js',\{updateViaCache:'none'\}\)/);
+assert.match(worker,/event\.request\.mode==='navigate'/);
+assert.match(worker,/fetch\(event\.request\)/);
+assert.match(worker,/caches\.match\('\.\/index\.html'\)/);
+assert.match(worker,/self\.clients\.claim\(\)/);
+function pngSize(path){const b=fs.readFileSync(path);assert.equal(b.toString('hex',0,8),'89504e470d0a1a0a');return [b.readUInt32BE(16),b.readUInt32BE(20)];}
+assert.deepEqual(pngSize('icon-180.png'),[180,180]);
+assert.deepEqual(pngSize('icon-192.png'),[192,192]);
+assert.deepEqual(pngSize('icon-512.png'),[512,512]);
+console.log('DREAMWORLD_IPHONE_PWA_VERIFIED');

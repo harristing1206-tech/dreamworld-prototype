@@ -3,9 +3,13 @@ assert.match(html,/id="editDreams"[^>]*>Edit<\/button>/,'History Edit button mis
 assert.match(html,/\.swipe-actions\{[^}]*inset:0[^}]*background:var\(--danger\)/,'full-row red swipe surface missing');
 assert.match(html,/\.swipe-action\.delete\{[^}]*width:100%[^}]*justify-content:flex-end/,'trash action does not stay compositor-friendly');
 assert.match(html,/className='swipe-action delete'[\s\S]*<svg viewBox="0 0 24 24"/,'trash-can icon is missing');
-assert.match(html,/touchmove[\s\S]*event\.preventDefault\(\)[\s\S]*swipeWidth=main\.clientWidth\|\|row\.clientWidth\|\|320[\s\S]*queueOffset\(gesture\.offset\)/,'continuous full-width swipe feedback missing');
+assert.match(html,/touchmove[\s\S]*event\.preventDefault\(\)[\s\S]*gesture\.swipeWidth=main\.clientWidth\|\|row\.clientWidth\|\|gesture\.swipeWidth[\s\S]*queueOffset\(gesture\.offset\)/,'continuous full-width swipe feedback missing');
 assert.match(html,/translate3d\(\$\{pendingOffset\}px,0,0\)[\s\S]*requestAnimationFrame\(renderOffset\)/,'swipe rendering is not frame-coalesced on the compositor');
-assert.match(html,/const open=gesture\.horizontal&&gesture\.offset<=-60/,'swipe action is not release-threshold gated');
+assert.match(html,/\.swipe-action\.delete svg\{[^}]*--trash-shift[^}]*will-change:transform/,'trash icon is not compositor-centered');
+assert.match(html,/Math\.abs\(pendingOffset\)\/2-34/,'trash icon does not track the center of the revealed width');
+assert.match(html,/fullSwipe=commit&&gesture\.horizontal&&Math\.abs\(gesture\.offset\)>=gesture\.swipeWidth\*\.92/,'complete swipe auto-delete threshold missing');
+assert.match(html,/touchend',[\s\S]*finish\(true\)[\s\S]*touchcancel',[\s\S]*finish\(false\)/,'release and cancellation are not safely separated');
+assert.match(html,/setTimeout\(\(\)=>void onFull\(\),200\)/,'full-swipe deletion does not wait for dismissal motion');
 assert.match(html,/\.edit-minus:after\{[^}]*height:2px[^}]*background:white/,'native-style edit minus glyph missing');
 assert.match(html,/button\.textContent=editing\?'✓':'Edit'/,'Edit button does not morph into a checkmark');
 assert.match(html,/class="confirm-backdrop" id="deleteConfirm"[^>]*role="dialog"[^>]*aria-modal="true"/,'accessible delete confirmation missing');

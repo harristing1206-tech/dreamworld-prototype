@@ -39,6 +39,14 @@
 - If durable storage fails, the transcript and raw audio remain on the review screen and the app does not report the dream as logged.
 - Other open Dreamworld tabs refresh through a journal update channel.
 
+## Anarlog-adapted journal titles and summaries
+
+- After the user reviews the real transcript and taps **Save to Journal**, Dreamworld fingerprints that exact transcript and sends it to the owner-only `/dreamworld-ai/v1/title` route.
+- The private route adapts Anarlog’s MIT-licensed concise-title and source-grounded summary workflow for dreams: 2–8 title words and a faithful 1–2 sentence summary, with no symbol interpretation or invented details.
+- The response must bind to the exact transcript fingerprint and declare `anarlog-adapted-dream-title-summary-v1` provenance before it is accepted.
+- History and the Insights calendar use the generated title; the summary appears as the journal excerpt, while the full reviewed transcript and raw audio remain separately accessible.
+- If private generation is unavailable, the app saves with a deterministic transcript-derived title and summary rather than a generic date. The fallback is visibly disclosed and recorded in provenance.
+
 ## Appearance
 
 - Dreamworld follows the iPhone’s Light or Dark appearance by default.
@@ -72,6 +80,7 @@ node validate-stt-failure.cjs
 node validate-journal-contract.cjs
 node validate-journal-persistence.cjs
 node validate-dark-mode.cjs
+node validate-anarlog-title.cjs
 ```
 
 The tests verify the five-slot order, center plus treatment, tab routing, interactive Insights calendar and calculations, alarm creation, safe alarm-label rendering, smooth wheel behavior, and the full Log flow.

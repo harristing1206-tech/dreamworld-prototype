@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
+assert.match(html,/id="editDreams"[^>]*>Edit<\/button>/,'History Edit button missing');assert.match(html,/id="editAlarms"[^>]*>Edit<\/button>/,'Alarm Edit button missing');
+assert.match(html,/\.swipe-actions\{[^}]*width:144px[^}]*grid-template-columns:repeat\(2,72px\)/,'swipe action geometry missing');
+assert.match(html,/\.swipe-action\.delete\{background:var\(--danger\)/,'Delete action is not red');
+assert.match(html,/touchmove[\s\S]*gesture\.offset=Math\.max\(-144[\s\S]*event\.preventDefault\(\)/,'continuous swipe-left feedback missing');
+assert.match(html,/const open=gesture\.horizontal&&gesture\.offset<=-60/,'swipe action is not release-threshold gated');
+assert.match(html,/class="confirm-backdrop" id="deleteConfirm"[^>]*role="dialog"[^>]*aria-modal="true"/,'accessible delete confirmation missing');
+assert.match(html,/id="deleteConfirmMessage">This action cannot be undone/,'delete consequence is not disclosed');
+assert.match(html,/class="confirm-delete" id="confirmDelete"/,'red confirmation control missing');
+assert.match(html,/setDeleteModalInert\(true\)/,'delete modal does not make background inert');assert.match(html,/event\.key==='Tab'[\s\S]*controls\[next\]\.focus\(\)/,'delete modal does not trap keyboard focus');
+assert.match(html,/id="dreamEditName"[^>]*maxlength="80"/,'dream title editor missing');assert.match(html,/id="dreamEditSummary"[^>]*maxlength="400"/,'dream summary editor missing');
+assert.match(html,/deleteJournalRecord=async id/,'durable dream deletion missing');assert.match(html,/saveJournalRecord\(updated\)/,'durable dream edit missing');
+assert.match(html,/refreshJournalSurfaces\(\)[\s\S]*journalChannel\?\.postMessage/,'journal/calendar refresh after mutation missing');
+console.log('DREAMWORLD_SWIPE_EDIT_DELETE_CONTRACT_VERIFIED');

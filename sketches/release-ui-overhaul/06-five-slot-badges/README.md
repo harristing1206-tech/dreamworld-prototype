@@ -39,6 +39,15 @@
 - If durable storage fails, the transcript and raw audio remain on the review screen and the app does not report the dream as logged.
 - Other open Dreamworld tabs refresh through a journal update channel.
 
+## Swipe, edit, and deletion controls
+
+- Alarm and Dream History each have a top-left **Edit** control. Edit mode changes it to **Done** and reveals an Edit plus red Delete action for every row without sliding titles off the left edge.
+- Holding and dragging a row left provides continuous finger-following feedback. The actions commit open only when the released offset reaches 60px; short or vertical gestures reset without activating anything.
+- Individual swipe actions remain available outside Edit mode. Tapping the exposed row itself closes the actions rather than accidentally opening or toggling it.
+- Alarm Edit reuses the smooth alarm sheet. Dream Edit provides bounded title and summary fields and durably updates the exact IndexedDB record.
+- Every Delete action opens a dedicated confirmation dialog. Cancel preserves the item and restores focus; confirmed Delete is red, removes the exact alarm or dream, and cannot be triggered by the swipe itself.
+- Dream deletion is durable and immediately recalculates History, calendar markers, Insights, and Profile totals. The confirmation modal makes the obscured app inert, traps focus, and supports Escape.
+
 ## Audio-reactive morning capture
 
 - The recording state uses an original three-form botanical figure inspired by the supplied soft abstract reference, without copying its brand, controls, or composition.
@@ -98,6 +107,7 @@ node validate-dark-mode.cjs
 node validate-anarlog-title.cjs
 node validate-tab-history-profile.cjs
 node validate-voice-reactive.cjs
+node validate-swipe-edit-delete.cjs
 ```
 
 The tests verify the five-slot order, center plus treatment, tab routing, interactive Insights calendar and calculations, alarm creation, safe alarm-label rendering, smooth wheel behavior, and the full Log flow.

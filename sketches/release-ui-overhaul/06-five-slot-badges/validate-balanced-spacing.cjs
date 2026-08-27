@@ -13,9 +13,9 @@ assert.match(html, /@media\(max-width:500px\) and \(pointer:fine\)/, 'narrow lap
 assert.match(html, /@media\(display-mode:standalone\),\(max-width:500px\) and \(pointer:coarse\)/, 'real phone and installed-app fullscreen behavior missing');
 assert.match(html, /\.screen\{[^}]*padding:[^}]*env\(safe-area-inset-right\)[^}]*env\(safe-area-inset-left\)/, 'screen safe-area gutters missing');
 assert.match(html, /\.alarm-head\{[^}]*padding-top:8px/, 'Alarm header does not match the other tab headers');
-assert.match(html, /\.alarm-title-row\{[^}]*justify-content:space-between/, 'Alarm title and Add action are not balanced');
+assert.match(html, /\.list-toolbar\{[^}]*justify-content:space-between/, 'Edit and Add actions are not balanced');
 assert.match(html, /\.alarm-add\{[^}]*width:44px[^}]*height:44px/, 'Alarm Add action is not a full touch target');
-assert.match(html, /\.alarm-row\{[^}]*min-height:88px[^}]*padding:8px 0/, 'Alarm rows are not compact');
+assert.match(html, /\.alarm-row \.swipe-main\{[^}]*min-height:88px[^}]*padding:8px 0/, 'Alarm rows are not compact');
 assert.match(html, /\.alarm-edit\{[^}]*min-height:72px/, 'Alarm row edit target is too small');
 assert.match(html, /--tabbar-height:76px/, 'compact tab bar height missing');
 assert.match(html, /\.viewport\{[^}]*calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/, 'viewport does not follow the compact safe-area tab bar');
@@ -25,7 +25,7 @@ assert.match(html, /\.tab:before\{[^}]*width:60px[^}]*height:46px[^}]*border-rad
 assert.match(html, /\.tab\.active:not\(\.log-tab\):before\{[^}]*opacity:1[^}]*scale\(1\)/, 'selected-tab capsule does not activate');
 assert.match(html, /\.tab\.log-tab\{[^}]*align-self:center[^}]*translateY\(-4px\)/, 'plus button is not visually aligned with the icon row');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px[^}]*flex:0 0 58px[^}]*aspect-ratio:1\/1[^}]*border-radius:50%/, 'center plus can shrink into an oval');
-assert.match(html, /<header class="alarm-head"><p class="date">Wake schedule<\/p><div class="alarm-title-row"><h1 class="nav-title">Alarms<\/h1><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><\/header>/, 'Alarm header structure does not match the tab system');
-assert.doesNotMatch(html, /id="editAlarms"|Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header controls or copy remain');
+assert.match(html, /<header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><p class="date">Wake schedule<\/p><h1 class="nav-title">Alarms<\/h1><\/header>/, 'Alarm header structure does not match the requested Edit/Add system');
+assert.doesNotMatch(html, /Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header copy remains');
 
 console.log('DREAMWORLD_BALANCED_SPACING_VERIFIED');

@@ -139,7 +139,7 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.getElementById('deleteConfirm').hidden,false);
   assert.equal(d.querySelector('.viewport').inert,true);
   assert.match(d.getElementById('deleteConfirmMessage').textContent,/Are you sure/);
-  d.getElementById('cancelDelete').click();
+  d.getElementById('cancelDelete').click();await wait(240);
   assert.equal(d.querySelector('.viewport').inert,false);
   assert.equal(d.querySelectorAll('#historyList .history-entry').length,1,'cancel must preserve dream');
   dreamRow.querySelector('.swipe-action.delete').click();d.getElementById('confirmDelete').click();await wait(25);

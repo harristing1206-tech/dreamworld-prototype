@@ -45,6 +45,9 @@
 - In Edit mode, tapping a row edits it; tapping its minus reveals the red Delete action. Alarm Edit reuses the smooth alarm sheet, while Dream Edit provides bounded title and summary fields and durably updates the exact IndexedDB record.
 - Outside Edit mode, holding and dragging a row left provides uninterrupted one-to-one finger feedback across the row's full measured width. The red destructive surface expands behind the moving content and can cover the entire row; there is no fixed 144px movement clamp.
 - Release remains safe: drags under 60px reset, qualifying drags settle to a compact 88px Delete action, and the swipe itself never deletes anything. Tapping the exposed row closes the action rather than opening or toggling it.
+- Swipe rendering is coalesced to one `requestAnimationFrame` update and uses `translate3d`, paint containment, and backface hiding so touch events cannot force repeated layout/paint work. The red surface is fixed behind the row rather than resizing on every movement frame.
+- The exposed action uses an original outline trash-can SVG instead of the rigid Delete label. The edit minus glyph is CSS-rendered rather than font-aligned, and Edit/minus transitions use a 240–260ms native-style cubic curve.
+- The confirmation backdrop now fades while its card eases from a 12px/0.96-scale offset. Closing reverses the transition before hiding and releasing the inert background.
 - Every Delete action opens a dedicated confirmation dialog. Cancel preserves the item and restores focus; confirmed Delete is red, removes the exact alarm or dream, and cannot be triggered by the swipe itself.
 - Dream deletion is durable and immediately recalculates History, calendar markers, Insights, and Profile totals. The confirmation modal makes the obscured app inert, traps focus, and supports Escape.
 

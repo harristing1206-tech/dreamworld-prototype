@@ -1,9 +1,11 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/id="editDreams"[^>]*>Edit<\/button>/,'History Edit button missing');assert.match(html,/id="editAlarms"[^>]*>Edit<\/button>/,'Alarm Edit button missing');
-assert.match(html,/\.swipe-actions\{[^}]*width:144px[^}]*grid-template-columns:repeat\(2,72px\)/,'swipe action geometry missing');
-assert.match(html,/\.swipe-action\.delete\{background:var\(--danger\)/,'Delete action is not red');
-assert.match(html,/touchmove[\s\S]*gesture\.offset=Math\.max\(-144[\s\S]*event\.preventDefault\(\)/,'continuous swipe-left feedback missing');
+assert.match(html,/\.swipe-actions\{[^}]*inset:0[^}]*background:var\(--danger\)/,'full-row red swipe surface missing');
+assert.match(html,/\.swipe-action\.delete\{width:max\(72px,var\(--swipe-reveal\)\)/,'Delete action does not expand with the swipe');
+assert.match(html,/touchmove[\s\S]*event\.preventDefault\(\)[\s\S]*swipeWidth=main\.clientWidth\|\|row\.clientWidth\|\|320[\s\S]*gesture\.offset=Math\.max\(-swipeWidth[\s\S]*--swipe-reveal/,'continuous full-width swipe feedback missing');
 assert.match(html,/const open=gesture\.horizontal&&gesture\.offset<=-60/,'swipe action is not release-threshold gated');
+assert.match(html,/className='edit-minus'[\s\S]*textContent='−'/,'native-style edit minus control missing');
+assert.match(html,/button\.textContent=editing\?'✓':'Edit'/,'Edit button does not morph into a checkmark');
 assert.match(html,/class="confirm-backdrop" id="deleteConfirm"[^>]*role="dialog"[^>]*aria-modal="true"/,'accessible delete confirmation missing');
 assert.match(html,/id="deleteConfirmMessage">This action cannot be undone/,'delete consequence is not disclosed');
 assert.match(html,/class="confirm-delete" id="confirmDelete"/,'red confirmation control missing');

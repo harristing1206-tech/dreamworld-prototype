@@ -41,10 +41,10 @@
 
 ## Swipe, edit, and deletion controls
 
-- Alarm and Dream History each have a top-left **Edit** control. Edit mode changes it to **Done** and reveals an Edit plus red Delete action for every row without sliding titles off the left edge.
-- Holding and dragging a row left provides continuous finger-following feedback. The actions commit open only when the released offset reaches 60px; short or vertical gestures reset without activating anything.
-- Individual swipe actions remain available outside Edit mode. Tapping the exposed row itself closes the actions rather than accidentally opening or toggling it.
-- Alarm Edit reuses the smooth alarm sheet. Dream Edit provides bounded title and summary fields and durably updates the exact IndexedDB record.
+- Alarm and Dream History each have a top-left **Edit** pill. Like the supplied iOS Clock reference, entering Edit mode morphs it into a circular checkmark, slides in one red minus control per row, replaces alarm switches with chevrons, and keeps row content readable.
+- In Edit mode, tapping a row edits it; tapping its minus reveals the red Delete action. Alarm Edit reuses the smooth alarm sheet, while Dream Edit provides bounded title and summary fields and durably updates the exact IndexedDB record.
+- Outside Edit mode, holding and dragging a row left provides uninterrupted one-to-one finger feedback across the row's full measured width. The red destructive surface expands behind the moving content and can cover the entire row; there is no fixed 144px movement clamp.
+- Release remains safe: drags under 60px reset, qualifying drags settle to a compact 88px Delete action, and the swipe itself never deletes anything. Tapping the exposed row closes the action rather than opening or toggling it.
 - Every Delete action opens a dedicated confirmation dialog. Cancel preserves the item and restores focus; confirmed Delete is red, removes the exact alarm or dream, and cannot be triggered by the swipe itself.
 - Dream deletion is durable and immediately recalculates History, calendar markers, Insights, and Profile totals. The confirmation modal makes the obscured app inert, traps focus, and supports Escape.
 

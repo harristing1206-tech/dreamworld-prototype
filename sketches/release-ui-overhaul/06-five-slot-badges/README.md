@@ -39,6 +39,14 @@
 - If durable storage fails, the transcript and raw audio remain on the review screen and the app does not report the dream as logged.
 - Other open Dreamworld tabs refresh through a journal update channel.
 
+## Audio-reactive morning capture
+
+- The recording state uses an original three-form botanical figure inspired by the supplied soft abstract reference, without copying its brand, controls, or composition.
+- A real `AudioContext` connects the active microphone stream to an `AnalyserNode`; time-domain RMS energy drives one shared smoothed `--voice-level`, so all three forms expand and soften in unison with the user's voice.
+- The visualization never connects microphone audio to speakers, never records a second stream, and stops its animation frame, source, analyser, and audio context whenever recording ends, errors, is discarded, or the user leaves Log.
+- If Web Audio is unavailable, recording still works and the figure remains calm and static. With Reduce Motion enabled, analysis animation does not start.
+- Recording truth remains explicit through the timer, Recording status, stop-and-save control, and local-draft flow.
+
 ## Anarlog-adapted journal titles and summaries
 
 - After the user reviews the real transcript and taps **Save to Journal**, Dreamworld fingerprints that exact transcript and sends it to the owner-only `/dreamworld-ai/v1/title` route.
@@ -89,6 +97,7 @@ node validate-journal-persistence.cjs
 node validate-dark-mode.cjs
 node validate-anarlog-title.cjs
 node validate-tab-history-profile.cjs
+node validate-voice-reactive.cjs
 ```
 
 The tests verify the five-slot order, center plus treatment, tab routing, interactive Insights calendar and calculations, alarm creation, safe alarm-label rendering, smooth wheel behavior, and the full Log flow.

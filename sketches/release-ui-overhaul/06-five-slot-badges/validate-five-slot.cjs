@@ -61,7 +61,8 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.querySelectorAll('.tab.active').length, 1);
   assert.equal(d.querySelector('.tab[aria-current="page"]').dataset.tab, 'history');
   assert.equal(d.querySelectorAll('.history-entry').length, 6);
-  assert.ok([...d.querySelectorAll('.history-entry')].every(entry=>entry.children.length===2&&entry.children[0].tagName==='H2'&&entry.children[1].tagName==='P'),'History rows must show only title and summary');
+  assert.ok([...d.querySelectorAll('.history-entry')].every(entry=>entry.children.length===2&&entry.children[0].tagName==='H2'&&entry.children[1].classList.contains('history-entry-date')),'History rows must show title followed by logged date');
+  assert.equal(d.querySelector('[data-entry-id="sample-2026-08-15"] .history-entry-date').textContent,'Aug 15, 2026');
 
   d.querySelector('[data-tab="insights"]').click();
   assert.ok(d.querySelector('[data-screen="insights"]').classList.contains('active'));

@@ -1,10 +1,12 @@
 const assert=require('node:assert/strict');const fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/\.tab\.log-tab\{[^}]*translateY\(-4px\)/,'center plus is not aligned with tab icons');
 assert.match(html,/\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px/,'center plus size changed');
-assert.match(html,/\.history-entry\{[^}]*min-height:72px[^}]*padding:12px 0/,'History rows are not compact');
+assert.match(html,/\.history-entry\{[^}]*min-height:66px[^}]*padding:11px 0/,'History rows are not compact');
 assert.match(html,/\.history-entry h2\{[^}]*font-size:18px/,'History title scale is not compact');
-assert.match(html,/\.history-entry p\{[^}]*-webkit-line-clamp:2/,'History summary is not bounded to two lines');
-assert.doesNotMatch(html,/className='entry-foot'|const header=document\.createElement\('header'\)/,'History rows still render metadata beyond title and summary');
+assert.match(html,/\.history-entry-date\{[^}]*margin:4px 0 0[^}]*font-size:13px/,'History date does not sit directly below the title');
+assert.match(html,/historyDateLabel=record[\s\S]*month:'short',day:'numeric',year:'numeric'/,'History date format is missing');
+assert.match(html,/button\.append\(title,date\)/,'History row hierarchy is not title then date');
+assert.doesNotMatch(html,/className='entry-foot'|const header=document\.createElement\('header'\)|button\.append\(title,excerpt\)/,'History rows still render obsolete metadata or summary');
 assert.match(html,/historyFocus\.addEventListener\('touchstart'/,'dream detail swipe start is missing');
 assert.match(html,/historySwipe\.dx>=72/,'swipe-right release threshold is missing');
 assert.match(html,/event\.preventDefault\(\)[\s\S]*translateX/,'horizontal swipe feedback is missing');

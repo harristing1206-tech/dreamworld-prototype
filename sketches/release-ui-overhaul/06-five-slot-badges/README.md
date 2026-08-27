@@ -50,7 +50,7 @@
 ## Navigation and journal refinements
 
 - The 58px center Log button keeps its established size but sits only 4px above the icon row, so it remains prominent without floating away from the tab bar.
-- History rows use a compact 72px minimum layout containing only the dream title and a two-line summary. Date, duration, transcript, and audio details remain inside the opened dream.
+- History rows use a compact 66px minimum layout containing the dream title first and its short logged date directly underneath. Summary, duration, transcript, and audio details remain inside the opened dream.
 - Open dream details support a release-time swipe-right exit: horizontal drag feedback follows the finger, swipes under 72px reset, and successful swipes return focus to the matching History row. The visible back button remains available.
 - Profile statistics use a centered divider with 32px of breathing room; Dreams Logged aligns left and Dream Nights aligns right.
 

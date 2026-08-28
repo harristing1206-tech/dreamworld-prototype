@@ -9,7 +9,7 @@ assert.match(html,/\.swipe-action\.delete svg\{[^}]*--trash-shift[^}]*will-chang
 assert.match(html,/Math\.abs\(pendingOffset\)\/2-34/,'trash icon does not track the center of the revealed width');
 assert.match(html,/fullSwipe=commit&&gesture\.horizontal&&Math\.abs\(gesture\.offset\)>=gesture\.swipeWidth\*\.92/,'complete swipe auto-delete threshold missing');
 assert.match(html,/touchend',[\s\S]*finish\(true\)[\s\S]*touchcancel',[\s\S]*finish\(false\)/,'release and cancellation are not safely separated');
-assert.match(html,/setTimeout\(\(\)=>void onFull\(\),200\)/,'full-swipe deletion does not wait for dismissal motion');
+assert.match(html,/setTimeout\(\(\)=>\{row\.classList\.remove\('swiping'\);void onFull\(\)\},200\)/,'full-swipe deletion does not wait for dismissal motion and clear transient swipe state');
 assert.match(html,/\.edit-minus:after\{[^}]*height:2px[^}]*background:white/,'native-style edit minus glyph missing');
 assert.match(html,/button\.textContent=editing\?'✓':'Edit'/,'Edit button does not morph into a checkmark');
 assert.match(html,/class="confirm-backdrop" id="deleteConfirm"[^>]*role="dialog"[^>]*aria-modal="true"/,'accessible delete confirmation missing');

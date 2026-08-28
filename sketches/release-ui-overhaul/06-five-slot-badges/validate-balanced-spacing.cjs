@@ -25,7 +25,8 @@ assert.match(html, /\.tab:before\{[^}]*width:42px[^}]*height:38px[^}]*border-rad
 assert.match(html, /\.tab\.active:not\(\.log-tab\):before\{[^}]*opacity:\.62[^}]*scale\(1\)/, 'selected-tab treatment does not activate');
 assert.match(html, /\.tab\.log-tab\{[^}]*align-self:center[^}]*translateY\(-4px\)/, 'plus button is not visually aligned with the icon row');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px[^}]*flex:0 0 58px[^}]*aspect-ratio:1\/1[^}]*border-radius:50%/, 'center plus can shrink into an oval');
-assert.match(html, /<header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><p class="date">Wake schedule<\/p><h1 class="nav-title">Alarms<\/h1><\/header>/, 'Alarm header structure does not match the requested Edit/Add system');
+assert.match(html, /<header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><p class="date">Your morning<\/p><h1 class="nav-title">Wake gently\.<br>Remember more\.<\/h1><\/header>/, 'Alarm header structure does not preserve Edit/Add inside the next-wake composition');
+assert.match(html, /#alarmList \.alarm-row:first-child\{[^}]*min-height:248px[^}]*border-radius:25px[^}]*background:var\(--premium-dark\)/, 'next enabled alarm is not presented as the dominant wake stage');
 assert.doesNotMatch(html, /Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header copy remains');
 assert.match(html, /\.statusbar\{display:none\}\.viewport\{inset:max\(env\(safe-area-inset-top\),12px\)/, 'installed iPhone still shows the simulated status bar');
 

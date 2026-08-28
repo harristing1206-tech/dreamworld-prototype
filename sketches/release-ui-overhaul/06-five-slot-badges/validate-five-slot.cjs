@@ -61,7 +61,7 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.querySelectorAll('.tab.active').length, 1);
   assert.equal(d.querySelector('.tab[aria-current="page"]').dataset.tab, 'history');
   assert.equal(d.querySelectorAll('.history-entry').length, 6);
-  assert.ok([...d.querySelectorAll('.history-entry')].every(entry=>entry.children.length===2&&entry.children[0].tagName==='H2'&&entry.children[1].classList.contains('history-entry-date')),'History rows must show title followed by logged date');
+  assert.ok([...d.querySelectorAll('.history-entry')].every(entry=>entry.children.length===5&&entry.children[0].classList.contains('history-date-rail')&&entry.children[1].tagName==='H2'&&entry.children[2].classList.contains('history-entry-date')&&entry.children[3].classList.contains('history-entry-excerpt')&&entry.children[4].classList.contains('history-entry-arrow')),'History rows must use the editorial date-rail hierarchy');
   assert.equal(d.querySelector('[data-entry-id="sample-2026-08-15"] .history-entry-date').textContent,'Aug 15, 2026');
 
   d.querySelector('[data-tab="insights"]').click();

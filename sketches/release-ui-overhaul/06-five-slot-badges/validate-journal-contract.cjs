@@ -7,5 +7,5 @@ assert.match(html,/const record=\{id,dateKey:[\s\S]*transcript,[\s\S]*provenance
 assert.match(html,/renderHistoryList\(\);renderInsightsCalendar\(\);updateInsights\(\)/,'history and Insights do not refresh from one record source');
 assert.match(html,/journalRecords\.filter\(record=>record\.dateKey\?\.startsWith\(monthPrefix\)\)/,'calendar metrics are not derived from journal records');
 assert.match(html,/records=sortedJournalRecords\(\)\.filter\(record=>record\.dateKey===dateKey\)/,'calendar dates are not connected to exact journal dates');
-assert.match(html,/if\(!stored\)\{showToast\('Dreamworld could not store this journal entry\. Your transcript and audio are still here\.'/,'storage failure does not preserve recoverable source data');
+assert.match(html,/if\(!stored\)\{[^}]*showLogState\('transcript'\);showToast\('Dreamworld could not store this journal entry\. Your transcript and audio are still here\.'/,'storage failure does not preserve recoverable source data');
 console.log('DREAMWORLD_JOURNAL_SHARED_SOURCE_CONTRACT_VERIFIED');

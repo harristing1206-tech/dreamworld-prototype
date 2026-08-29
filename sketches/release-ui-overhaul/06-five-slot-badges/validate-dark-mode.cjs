@@ -9,12 +9,12 @@ const dom=new JSDOM(source,{runScripts:'dangerously',url:'https://preview.test/d
 const d=dom.window.document,wait=ms=>new Promise(resolve=>dom.window.setTimeout(resolve,ms));
 (async()=>{
   await wait(20);
-  assert.match(source,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#111712;[\s\S]*--surface:#1a221b;[\s\S]*--ink:#f1eee5;[\s\S]*--tabbar-bg:rgba\(20,27,21,.97\)/);
+  assert.match(source,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--body-bg:#000000;[\s\S]*--surface:#18211b;[\s\S]*--ink:#f1f3ed;[\s\S]*--tabbar-bg:rgba\(0,0,0,\.97\)/);
   assert.match(source,/appearanceMedia\.addEventListener\?\.\('change'/);
   assert.equal(d.documentElement.dataset.theme,'dark');
   assert.equal(d.documentElement.dataset.themePreference,'dark');
   assert.equal(d.getElementById('appearanceStatus').textContent,'Dark');
-  assert.equal(d.querySelector('meta[name="theme-color"]').content,'#111712');
+  assert.equal(d.querySelector('meta[name="theme-color"]').content,'#000000');
   assert.equal(d.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content,'black-translucent');
   d.getElementById('appearanceSetting').click();
   assert.equal(d.documentElement.dataset.themePreference,'system');

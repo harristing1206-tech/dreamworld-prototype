@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');const html=fs.readFileSync('index.html','utf8'),manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
 assert.match(html,/--canvas:#f6f3ea;[\s\S]*--surface:#fffdf8;[\s\S]*--raised:#e8eee3;/,'refined light surface hierarchy missing');
-assert.match(html,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#111712;[\s\S]*--surface:#1a221b;[\s\S]*--raised:#263227;/,'refined dark surface hierarchy missing');
+assert.match(html,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--surface:#1a221b;[\s\S]*--raised:#263227;/,'true-black dark canvas and refined raised-surface hierarchy missing');
 assert.match(html,/\.nav-title\{font-size:32px/,'major titles are not normalized');assert.match(html,/\.greeting\{[^}]*font-size:32px/,'History title is inconsistent');assert.match(html,/\.log-title\{[^}]*font-size:32px/,'Log title is inconsistent');
 assert.match(html,/\.tab:before\{[^}]*width:42px[^}]*height:38px/,'quiet selected-tab treatment missing');assert.match(html,/\.tab\.active:not\(\.log-tab\):before\{opacity:\.62/,'selected tab is still visually heavy');
 assert.match(html,/\.metric-symbol\{display:none\}/,'repeated Insight icon tiles remain');assert.match(html,/\.insight-detail\{[^}]*border-radius:14px[^}]*background:var\(--surface\)/,'Insight detail surface is inconsistent');

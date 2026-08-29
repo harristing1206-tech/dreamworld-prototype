@@ -52,7 +52,7 @@
     }
     :root[data-theme="dark"]{
       color-scheme:dark;
-      --canvas:#111712;
+      --canvas:#000000;
       --surface:#1a221b;
       --raised:#263227;
       --separator:rgba(241,238,229,.13);
@@ -68,10 +68,10 @@
       --sky:#86a4b1;
       --danger:#df7464;
       --green:#789f67;
-      --body-bg:#0b100c;
+      --body-bg:#000000;
       --phone-border:#303b32;
       --status-ink:#d8ded5;
-      --tabbar-bg:rgba(20,27,21,.97);
+      --tabbar-bg:rgba(0,0,0,.97);
       --switch-off:#4d574f;
       --toast-bg:#f1eee5;
       --toast-ink:#203028;
@@ -134,9 +134,9 @@
       --premium-dark:#101813;--premium-raised:#1c2820;--premium-line:rgba(232,240,232,.13);
     }
     :root[data-theme="dark"]{
-      --canvas:#0e1511;--surface:#18211b;--raised:#243129;--ink:#f1f3ed;
+      --canvas:#000000;--body-bg:#000000;--surface:#18211b;--raised:#243129;--ink:#f1f3ed;
       --muted:#a8b1a8;--faint:#747f76;--accent:#a6c7ad;--highlight:#df8a62;
-      --tabbar-bg:rgba(16,23,18,.97);--premium-dark:#080d0a;--premium-raised:#142019;
+      --tabbar-bg:rgba(0,0,0,.97);--premium-dark:#080d0a;--premium-raised:#142019;
     }
     .screen{padding-top:8px;padding-bottom:44px}
     .date,.log-kicker{font-size:12px;font-weight:720;letter-spacing:.08em;text-transform:uppercase}
@@ -329,7 +329,7 @@
   const STT_ENDPOINT=`${window.location.origin}/dreamworld-stt/v1/transcribe`,JOURNAL_METADATA_ENDPOINT=`${window.location.origin}/dreamworld-ai/v1/title`;
   const DRAFT_DB='dreamworld-audio-drafts',DRAFT_STORE='drafts',JOURNAL_STORE='journal',DRAFT_KEY='latest',APPEARANCE_KEY='dreamworld:appearance',JOURNAL_STARTED_KEY='dreamworld:journal-started';
   const appearanceMedia=matchMedia('(prefers-color-scheme: dark)');let appearancePreference=document.documentElement.dataset.themePreference||'system';
-  const applyAppearance=(choice,{persist=false}={})=>{if(!['system','light','dark'].includes(choice))choice='system';appearancePreference=choice;const resolved=choice==='system'?(appearanceMedia.matches?'dark':'light'):choice;document.documentElement.dataset.theme=resolved;document.documentElement.dataset.themePreference=choice;document.querySelector('meta[name="theme-color"]').content=resolved==='dark'?'#111712':'#f6f3ea';document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content=resolved==='dark'?'black-translucent':'default';const label=choice[0].toUpperCase()+choice.slice(1),status=document.getElementById('appearanceStatus'),button=document.getElementById('appearanceSetting');if(status)status.textContent=label;if(button)button.setAttribute('aria-label',`Change appearance, currently ${label}`);if(persist)try{localStorage.setItem(APPEARANCE_KEY,choice)}catch{}};
+  const applyAppearance=(choice,{persist=false}={})=>{if(!['system','light','dark'].includes(choice))choice='system';appearancePreference=choice;const resolved=choice==='system'?(appearanceMedia.matches?'dark':'light'):choice;document.documentElement.dataset.theme=resolved;document.documentElement.dataset.themePreference=choice;document.querySelector('meta[name="theme-color"]').content=resolved==='dark'?'#000000':'#f6f3ea';document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content=resolved==='dark'?'black-translucent':'default';const label=choice[0].toUpperCase()+choice.slice(1),status=document.getElementById('appearanceStatus'),button=document.getElementById('appearanceSetting');if(status)status.textContent=label;if(button)button.setAttribute('aria-label',`Change appearance, currently ${label}`);if(persist)try{localStorage.setItem(APPEARANCE_KEY,choice)}catch{}};
   const cycleAppearance=()=>{const choices=['system','light','dark'],index=choices.indexOf(appearancePreference);applyAppearance(choices[(index+1)%choices.length],{persist:true})};
   const sampleDreams=[
     {id:'sample-2026-08-03',dateKey:'2026-08-03',createdAt:'2026-08-03T07:10:00-07:00',day:3,date:'Monday, August 3',title:'The garden stairway',transcript:'I climbed a garden staircase where each landing opened into a different season.',excerpt:'I climbed a garden staircase where each landing opened into a different season.',sleep:438,recording:34,recall:'Faint',sample:true},

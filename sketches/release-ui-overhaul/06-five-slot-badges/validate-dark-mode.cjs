@@ -11,7 +11,7 @@ const d=dom.window.document,wait=ms=>new Promise(resolve=>dom.window.setTimeout(
   await wait(20);
   assert.match(source,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--body-bg:#000000;[\s\S]*--surface:#18211b;[\s\S]*--ink:#f1f3ed;[\s\S]*--tabbar-bg:rgba\(0,0,0,\.97\)/);
   assert.match(source,/--bubble-outline:rgba\(210,216,211,\.22\)/,'dark bubble outline token missing');
-  assert.match(source,/:root\[data-theme="dark"\] :is\([^}]*#alarmList \.alarm-row[^}]*\.tabbar[^}]*\.insights-hero[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/,'major dark-mode bubbles do not share the thin gray outline');
+  assert.match(source,/:root\[data-theme="dark"\] :is\([^}]*#alarmList \.alarm-row[^}]*\.tabbar[^}]*\.insights-hero[^}]*\.insights-calendar[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/,'major dark-mode bubbles and calendar do not share the thin gray outline');
   assert.match(source,/appearanceMedia\.addEventListener\?\.\('change'/);
   assert.equal(d.documentElement.dataset.theme,'dark');
   assert.equal(d.documentElement.dataset.themePreference,'dark');

@@ -13,8 +13,9 @@ const d=dom.window.document,wait=ms=>new Promise(resolve=>dom.window.setTimeout(
   assert.match(source,/--bubble-outline:rgba\(210,216,211,\.22\)/,'dark bubble outline token missing');
   assert.match(source,/:root\[data-theme="dark"\] :is\([^}]*#alarmList \.alarm-row[^}]*\.tabbar[^}]*\.insights-hero[^}]*\.insights-calendar[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/,'major dark-mode bubbles and calendar do not share the thin gray outline');
   assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child\{background:#f5f6f2;color:#142019\}/,'main alarm bubble is not inverted in dark mode');
-  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child:before\{background:rgba\(0,0,0,\.18\)\}/,'dark-mode main alarm fade is not inverted');
-  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-detail\{color:rgba\(20,32,25,\.66\)\}/,'inverted main alarm supporting text lacks dark contrast');
+  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child:before\{background:rgba\(0,0,0,\.72\)\}/,'dark-mode main alarm lacks the visible opposite black-to-white fade');
+  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-time\{color:#f5f7f3;[^}]*text-shadow:0 2px 16px rgba\(0,0,0,\.48\)/,'inverted main alarm time lacks contrast over the black corner');
+  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-detail\{color:rgba\(245,247,243,\.76\)\}/,'inverted main alarm supporting text lacks light contrast over the black corner');
   assert.match(source,/appearanceMedia\.addEventListener\?\.\('change'/);
   assert.equal(d.documentElement.dataset.theme,'dark');
   assert.equal(d.documentElement.dataset.themePreference,'dark');

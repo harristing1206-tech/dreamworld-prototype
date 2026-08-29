@@ -136,8 +136,10 @@
     :root[data-theme="dark"]{
       --canvas:#000000;--body-bg:#000000;--surface:#18211b;--raised:#243129;--ink:#f1f3ed;
       --muted:#a8b1a8;--faint:#747f76;--accent:#a6c7ad;--highlight:#df8a62;
-      --tabbar-bg:rgba(0,0,0,.97);--premium-dark:#080d0a;--premium-raised:#142019;
+      --tabbar-bg:rgba(0,0,0,.97);--premium-dark:#080d0a;--premium-raised:#142019;--bubble-outline:rgba(210,216,211,.22);
     }
+    :root[data-theme="dark"] :is(#alarmList .alarm-row,.tabbar,.tab .plus-disc,.mic,.stop,.state-icon,.play,.primary,.secondary,.transcript,.insights-hero,.insight-detail,.profile-avatar,.sheet,.time-picker,.form-group,.day,.confirm-card,.toast){outline:1px solid var(--bubble-outline);outline-offset:-1px}
+    :root[data-theme="dark"] .tab:before{outline:1px solid var(--bubble-outline);outline-offset:-1px}
     .screen{padding-top:8px;padding-bottom:44px}
     .date,.log-kicker{font-size:12px;font-weight:720;letter-spacing:.08em;text-transform:uppercase}
     .nav-title,.greeting,.log-title{font-size:31px;line-height:1.04;letter-spacing:-.04em;font-weight:740}

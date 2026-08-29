@@ -62,11 +62,11 @@
 
 ## Audio-reactive morning capture
 
-- The recording state uses an original holographic **Listener** avatar with a restrained mask, concentric signal rings, and the existing warm botanical palette—evoking a responsive AI presence without copying JARVIS or another brand.
-- The active microphone stream feeds one `AnalyserNode`; time-domain RMS energy passes through a noise gate, fast attack, and slower release before driving the avatar and ring scales through `requestAnimationFrame`.
-- Quiet room noise leaves the Listener calm, normal speech moves it continuously, and stronger speech expands the core and signal field without stepped state jumps.
+- The recording state uses an original layered **abstract presence** with softly irregular nested fields and the existing warm botanical palette. It borrows the reference’s calm depth and breathing rhythm without copying its branding, controls, colors, or exact capsule composition.
+- The active microphone stream feeds one `AnalyserNode`; time-domain RMS energy passes through a noise gate, fast attack, and slower release before expanding and relaxing the nested form through `requestAnimationFrame`.
+- Quiet room noise leaves the form calm, normal speech moves it continuously, and stronger speech enlarges the luminous core and surrounding field without stepped state jumps.
 - The visualization never connects microphone audio to speakers, never records a second stream, and stops its animation frame, source, analyser, and audio context whenever recording ends, errors, is discarded, or the user leaves Log.
-- If Web Audio is unavailable, recording still works and the Listener remains calm and static. With Reduce Motion enabled, microphone analysis animation does not start.
+- If Web Audio is unavailable, recording still works and the abstract form remains calm and static. With Reduce Motion enabled, microphone analysis animation does not start.
 - Recording truth remains explicit through the timer, Recording status, centered stop-and-save control, and local-draft flow.
 
 ## Anarlog-adapted journal titles and summaries

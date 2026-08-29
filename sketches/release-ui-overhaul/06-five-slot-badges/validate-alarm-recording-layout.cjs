@@ -8,6 +8,6 @@ assert.doesNotMatch(outlineRule[1],/\.form-group/,'Repeat and Options still rece
 assert.doesNotMatch(outlineRule[2],/\.form-group/,'dark-mode Repeat and Options still receive sharp rectangular outlines');
 assert.match(html,/\.form-row:first-of-type\{border-radius:12px 12px 0 0\}/,'Options group lost its rounded top corners');
 assert.match(html,/\.form-row:last-of-type\{[^}]*border-radius:0 0 12px 12px\}/,'Options group lost its rounded bottom corners');
-assert.match(html,/\.log-screen:has\(\.recording-state\.active\)>header\{visibility:hidden\}/,'recording state does not suppress the overlapping capture header');
-assert.match(html,/\.log-screen \.recording-state\{inset:0;padding:24px;align-content:center;background:var\(--premium-dark\)\}/,'recording state does not own a full opaque layout surface');
+assert.match(html,/\.log-screen:has\(\.capture-state\.active:not\(\[data-log-state="ready"\]\)\)>header\{visibility:hidden\}/,'non-ready capture states do not suppress the overlapping capture header');
+assert.match(html,/\.log-screen \.capture-state\.active:not\(\[data-log-state="ready"\]\)\{inset:0;padding:24px;overflow-y:auto;align-content:safe center;background:var\(--premium-dark\)\}/,'non-ready capture states do not own a full opaque scrollable layout surface');
 console.log('DREAMWORLD_ALARM_RECORDING_LAYOUT_VERIFIED');

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Dreamworld — Five-slot navigation and insights demo</title>
-  <meta name="theme-color" content="#f6f3ea">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Dreamworld">
@@ -15,9 +15,9 @@
   <style>
     :root{
       color-scheme:light;
-      --canvas:#f6f3ea;
-      --surface:#fffdf8;
-      --raised:#e8eee3;
+      --canvas:#ffffff;
+      --surface:#ffffff;
+      --raised:#f1f2ef;
       --separator:rgba(35,48,40,.12);
       --ink:#203028;
       --muted:#667168;
@@ -31,10 +31,10 @@
       --sky:#7898a7;
       --danger:#c45142;
       --green:#6e965c;
-      --body-bg:#d8d5cc;
-      --phone-border:#c5c2b8;
+      --body-bg:#ffffff;
+      --phone-border:#d6d8d6;
       --status-ink:#536158;
-      --tabbar-bg:rgba(255,253,248,.97);
+      --tabbar-bg:rgba(255,255,255,.97);
       --switch-off:#bcc1b9;
       --toast-bg:#283a30;
       --toast-ink:#fffdf8;
@@ -128,7 +128,7 @@
 
     /* v36 — structural Mobbin-informed redesign. Composition first. */
     :root{
-      --canvas:#f4f1e9;--surface:#fbfaf6;--raised:#e5ebe1;--ink:#17251e;
+      --canvas:#ffffff;--body-bg:#ffffff;--surface:#ffffff;--raised:#f1f2ef;--ink:#17251e;
       --muted:#667168;--faint:#8a938b;--accent:#315a43;--highlight:#c96f4a;
       --tabbar-height:72px;--radius:18px;--page-gutter:24px;
       --premium-dark:#101813;--premium-raised:#1c2820;--premium-line:rgba(232,240,232,.13);
@@ -331,7 +331,7 @@
   const STT_ENDPOINT=`${window.location.origin}/dreamworld-stt/v1/transcribe`,JOURNAL_METADATA_ENDPOINT=`${window.location.origin}/dreamworld-ai/v1/title`;
   const DRAFT_DB='dreamworld-audio-drafts',DRAFT_STORE='drafts',JOURNAL_STORE='journal',DRAFT_KEY='latest',APPEARANCE_KEY='dreamworld:appearance',JOURNAL_STARTED_KEY='dreamworld:journal-started';
   const appearanceMedia=matchMedia('(prefers-color-scheme: dark)');let appearancePreference=document.documentElement.dataset.themePreference||'system';
-  const applyAppearance=(choice,{persist=false}={})=>{if(!['system','light','dark'].includes(choice))choice='system';appearancePreference=choice;const resolved=choice==='system'?(appearanceMedia.matches?'dark':'light'):choice;document.documentElement.dataset.theme=resolved;document.documentElement.dataset.themePreference=choice;document.querySelector('meta[name="theme-color"]').content=resolved==='dark'?'#000000':'#f6f3ea';document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content=resolved==='dark'?'black-translucent':'default';const label=choice[0].toUpperCase()+choice.slice(1),status=document.getElementById('appearanceStatus'),button=document.getElementById('appearanceSetting');if(status)status.textContent=label;if(button)button.setAttribute('aria-label',`Change appearance, currently ${label}`);if(persist)try{localStorage.setItem(APPEARANCE_KEY,choice)}catch{}};
+  const applyAppearance=(choice,{persist=false}={})=>{if(!['system','light','dark'].includes(choice))choice='system';appearancePreference=choice;const resolved=choice==='system'?(appearanceMedia.matches?'dark':'light'):choice;document.documentElement.dataset.theme=resolved;document.documentElement.dataset.themePreference=choice;document.querySelector('meta[name="theme-color"]').content=resolved==='dark'?'#000000':'#ffffff';document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content=resolved==='dark'?'black-translucent':'default';const label=choice[0].toUpperCase()+choice.slice(1),status=document.getElementById('appearanceStatus'),button=document.getElementById('appearanceSetting');if(status)status.textContent=label;if(button)button.setAttribute('aria-label',`Change appearance, currently ${label}`);if(persist)try{localStorage.setItem(APPEARANCE_KEY,choice)}catch{}};
   const cycleAppearance=()=>{const choices=['system','light','dark'],index=choices.indexOf(appearancePreference);applyAppearance(choices[(index+1)%choices.length],{persist:true})};
   const sampleDreams=[
     {id:'sample-2026-08-03',dateKey:'2026-08-03',createdAt:'2026-08-03T07:10:00-07:00',day:3,date:'Monday, August 3',title:'The garden stairway',transcript:'I climbed a garden staircase where each landing opened into a different season.',excerpt:'I climbed a garden staircase where each landing opened into a different season.',sleep:438,recording:34,recall:'Faint',sample:true},

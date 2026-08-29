@@ -4,9 +4,9 @@ const assert = require('node:assert/strict');
 const html = fs.readFileSync('index.html', 'utf8');
 
 const requiredTokens = {
-  canvas: '#f6f3ea',
-  surface: '#fffdf8',
-  raised: '#e8eee3',
+  canvas: '#ffffff',
+  surface: '#ffffff',
+  raised: '#f1f2ef',
   ink: '#203028',
   muted: '#667168',
   faint: '#879087',
@@ -42,7 +42,7 @@ for (const [label, foreground, background, minimum] of [
 assert.ok(contrast('#ffffff', requiredTokens.highlight) >= 3, 'terracotta icon contrast is below 3:1');
 
 assert.match(html, /color-scheme:light/, 'app did not switch to the light world palette');
-assert.match(html, /--tabbar-bg:rgba\(255,253,248,.97\)/, 'light tab bar token is not warm neutral');
+assert.match(html, /--tabbar-bg:rgba\(255,255,255,.97\)/, 'light tab bar is not true white');
 assert.match(html, /\.tabbar\{[^}]*background:var\(--tabbar-bg\)/, 'tab bar does not use the semantic theme token');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*background:var\(--highlight\)/, 'log action is not using terracotta');
 assert.match(html, /\.mic\{[^}]*background:var\(--highlight\)/, 'capture action is not using terracotta');

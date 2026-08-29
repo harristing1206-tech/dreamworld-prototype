@@ -62,11 +62,12 @@
 
 ## Audio-reactive morning capture
 
-- The recording state uses an original three-form botanical figure inspired by the supplied soft abstract reference, without copying its brand, controls, or composition.
-- A real `AudioContext` connects the active microphone stream to an `AnalyserNode`; time-domain RMS energy drives one shared smoothed `--voice-level`, so all three forms expand and soften in unison with the user's voice.
+- The recording state uses an original holographic **Listener** avatar with a restrained mask, concentric signal rings, and the existing warm botanical palette—evoking a responsive AI presence without copying JARVIS or another brand.
+- The active microphone stream feeds one `AnalyserNode`; time-domain RMS energy passes through a noise gate, fast attack, and slower release before driving the avatar and ring scales through `requestAnimationFrame`.
+- Quiet room noise leaves the Listener calm, normal speech moves it continuously, and stronger speech expands the core and signal field without stepped state jumps.
 - The visualization never connects microphone audio to speakers, never records a second stream, and stops its animation frame, source, analyser, and audio context whenever recording ends, errors, is discarded, or the user leaves Log.
-- If Web Audio is unavailable, recording still works and the figure remains calm and static. With Reduce Motion enabled, analysis animation does not start.
-- Recording truth remains explicit through the timer, Recording status, stop-and-save control, and local-draft flow.
+- If Web Audio is unavailable, recording still works and the Listener remains calm and static. With Reduce Motion enabled, microphone analysis animation does not start.
+- Recording truth remains explicit through the timer, Recording status, centered stop-and-save control, and local-draft flow.
 
 ## Anarlog-adapted journal titles and summaries
 
@@ -119,6 +120,11 @@ node validate-dark-mode.cjs
 node validate-anarlog-title.cjs
 node validate-tab-history-profile.cjs
 node validate-voice-reactive.cjs
+node validate-voice-reactive-race.cjs
+node validate-voice-reactive-reduced-motion.cjs
+node validate-voice-reactive-fallback.cjs
+node validate-voice-close-fallback.cjs
+node validate-recording-request-race.cjs
 node validate-swipe-edit-delete.cjs
 node validate-mobbin-refinement.cjs
 ```

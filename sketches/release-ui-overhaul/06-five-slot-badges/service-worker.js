@@ -1,4 +1,4 @@
-const CACHE='dreamworld-pwa-20260828-20';
+const CACHE='dreamworld-pwa-20260829-21';
 const SHELL=['./index.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));

@@ -27,6 +27,8 @@ assert.match(html, /\.tab\.log-tab\{[^}]*align-self:center[^}]*translateY\(-4px\
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px[^}]*flex:0 0 58px[^}]*aspect-ratio:1\/1[^}]*border-radius:50%/, 'center plus can shrink into an oval');
 assert.match(html, /<header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><p class="date">Your morning<\/p><h1 class="nav-title">Wake gently\.<br>Remember more\.<\/h1><\/header>/, 'Alarm header structure does not preserve Edit/Add inside the next-wake composition');
 assert.match(html, /#alarmList \.alarm-row:first-child\{[^}]*min-height:248px[^}]*border-radius:25px[^}]*background:var\(--premium-dark\)/, 'next enabled alarm is not presented as the dominant wake stage');
+assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\)\{[^}]*border-radius:18px[^}]*background:var\(--surface\)[^}]*overflow:hidden/, 'secondary alarms are not contained in rounded light blocks');
+assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{[^}]*min-height:78px[^}]*padding:0 16px[^}]*background:var\(--surface\)/, 'secondary alarm block content lacks consistent inset padding');
 assert.doesNotMatch(html, /Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header copy remains');
 assert.match(html, /\.statusbar\{display:none\}\.viewport\{inset:max\(env\(safe-area-inset-top\),12px\)/, 'installed iPhone still shows the simulated status bar');
 

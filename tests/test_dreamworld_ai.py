@@ -202,6 +202,73 @@ class ContractTests(unittest.TestCase):
                 "transcriptFingerprint": hashlib.sha256(b"different").hexdigest(),
             })
 
+    def test_punctuation_pass_adds_sentence_punctuation_without_changing_words(self):
+        request = api.validate_punctuation_request({
+            "clientVersion": 1,
+            "text": "i was in the garden and then the gate opened but nobody was there",
+        })
+        observed = {}
+
+        def caller(messages, timeout=0):
+            observed["messages"] = messages
+            observed["timeout"] = timeout
+            return {"text": "I was in the garden, and then the gate opened, but nobody was there."}, "test-punctuation-model"
+
+        result = api.restore_transcript_punctuation(request, caller)
+        self.assertEqual(result["text"], "I was in the garden, and then the gate opened, but nobody was there.")
+        self.assertEqual(result["provenance"]["method"], "punctuation-only-v1")
+        self.assertTrue(result["provenance"]["wordsPreserved"])
+        self.assertIn("periods", observed["messages"][0]["content"])
+        self.assertIn("commas", observed["messages"][0]["content"])
+        self.assertIn("untrusted_raw_transcript", observed["messages"][1]["content"])
+
+    def test_punctuation_pass_rejects_any_word_change(self):
+        source = "i walked beside the silver lake and found a key"
+        with self.assertRaisesRegex(api.UpstreamError, "changed transcript words"):
+            api.validate_punctuation_output(
+                {"text": "I walked beside the blue lake, and found a key."},
+                source,
+            )
+
+    def test_punctuation_pass_requires_basic_sentence_marks(self):
+        source = "i walked beside the silver lake and found a key"
+        with self.assertRaisesRegex(api.UpstreamError, "sentence punctuation"):
+            api.validate_punctuation_output({"text": source}, source)
+
+    def test_punctuation_pass_rejects_unicode_word_collisions_and_mark_deletion(self):
+        cases = (
+            ("straße", "strasse."),
+            ("oﬃce", "office."),
+            ("cafe\u0301", "cafe."),
+            ("K", "k."),
+            ("ſ", "s."),
+            ("Ω", "ω."),
+        )
+        for source, output in cases:
+            with self.subTest(source=source, output=output):
+                with self.assertRaisesRegex(api.UpstreamError, "changed transcript words"):
+                    api.validate_punctuation_output({"text": output}, source)
+
+    def test_punctuation_pass_rejects_non_punctuation_symbols_and_controls(self):
+        for inserted in ("💣", "©", "\u202e", "\u200b"):
+            with self.subTest(inserted=repr(inserted)):
+                with self.assertRaisesRegex(api.UpstreamError, "unsupported characters"):
+                    api.validate_punctuation_output({"text": f"hello {inserted} world."}, "hello world")
+        self.assertEqual(api.validate_punctuation_output({"text": "hello — world."}, "hello world"), "hello — world.")
+
+    def test_punctuation_pass_preserves_source_symbols_at_their_lexical_anchor(self):
+        source = "the price was $5 and the sign showed ©"
+        preserved = "The price was $5, and the sign showed ©."
+        self.assertEqual(api.validate_punctuation_output({"text": preserved}, source), preserved)
+        for changed in (
+            "The price was 5, and the sign showed ©.",
+            "The price was $5, and the sign showed.",
+            "© The price was $5, and the sign showed.",
+        ):
+            with self.subTest(changed=changed):
+                with self.assertRaisesRegex(api.UpstreamError, "changed transcript symbols"):
+                    api.validate_punctuation_output({"text": changed}, source)
+
     def test_model_output_has_no_storage_field_and_is_bounded(self):
         request = api.validate_analysis_request(request_payload())
         self.assertIn("tentative reading", api.validate_model_output(model_output(), request)["analysis"])
@@ -682,6 +749,27 @@ class HttpBoundaryTests(unittest.TestCase):
         with self.assertRaises(urllib.error.HTTPError) as caught:
             self.post("/v1/cancel", body)
         self.assertEqual(caught.exception.code, 404)
+        caught.exception.close()
+
+    def test_owner_only_punctuation_endpoint_preserves_words_and_returns_provenance(self):
+        source = "i entered the room and the windows were open but it was raining inside"
+        model_result = {"text": "I entered the room, and the windows were open, but it was raining inside."}
+        with patch.object(api, "call_hermes", return_value=(model_result, "test-punctuation-model")):
+            with self.post("/v1/punctuate", {"clientVersion": 1, "text": source}) as response:
+                payload = json.loads(response.read())
+        self.assertEqual(payload["text"], model_result["text"])
+        self.assertTrue(payload["provenance"]["wordsPreserved"])
+        self.assertEqual(payload["provenance"]["method"], "punctuation-only-v1")
+
+    def test_malformed_punctuation_request_is_rejected_before_quota_charge(self):
+        class RejectIfCharged:
+            def allow(self, _identity):
+                raise AssertionError("malformed requests must not consume quota")
+
+        with patch.object(api, "REQUEST_BUDGET", RejectIfCharged()):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                self.post("/v1/punctuate", {"clientVersion": 1, "text": "", "extra": True})
+        self.assertEqual(caught.exception.code, 400)
         caught.exception.close()
 
 

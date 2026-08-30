@@ -26,6 +26,7 @@ const dom = new JSDOM(source, {
     window.MediaRecorder = FakeMediaRecorder;
     window.fetch = async (url,options={}) => {
       if (String(url).includes('/dreamworld-stt/')) return { ok: true, json: async () => ({ text: 'I walked through a bright station beneath the lake.', provenance: { provider: 'OpenWhispr-compatible private engine', engine: 'whisper.cpp', model: 'small', processing: 'private-vps', audioRetainedByServer: false } }) };
+      if (String(url).includes('/dreamworld-ai/v1/punctuate')) { const request=JSON.parse(options.body); return { ok:true, json:async()=>({schemaVersion:1,text:request.text,provenance:{method:'punctuation-only-v1',model:'test-punctuation-model',wordsPreserved:true}}) }; }
       if (String(url).includes('/dreamworld-ai/v1/title')) { const request=JSON.parse(options.body); return { ok:true, json:async()=>({schemaVersion:1,title:'Bright Station Beneath Lake',summary:'The dreamer walked through a bright station beneath the lake.',transcriptFingerprint:request.transcriptFingerprint,provenance:{method:'anarlog-adapted-dream-title-summary-v1',model:'test-title-model',sourceGrounded:true}}) }; }
       throw new Error(`Unexpected fetch: ${url}`);
     };

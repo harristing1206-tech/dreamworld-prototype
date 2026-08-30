@@ -7,6 +7,9 @@ assert.match(html,/new Blob\(audioChunks/,'captured chunks are not preserved as 
 assert.match(html,/indexedDB\.open\(DRAFT_DB,2\)/,'raw audio draft and journal storage schema missing');
 assert.match(html,/form\.append\('file',blob/,'preserved audio is not sent to transcription');
 assert.match(html,/\/dreamworld-stt\/v1\/transcribe/,'private STT endpoint missing');
+assert.match(html,/\/dreamworld-ai\/v1\/punctuate/,'private punctuation endpoint missing');
+assert.match(html,/wordsPreserved!==true/,'punctuation pass does not verify that transcript words were preserved');
+assert.match(html,/Adding periods and commas privately/,'punctuation processing state is not disclosed');
 assert.match(html,/payload\.provenance\?\.engine!==\'whisper\.cpp\'/,'transcript provenance is not validated');
 assert.match(html,/data-log-state="transcription-failed"/,'recoverable transcription failure state missing');
 assert.match(html,/retryFailedTranscript/,'same-recording retry missing');

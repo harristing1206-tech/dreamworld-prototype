@@ -37,6 +37,20 @@ test('Ambient Paper softens the alarm page and every non-primary card', () => {
   assert.match(html, /button:focus-visible[^}]*outline:3px solid var\(--accent\)/, 'card controls must retain visible keyboard focus');
 });
 
+test('bottom navigation floats over visible scroll content', () => {
+  assert.match(html, /:root\{[^}]*--tabbar-bg:rgba\(250,250,248,\.76\)/, 'light navigation material must be translucent');
+  assert.match(html, /:root\[data-theme="dark"\]\{[^}]*--tabbar-bg:rgba\(12,14,17,\.76\)/, 'dark navigation material must be translucent');
+  const bar = html.match(/\.tabbar\{([^}]*left:24px[^}]*)\}/);
+  assert.ok(bar, 'floating navigation geometry missing');
+  assert.match(bar[1], /right:24px/);
+  assert.match(bar[1], /border-radius:32px/);
+  assert.match(bar[1], /backdrop-filter:blur\(22px\) saturate\(140%\)/, 'navigation must blur the content visible behind it');
+  assert.match(html, /\.viewport\{inset-bottom:0\}/, 'scrolling content must extend behind the floating navigation');
+  assert.match(html, /\.screen\{padding-top:8px;padding-bottom:calc\(96px \+ env\(safe-area-inset-bottom\)\)\}/, 'screen needs enough end padding to keep final actions reachable above the overlay');
+  assert.match(html, /\.log-screen \.capture-state\{[^}]*inset:148px 24px calc\(96px \+ env\(safe-area-inset-bottom\)\)/, 'ready capture controls must clear the navigation overlay');
+  assert.match(html, /\.log-screen \.capture-state\.active:not\(\[data-log-state="ready"\]\)\{inset:0 0 calc\(96px \+ env\(safe-area-inset-bottom\)\) 0;padding:24px/, 'non-ready capture controls must clear the navigation overlay');
+});
+
 test('alarm cards use a compact rectangular hierarchy', () => {
   const primaryRow = html.match(/#alarmList \.alarm-row:first-child\{([^}]+)\}/);
   const primaryMain = html.match(/#alarmList \.alarm-row:first-child \.swipe-main\{([^}]+)\}/);

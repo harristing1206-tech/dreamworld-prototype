@@ -17,9 +17,9 @@ assert.match(html, /\.list-toolbar\{[^}]*justify-content:space-between/, 'Edit a
 assert.match(html, /\.alarm-add\{[^}]*width:44px[^}]*height:44px/, 'Alarm Add action is not a full touch target');
 assert.match(html, /\.alarm-row \.swipe-main\{[^}]*min-height:84px[^}]*padding:7px 0/, 'Alarm rows are not compact');
 assert.match(html, /\.alarm-edit\{[^}]*min-height:72px/, 'Alarm row edit target is too small');
-assert.match(html, /--tabbar-height:76px/, 'compact tab bar height missing');
-assert.match(html, /\.viewport\{[^}]*calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/, 'viewport does not follow the compact safe-area tab bar');
-assert.match(html, /\.tabbar\{[^}]*height:calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)[^}]*align-items:center/, 'tab bar is not compact and vertically centered');
+assert.match(html, /\.viewport\{inset-bottom:0\}/, 'viewport must extend behind the floating tab bar');
+assert.match(html, /\.screen\{padding-top:8px;padding-bottom:calc\(96px \+ env\(safe-area-inset-bottom\)\)\}/, 'scroll content does not retain reachable bottom clearance');
+assert.match(html, /\.tabbar\{left:24px;right:24px;[^}]*height:64px[^}]*border-radius:32px[^}]*backdrop-filter:blur\(22px\) saturate\(140%\)/, 'tab bar is not a compact translucent floating capsule');
 assert.match(html, /\.tab\{[^}]*min-height:52px[^}]*align-items:center[^}]*justify-content:center/, 'tab icons are not centered in their grid cells');
 assert.match(html, /\.tab:before\{[^}]*width:42px[^}]*height:38px[^}]*border-radius:19px[^}]*background:var\(--raised\)/, 'restrained selected-tab treatment is missing');
 assert.match(html, /\.tab\.active:not\(\.log-tab\):before\{[^}]*opacity:\.62[^}]*scale\(1\)/, 'selected-tab treatment does not activate');

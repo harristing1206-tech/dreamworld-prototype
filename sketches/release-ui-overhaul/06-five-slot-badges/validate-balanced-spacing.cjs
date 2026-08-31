@@ -30,8 +30,8 @@ assert.match(html, /#alarmList \.alarm-row:first-child\{[^}]*min-height:248px[^}
 assert.match(html, /#alarmList \.alarm-row:first-child:before\{[^}]*left:-150px[^}]*top:auto[^}]*bottom:-145px[^}]*background:rgba\(239,241,235,\.26\)[^}]*filter:blur\(68px\)/, 'main alarm fade does not originate below the bottom-left corner');
 assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-time\{[^}]*text-shadow:0 2px 16px rgba\(0,0,0,\.38\)/, 'main alarm time loses contrast over the bottom-left fade');
 assert.match(html, /#alarmList \.alarm-row:first-child \.swipe-main\{[^}]*background:transparent/, 'main alarm content layer obscures the faded material field');
-assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\)\{[^}]*border-radius:18px[^}]*background:var\(--surface\)[^}]*overflow:hidden/, 'secondary alarms are not contained in rounded light blocks');
-assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{[^}]*min-height:78px[^}]*padding:0 16px[^}]*background:var\(--surface\)/, 'secondary alarm block content lacks consistent inset padding');
+assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\)\{[^}]*border:0[^}]*outline:0[^}]*border-radius:24px[^}]*background:#fffffe[^}]*overflow:hidden/, 'secondary alarms do not use the Ambient Paper surface');
+assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{[^}]*min-height:78px[^}]*padding:0 16px[^}]*background:inherit/, 'secondary alarm paper content lacks consistent inset padding');
 assert.doesNotMatch(html, /Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header copy remains');
 assert.match(html, /\.statusbar\{display:none\}\.viewport\{inset:max\(env\(safe-area-inset-top\),12px\)/, 'installed iPhone still shows the simulated status bar');
 

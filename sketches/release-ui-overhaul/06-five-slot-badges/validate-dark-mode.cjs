@@ -9,11 +9,13 @@ const dom=new JSDOM(source,{runScripts:'dangerously',url:'https://preview.test/d
 const d=dom.window.document,wait=ms=>new Promise(resolve=>dom.window.setTimeout(resolve,ms));
 (async()=>{
   await wait(20);
-  assert.match(source,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--body-bg:#000000;[\s\S]*--surface:#18211b;[\s\S]*--ink:#f1f3ed;[\s\S]*--tabbar-bg:rgba\(0,0,0,\.97\)/);
-  assert.match(source,/--bubble-outline:rgba\(210,216,211,\.22\)/,'dark bubble outline token missing');
+  assert.match(source,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--body-bg:#000000;[\s\S]*--surface:#171a20;[\s\S]*--raised:#232730;[\s\S]*--ink:#f1f3ed;[\s\S]*--tabbar-bg:rgba\(0,0,0,\.97\)/);
+  assert.match(source,/--bubble-outline:rgba\(216,222,232,\.20\)/,'neutral dark bubble outline token missing');
   assert.match(source,/:root\[data-theme="dark"\] :is\([^}]*\.tabbar[^}]*\.insights-hero[^}]*\.insights-calendar[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/,'remaining dark-mode bubbles and calendar do not share the thin gray outline');
   assert.doesNotMatch(source,/:root\[data-theme="dark"\] :is\([^}]*#alarmList \.alarm-row/,'Ambient Paper alarm cards must stay outside the legacy outline group');
   assert.match(source,/:root\[data-theme="dark"\] \.alarm-list \.alarm-row:not\(:first-child\)\{background:var\(--surface\);color:var\(--ink\);box-shadow:0 16px 38px rgba\(0,0,0,\.22\)\}/,'dark secondary alarms lack the Ambient Paper override');
+  assert.match(source,/:root\[data-theme="dark"\] \.insights-hero\{background:#06264d;color:#f4f8ff;box-shadow:0 18px 42px rgba\(0,111,230,\.24\)\}/,'dark Recall Index does not use the vibrant blue field');
+  assert.match(source,/:root\[data-theme="dark"\] \.insights-hero:after\{background:rgba\(34,155,255,\.72\);filter:blur\(52px\)\}/,'dark Recall Index blue fade is missing');
   assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child\{background:#d9dcd8;color:#142019\}/,'main alarm bubble does not finish in the requested soft gray in dark mode');
   assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child:before\{background:rgba\(0,0,0,\.72\)\}/,'dark-mode main alarm lacks the visible opposite black-to-white fade');
   assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-time\{color:#f5f7f3;[^}]*text-shadow:0 2px 16px rgba\(0,0,0,\.48\)/,'inverted main alarm time lacks contrast over the black corner');

@@ -7,7 +7,7 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'sketches', 'release-ui-
 
 test('bottom navigation is slightly shorter with labels closer to icons', () => {
   assert.match(html, /--tabbar-height:68px/);
-  assert.match(html, /--type-label-size:11px;--type-label-line:1\.08;--type-label-weight:600/);
+  assert.match(html, /--type-label-size:11px;--type-label-line:1\.08;--type-label-weight:550/);
   assert.match(html, /\.tab\{min-height:58px;padding:1px 1px 1px;flex-direction:column;gap:0\}/);
   assert.match(html, /\.tab svg\{width:20px;height:20px\}/);
   assert.match(html, /\.tab-label\{[^}]*font-size:var\(--type-label-size\)/);

@@ -9,7 +9,7 @@ const dom=new JSDOM(source,{runScripts:'dangerously',url:'https://preview.test/d
 const d=dom.window.document,wait=ms=>new Promise(resolve=>dom.window.setTimeout(resolve,ms));
 (async()=>{
   await wait(20);
-  assert.match(source,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--body-bg:#000000;[\s\S]*--surface:#171a20;[\s\S]*--raised:#232730;[\s\S]*--ink:#f1f3ed;[\s\S]*--tabbar-bg:rgba\(0,0,0,\.97\)/);
+  assert.match(source,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--body-bg:#000000;[\s\S]*--surface:#171a20;[\s\S]*--raised:#232730;[\s\S]*--ink:#f1f3ed;[\s\S]*--tabbar-bg:#000000/);
   assert.match(source,/--bubble-outline:rgba\(216,222,232,\.20\)/,'neutral dark bubble outline token missing');
   assert.match(source,/:root\[data-theme="dark"\] :is\([^}]*\.tabbar[^}]*\.insights-hero[^}]*\.insights-calendar[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/,'remaining dark-mode bubbles and calendar do not share the thin gray outline');
   assert.doesNotMatch(source,/:root\[data-theme="dark"\] :is\([^}]*#alarmList \.alarm-row/,'Ambient Paper alarm cards must stay outside the legacy outline group');

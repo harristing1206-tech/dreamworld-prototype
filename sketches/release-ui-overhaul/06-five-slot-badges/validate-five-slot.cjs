@@ -51,7 +51,7 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.querySelectorAll('.tab').length, 5);
   const tabs = [...d.querySelectorAll('.tab')];
   assert.deepEqual(tabs.map(tab => tab.getAttribute('aria-label')), ['Alarm', 'History', 'Log a dream', 'Insights', 'Profile']);
-  assert.ok(tabs.every(tab => tab.textContent.trim() === ''), 'bottom navigation must remain icon-only');
+  assert.deepEqual(tabs.map(tab => tab.querySelector('.tab-label')?.textContent.trim()), ['Alarm', 'History', 'Log', 'Insights', 'Profile'], 'bottom navigation must visibly label every destination');
   assert.ok(d.querySelector('[data-tab="log"] .plus-disc'), 'center Log action must be a raised plus disc');
   assert.equal(d.querySelectorAll('.tab.active').length, 1);
   assert.equal(d.querySelector('.tab[aria-current="page"]').dataset.tab, 'alarm');

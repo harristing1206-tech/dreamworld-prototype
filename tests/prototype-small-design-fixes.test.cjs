@@ -37,6 +37,24 @@ test('Ambient Paper softens the alarm page and every non-primary card', () => {
   assert.match(html, /button:focus-visible[^}]*outline:3px solid var\(--accent\)/, 'card controls must retain visible keyboard focus');
 });
 
+test('bottom navigation spans edge to edge and labels every destination', () => {
+  assert.match(html, /--tabbar-height:82px/, 'labeled navigation needs the taller full-width height token');
+  const bar = html.match(/\.tabbar\{left:0;right:0;bottom:0;([^}]+)\}/);
+  assert.ok(bar, 'edge-to-edge navigation geometry missing');
+  assert.match(bar[1], /height:calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(bar[1], /border-radius:0/);
+  assert.match(bar[1], /outline:0/);
+  assert.match(html, /:root\[data-theme="light"\] \.tabbar,:root\[data-theme="dark"\] \.tabbar\{outline:0\}/, 'theme bubble outline must not re-wrap the full-width bar');
+  assert.match(html, /--tabbar-bg:#ffffff/, 'light navigation surface must be opaque');
+  assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--tabbar-bg:#000000/, 'dark navigation surface must be opaque');
+  assert.match(html, /\.tab-label\{[^}]*color:var\(--muted\)[^}]*font-size:10px/, 'visible tab-label styling missing');
+  assert.ok(contrastRatio('#667168', '#ffffff') >= 4.5, 'light inactive labels must retain WCAG AA text contrast');
+  for (const [tab, label] of [['alarm', 'Alarm'], ['history', 'History'], ['log', 'Log'], ['insights', 'Insights'], ['profile', 'Profile']]) {
+    assert.match(html, new RegExp(`data-tab="${tab}"[\\s\\S]*?<span class="tab-label">${label}<\\/span>[\\s\\S]*?<\\/button>`), `${label} tab title missing`);
+  }
+  assert.match(html, /@media\(display-mode:standalone\),\(max-width:500px\) and \(pointer:coarse\)\{[\s\S]*?\.tabbar\{bottom:0;[^}]*height:calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/, 'installed mode must remain edge to edge through the safe area');
+});
+
 test('alarm cards use a compact rectangular hierarchy', () => {
   const primaryRow = html.match(/#alarmList \.alarm-row:first-child\{([^}]+)\}/);
   const primaryMain = html.match(/#alarmList \.alarm-row:first-child \.swipe-main\{([^}]+)\}/);

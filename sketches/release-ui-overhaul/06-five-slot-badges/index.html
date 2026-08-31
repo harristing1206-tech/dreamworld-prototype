@@ -46,14 +46,14 @@
       --radius:13px;
       --page-gutter:clamp(24px,6vw,30px);
       --control-size:44px;
-      --tabbar-height:72px;
+      --tabbar-height:68px;
       --device-width:402;
       --device-height:840;
       --font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
       --type-display-size:31px;--type-display-line:1.06;--type-display-weight:700;--type-display-tracking:-.03em;
       --type-body-size:16px;--type-body-line:1.5;--type-body-weight:400;
       --type-meta-size:13px;--type-meta-line:1.35;--type-meta-weight:500;
-      --type-label-size:11px;--type-label-line:1.2;--type-label-weight:600;
+      --type-label-size:11px;--type-label-line:1.08;--type-label-weight:600;
       font-family:var(--font-ui);
     }
     :root[data-theme="dark"]{
@@ -114,7 +114,7 @@
     .insights-calendar{margin-top:15px;padding:15px 12px 12px;border:1px solid var(--separator);border-radius:14px;background:var(--surface)}.calendar-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.calendar-toolbar h2{margin:0;font-size:17px;font-weight:700}.calendar-legend{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11px}.calendar-legend:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--highlight)}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.calendar-weekdays span{display:grid;place-items:center;height:24px;color:var(--faint);font-size:10px;font-weight:700}.calendar-day{position:relative;width:100%;max-width:44px;height:auto;min-width:0;min-height:0;aspect-ratio:1/1;justify-self:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);display:grid;place-items:center;font-size:13px;cursor:pointer}.calendar-day:hover{background:rgba(77,112,79,.08)}.calendar-day.has-dream{padding-bottom:5px;background:var(--raised);color:var(--ink);font-weight:700}.calendar-day.has-dream:after{content:"";position:absolute;bottom:2px;width:5px;height:5px;border-radius:50%;background:var(--highlight)}.calendar-day.selected{outline:2px solid var(--accent);outline-offset:1px}.calendar-blank{width:100%;max-width:44px;aspect-ratio:1/1;justify-self:center}
     .insight-metrics{margin-top:20px;border-top:1px solid var(--separator)}.insight-metric{min-height:60px;display:flex;align-items:center;border-bottom:1px solid var(--separator)}.metric-symbol{display:none}.metric-copy{flex:1;min-width:0}.metric-copy strong{display:block;font-size:14px;font-weight:600}.metric-copy span{display:block;margin-top:3px;color:var(--muted);font-size:11px}.metric-value{text-align:right}.metric-value strong{display:block;font-size:17px;font-weight:700}.metric-value span{display:block;margin-top:3px;color:var(--muted);font-size:10px}
     .insight-detail{margin-top:20px;padding:16px;border:1px solid var(--separator);border-radius:14px;background:var(--surface)}.insight-detail-date{margin:0;color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.insight-detail h2{margin:7px 0 13px;font-size:20px}.detail-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.detail-fact strong{display:block;font-size:15px}.detail-fact span{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.25}.insights-disclosure{margin:18px 0 0;color:var(--muted);font-size:11px;line-height:1.45}
-    .profile-head{padding:8px 0 22px;border-bottom:1px solid var(--separator)}.profile-avatar{width:54px;height:54px;margin-bottom:14px;display:grid;place-items:center;border-radius:50%;background:var(--raised);color:var(--accent);font-size:19px;font-weight:700}.profile-head h1{margin:0;font-size:30px;letter-spacing:-.028em}.profile-head p{margin:6px 0 0;color:var(--muted);font-size:13px}.profile-stats{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:20px;background:transparent}.profile-stats:after{content:"";position:absolute;top:10px;bottom:10px;left:50%;width:1px;background:var(--separator)}.profile-stat{padding:14px 0;background:transparent;text-align:left}.profile-stat strong{display:block;font-size:21px;font-weight:700}.profile-stat span{color:var(--muted);font-size:11px}
+    .profile-head{padding:18px 0 20px}.profile-head h1{margin:0;font-size:30px;line-height:1.08;letter-spacing:-.028em}.profile-identity{width:100%;min-height:92px;padding:8px 0 18px;border:0;border-bottom:1px solid var(--separator);background:none;color:var(--ink);display:flex;align-items:center;gap:16px;cursor:pointer}.profile-avatar{width:64px;height:64px;flex:0 0 64px;display:grid;place-items:center;border-radius:50%;background:var(--raised);color:var(--accent);font-size:20px;font-weight:700}.profile-identity-copy{flex:1;min-width:0;text-align:left}.profile-identity-copy strong{display:block;font-size:17px;font-weight:600}.profile-identity-copy span{display:block;margin-top:4px;color:var(--muted);font-size:13px}.profile-chevron{font-size:28px;line-height:1;color:var(--ink)}.settings-heading{margin:34px 0 12px;font-size:23px;line-height:1.15;letter-spacing:-.02em}
     .alarm-head{padding-top:8px}.alarm-add{width:44px;height:44px;flex:0 0 44px;padding:0;border:0;background:none;color:var(--accent);display:grid;place-items:center;cursor:pointer}.alarm-add svg{width:25px;height:25px}.alarm-list{margin-top:18px;border-top:1px solid var(--separator)}.alarm-row .swipe-main{min-height:84px;padding:7px 0;display:flex;align-items:center;gap:12px}.alarm-edit{flex:1;min-width:0;min-height:72px;padding:0;border:0;background:none;color:var(--ink);display:flex;align-items:center;text-align:left;cursor:pointer}.alarm-copy{flex:1;min-width:0}.alarm-time{font-size:36px;line-height:1;letter-spacing:-.035em;font-weight:400;font-variant-numeric:tabular-nums}.alarm-time span{font-size:16px;letter-spacing:0;color:var(--muted)}.alarm-time .alarm-value{font-size:inherit;letter-spacing:inherit;color:inherit}.alarm-detail{margin-top:6px;color:var(--muted);font-size:var(--type-meta-size);line-height:var(--type-meta-line);font-weight:var(--type-meta-weight);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .swipe-row{--swipe-reveal:0px;--trash-shift:0px;position:relative;overflow:hidden;border-bottom:1px solid var(--separator);touch-action:pan-y;contain:paint}.swipe-main{position:relative;z-index:2;width:100%;background:var(--canvas);transition:transform 240ms cubic-bezier(.22,.61,.36,1),width 240ms cubic-bezier(.22,.61,.36,1);will-change:transform,width;backface-visibility:hidden}.swipe-actions{position:absolute;z-index:1;inset:0;display:flex;justify-content:flex-end;background:var(--danger);opacity:0}.swipe-row.swiping .swipe-actions,.swipe-row.actions-open .swipe-actions{opacity:1}.swipe-action{min-width:72px;min-height:44px;border:0;background:transparent;color:white;cursor:pointer}.swipe-action.delete{width:100%;padding:0 24px;display:flex;align-items:center;justify-content:flex-end}.swipe-action.delete svg{width:20px;height:20px;transform:translate3d(calc(0px - var(--trash-shift)),0,0);will-change:transform}.swipe-row.actions-open{--swipe-reveal:88px;--trash-shift:10px}.swipe-row.actions-open .swipe-main{transform:translate3d(-88px,0,0)}.edit-minus{position:absolute;z-index:4;left:0;top:50%;width:26px;height:26px;padding:0;border:0;border-radius:50%;background:var(--danger);opacity:0;transform:translate3d(-10px,-50%,0) scale(.65);pointer-events:none;transition:opacity 240ms cubic-bezier(.22,.61,.36,1),transform 240ms cubic-bezier(.22,.61,.36,1);cursor:pointer}.edit-minus:after{content:'';position:absolute;left:7px;right:7px;top:12px;height:2px;border-radius:2px;background:white}.editing .edit-minus{opacity:1;transform:translate3d(0,-50%,0) scale(1);pointer-events:auto}.editing .swipe-row .swipe-main{width:calc(100% - 34px);transform:translate3d(34px,0,0)}.editing .swipe-actions{left:auto;width:88px;background:transparent}.editing .swipe-row.actions-open .swipe-actions{background:var(--danger)}.editing .swipe-row.actions-open .swipe-main{width:calc(100% - 122px);transform:translate3d(34px,0,0)}.editing .history-entry h2,.editing .history-entry-date{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.edit-chevron{display:none;margin-left:auto;color:var(--faint);font-size:22px}.editing .alarm-row .switch{display:none}.editing .alarm-row .edit-chevron{display:block}.editing .history-entry:after{content:'›';position:absolute;right:8px;top:50%;color:var(--faint);font-size:22px;transform:translateY(-50%)}
     .switch{position:relative;width:51px;height:31px;flex:0 0 auto;border:0;border-radius:18px;background:var(--switch-off);cursor:pointer;transition:.18s}.switch:after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:.18s}.switch.on{background:var(--alarm-on)}.switch.on:after{transform:translateX(20px)}
@@ -137,7 +137,7 @@
     :root{
       --canvas:#ffffff;--body-bg:#ffffff;--surface:#ffffff;--raised:#f1f2ef;--ink:#1f252b;
       --muted:#66707a;--faint:#8b939b;--accent:#1f252b;--active:#1f252b;--highlight:#c96f4a;
-      --tabbar-height:72px;--radius:18px;--page-gutter:24px;
+      --tabbar-height:68px;--radius:18px;--page-gutter:24px;
       --premium-dark:#101820;--premium-raised:#1c242c;--premium-line:rgba(232,236,240,.13);--bubble-outline:rgba(35,43,51,.18);
     }
     :root[data-theme="dark"]{
@@ -152,10 +152,10 @@
     .screen{padding-top:8px;padding-bottom:44px}
     .date,.log-kicker{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
     .nav-title,.greeting,.log-title{font-size:var(--type-display-size);line-height:var(--type-display-line);letter-spacing:var(--type-display-tracking);font-weight:var(--type-display-weight)}
-    .tabbar{left:0;right:0;bottom:0;height:calc(var(--tabbar-height) + env(safe-area-inset-bottom));padding:6px max(8px,calc(env(safe-area-inset-right) + 4px)) max(6px,env(safe-area-inset-bottom)) max(8px,calc(env(safe-area-inset-left) + 4px));border:0;border-top:1px solid var(--separator);border-radius:0;outline:0;background:var(--tabbar-bg);box-shadow:0 -10px 30px rgba(25,32,40,.08)}
+    .tabbar{left:0;right:0;bottom:0;height:calc(var(--tabbar-height) + env(safe-area-inset-bottom));padding:4px max(8px,calc(env(safe-area-inset-right) + 4px)) max(4px,env(safe-area-inset-bottom)) max(8px,calc(env(safe-area-inset-left) + 4px));border:0;border-top:1px solid var(--separator);border-radius:0;outline:0;background:var(--tabbar-bg);box-shadow:0 -10px 30px rgba(25,32,40,.08)}
     .viewport{inset-bottom:calc(var(--tabbar-height) + env(safe-area-inset-bottom))}
-    .tab{min-height:62px;padding:2px 1px 2px;flex-direction:column;gap:2px}.tab:before{display:none}.tab svg{width:20px;height:20px}.tab-label{position:relative;z-index:1;display:block;color:var(--muted);font-size:var(--type-label-size);line-height:var(--type-label-line);font-weight:var(--type-label-weight);letter-spacing:.01em;white-space:nowrap}.tab.active .tab-label{color:var(--accent);font-weight:700}
-    .tab.log-tab{transform:none;gap:2px}.tab.log-tab .plus-disc{width:44px;height:44px;min-width:44px;min-height:44px;flex-basis:44px;background:var(--ink);color:var(--canvas);box-shadow:none}.tab.log-tab svg{width:23px;height:23px}.tab.log-tab.active .plus-disc{box-shadow:0 0 0 3px color-mix(in srgb,var(--highlight) 30%,transparent)}
+    .tab{min-height:58px;padding:1px 1px 1px;flex-direction:column;gap:0}.tab:before{display:none}.tab svg{width:20px;height:20px}.tab-label{position:relative;z-index:1;display:block;color:var(--muted);font-size:var(--type-label-size);line-height:var(--type-label-line);font-weight:var(--type-label-weight);letter-spacing:.01em;white-space:nowrap}.tab.active .tab-label{color:var(--accent);font-weight:700}
+    .tab.log-tab{transform:none;gap:0}.tab.log-tab .plus-disc{width:44px;height:44px;min-width:44px;min-height:44px;flex-basis:44px;background:var(--ink);color:var(--canvas);box-shadow:none}.tab.log-tab svg{width:23px;height:23px}.tab.log-tab.active .plus-disc{box-shadow:0 0 0 3px color-mix(in srgb,var(--highlight) 30%,transparent)}
 
     /* Alarm becomes a next-wake stage, not a flat utility list. */
     :root[data-theme="light"] .screen[data-screen="alarm"]{background:#f7f7f5}
@@ -217,9 +217,9 @@
     .insight-metrics{margin-top:20px}.insight-metric{min-height:66px;gap:0}.metric-symbol{display:none}.metric-copy strong{font-size:14px}.metric-copy span{max-width:190px}.metric-value strong{font-size:17px}.insight-detail{border-radius:18px;padding:18px}
 
     /* Profile is identity first; settings remain quiet native rows. */
-    .profile-head{margin:0 -6px;padding:20px 6px 26px}.profile-avatar{width:52px;height:52px;margin:0 0 18px;border-radius:17px;font-size:18px}.profile-head h1{font-size:30px}.profile-head p{max-width:270px}.profile-stats{margin-top:24px;gap:24px}.profile-stat strong{font-size:26px}.section-label{margin-top:26px}.settings-group{margin-top:0}.setting-row{min-height:62px}.setting-icon{width:28px;height:28px;border-radius:0;background:transparent}.setting-icon svg{width:20px;height:20px}
+    .profile-head{margin:0;padding:18px 0 20px}.profile-head h1{font-size:30px}.section-label{margin-top:24px}.settings-group{margin-top:0}.setting-row{min-height:60px}.setting-icon{width:28px;height:28px;border-radius:0;background:transparent}.setting-icon svg{width:20px;height:20px}
 
-    @media(display-mode:standalone),(max-width:500px) and (pointer:coarse){.statusbar{display:none}.viewport{inset-top:max(12px,env(safe-area-inset-top))}.tabbar{bottom:0;padding-bottom:max(6px,env(safe-area-inset-bottom));height:calc(var(--tabbar-height) + env(safe-area-inset-bottom))}}
+    @media(display-mode:standalone),(max-width:500px) and (pointer:coarse){.statusbar{display:none}.viewport{inset-top:max(12px,env(safe-area-inset-top))}.tabbar{bottom:0;padding-bottom:max(4px,env(safe-area-inset-bottom));height:calc(var(--tabbar-height) + env(safe-area-inset-bottom))}}
   </style>
 </head>
 <body>
@@ -295,7 +295,9 @@
       </section>
 
       <section class="screen" data-screen="profile" aria-label="Profile and settings">
-        <header class="profile-head"><div class="profile-avatar">H</div><h1>My Dreamworld</h1><p>Your profile, privacy, and app settings.</p><div class="profile-stats"><div class="profile-stat"><strong id="profileDreamCount">6</strong><span>Dreams logged</span></div><div class="profile-stat"><strong id="profileDreamNights">6</strong><span>Dream nights</span></div></div></header>
+        <header class="profile-head"><h1>My Dream World</h1></header>
+        <button class="profile-identity" id="showProfile" type="button" aria-label="Show Harris profile"><span class="profile-avatar">H</span><span class="profile-identity-copy"><strong>Harris</strong><span>Show profile</span></span><span class="profile-chevron" aria-hidden="true">›</span></button>
+        <h2 class="settings-heading">Settings</h2>
         <p class="section-label">Appearance</p>
         <div class="settings-group"><button class="setting-row setting-button" id="appearanceSetting" type="button" aria-label="Change appearance, currently Light"><span class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 15.5A8 8 0 1 1 8.5 4 6.5 6.5 0 0 0 20 15.5Z"/></svg></span><span class="setting-copy"><strong>Appearance</strong><span>Choose light or dark mode</span></span><span class="status" id="appearanceStatus">Light</span></button></div>
         <p class="section-label">Alarms</p>
@@ -463,8 +465,7 @@
     document.getElementById('insightAverageSleep').textContent=formatMinutes(averageSleep);
     document.getElementById('insightAverageDream').textContent=formatSeconds(averageRecording);
     document.getElementById('insightRecall').textContent=ratedRecords.length?`${clearRecall} of ${ratedRecords.length}`:'Not rated';
-    document.getElementById('profileDreamCount').textContent=String(dreamCount);
-    document.getElementById('profileDreamNights').textContent=String(new Set(journalRecords.map(record=>record.dateKey)).size);
+
     const recallIndex=document.getElementById('recallIndex');if(recallIndex)recallIndex.textContent=String(ratedRecords.length?Math.round(clearRecall/ratedRecords.length*100):0);
   };
   const showTab=name=>{screens.forEach(s=>s.classList.toggle('active',s.dataset.screen===name));tabs.forEach(t=>{const selected=t.dataset.tab===name;t.classList.toggle('active',selected);if(selected)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});if(name!=='log'){recordingRequestGeneration+=1;recordingStartInFlight=false;clearInterval(ticker);if(mediaRecorder?.state==='recording')mediaRecorder.stop()}};
@@ -508,6 +509,7 @@
   tabs.forEach(tab=>tab.addEventListener('click',()=>{showTab(tab.dataset.tab);if(tab.dataset.tab==='log')void enterLog()}));
   document.querySelectorAll('[data-tab-target]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tabTarget)));
   document.getElementById('appearanceSetting').addEventListener('click',cycleAppearance);
+  document.getElementById('showProfile').addEventListener('click',()=>showToast('Your profile details are private in this prototype.'));
   applyAppearance(appearancePreference);
   const historyFocus=document.getElementById('historyFocus');let historySwipe=null;
   document.getElementById('historyFocusBack').addEventListener('click',()=>closeDreamDetail());

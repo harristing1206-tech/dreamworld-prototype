@@ -97,7 +97,9 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
 
   d.querySelector('[data-tab="profile"]').click();
   assert.ok(d.querySelector('[data-screen="profile"]').classList.contains('active'));
-  assert.equal(d.getElementById('profileDreamNights').textContent, '6');
+  assert.equal(d.querySelector('.profile-head h1').textContent, 'My Dream World');
+  assert.equal(d.querySelector('.profile-identity-copy strong').textContent, 'Harris');
+  assert.equal(d.querySelector('.profile-identity-copy span').textContent, 'Show profile');
 
   d.querySelector('[data-tab="log"]').click();
   assert.ok(d.querySelector('[data-screen="log"]').classList.contains('active'));
@@ -116,8 +118,6 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   d.getElementById('saveDream').click();
   await wait(30);
   assert.ok(d.querySelector('[data-log-state="logged"]').classList.contains('active'));
-  assert.equal(d.getElementById('profileDreamCount').textContent, '1');
-  assert.equal(d.getElementById('profileDreamNights').textContent, '1');
   assert.equal(d.querySelectorAll('#historyList .history-entry').length,1);
   const todayButton=d.querySelector('#insightsCalendar [data-day="26"]');
   assert.ok(todayButton.classList.contains('has-dream'),'saved dream must mark its calendar date');
@@ -145,7 +145,6 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.querySelectorAll('#historyList .history-entry').length,1,'cancel must preserve dream');
   dreamRow.querySelector('.swipe-action.delete').click();d.getElementById('confirmDelete').click();await wait(25);
   assert.equal(d.querySelectorAll('#historyList .history-entry').length,0,'confirmed delete must remove dream');
-  assert.equal(d.getElementById('profileDreamCount').textContent,'0');
   assert.equal(d.querySelector('#insightsCalendar [data-day="26"]').classList.contains('has-dream'),false);
   d.getElementById('editDreams').click();
 

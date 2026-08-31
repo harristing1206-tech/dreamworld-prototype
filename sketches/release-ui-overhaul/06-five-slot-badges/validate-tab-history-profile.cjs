@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict');const fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
-assert.match(html,/\.tab\.log-tab\{[^}]*translateY\(-4px\)/,'center plus is not aligned with tab icons');
-assert.match(html,/\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px/,'center plus size changed');
+assert.match(html,/\.tab\.log-tab\{transform:none;gap:0\}/,'center plus is not aligned with the compact tab row');
+assert.match(html,/\.tab\.log-tab \.plus-disc\{[^}]*width:44px[^}]*height:44px/,'center plus compact size changed');
 assert.match(html,/\.history-entry\{[^}]*grid-template-columns:50px minmax\(0,1fr\)[^}]*min-height:86px[^}]*padding:12px 0 13px/,'History rows do not use the compact editorial date rail');
 assert.match(html,/\.history-date-rail strong\{[^}]*font-size:21px/,'History date rail lacks compact numeric hierarchy');
 assert.match(html,/\.history-entry-excerpt\{[^}]*font-size:12px[^}]*white-space:nowrap[^}]*text-overflow:ellipsis/,'History excerpts are not bounded to one compact line');
@@ -10,8 +10,9 @@ assert.match(html,/button\.append\(rail,title,date,excerpt,arrow\)/,'History row
 assert.match(html,/historyFocus\.addEventListener\('touchstart'/,'dream detail swipe start is missing');
 assert.match(html,/historySwipe\.dx>=72/,'swipe-right release threshold is missing');
 assert.match(html,/event\.preventDefault\(\)[\s\S]*translateX/,'horizontal swipe feedback is missing');
-assert.match(html,/\.profile-stats\{[^}]*gap:32px/,'Profile statistics lack center breathing room');
-assert.match(html,/\.profile-stats:after\{[^}]*left:50%/,'Profile center divider is missing');
-assert.match(html,/\.profile-stat\{[^}]*text-align:left/,'Profile statistics do not align from the left edge of their columns');
-assert.doesNotMatch(html,/\.profile-stat:last-child\{[^}]*text-align:right/,'Dream Nights still aligns to the far right');
+assert.match(html,/<header class="profile-head"><h1>My Dream World<\/h1><\/header>/,'Profile title hierarchy is missing');
+assert.match(html,/class="profile-identity"[^>]*aria-label="Show Harris profile"/,'Profile identity row is missing');
+assert.match(html,/\.profile-identity\{[^}]*min-height:92px[^}]*border-bottom:1px solid var\(--separator\)/,'Profile identity row lacks native separation');
+assert.match(html,/<h2 class="settings-heading">Settings<\/h2>/,'Settings heading is missing');
+assert.doesNotMatch(html,/profile-stats|profileDreamCount|profileDreamNights/,'legacy profile statistics remain');
 console.log('DREAMWORLD_TAB_HISTORY_PROFILE_REFINEMENT_VERIFIED');

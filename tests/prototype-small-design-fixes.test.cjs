@@ -38,7 +38,7 @@ test('Ambient Paper softens the alarm page and every non-primary card', () => {
 });
 
 test('bottom navigation spans edge to edge and labels the four destination tabs', () => {
-  assert.match(html, /--tabbar-height:72px/, 'labeled navigation needs the compact full-width height token');
+  assert.match(html, /--tabbar-height:68px/, 'labeled navigation needs the compact full-width height token');
   const bar = html.match(/\.tabbar\{left:0;right:0;bottom:0;([^}]+)\}/);
   assert.ok(bar, 'edge-to-edge navigation geometry missing');
   assert.match(bar[1], /height:calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/);
@@ -70,9 +70,9 @@ test('alarm cards use a compact rectangular hierarchy', () => {
   assert.doesNotMatch(primaryRow[1], /width:/, 'primary alarm must keep the existing full-width behavior');
 });
 
-test('both profile statistics align from the left edge of their columns', () => {
-  const rule = html.match(/\.profile-stat\{([^}]+)\}/);
-  assert.ok(rule, 'profile statistic rule missing');
-  assert.match(rule[1], /text-align:left/, 'Dream Nights must align left within its column');
-  assert.doesNotMatch(html, /\.profile-stat:last-child\{[^}]*text-align:right/, 'legacy right alignment must not return');
+test('profile identity copy aligns from a consistent left edge', () => {
+  const rule = html.match(/\.profile-identity-copy\{([^}]+)\}/);
+  assert.ok(rule, 'profile identity copy rule missing');
+  assert.match(rule[1], /text-align:left/, 'profile identity text must align left');
+  assert.match(html, /\.profile-avatar\{[^}]*width:64px[^}]*height:64px/, 'profile avatar geometry missing');
 });

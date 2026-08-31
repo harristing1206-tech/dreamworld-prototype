@@ -10,7 +10,7 @@ test('Dreamworld uses one restrained SF Pro typography token system', () => {
   assert.match(html, /--type-display-size:31px;--type-display-line:1\.06;--type-display-weight:700;--type-display-tracking:-\.03em/);
   assert.match(html, /--type-body-size:16px;--type-body-line:1\.5;--type-body-weight:400/);
   assert.match(html, /--type-meta-size:13px;--type-meta-line:1\.35;--type-meta-weight:500/);
-  assert.match(html, /--type-label-size:11px;--type-label-line:1\.2;--type-label-weight:600/);
+  assert.match(html, /--type-label-size:11px;--type-label-line:1\.08;--type-label-weight:600/);
   assert.match(html, /body\{[^}]*font-family:var\(--font-ui\)/, 'body must inherit the single SF Pro system stack');
   assert.match(html, /\.nav-title,\.greeting,\.log-title\{[^}]*font-size:var\(--type-display-size\)[^}]*font-weight:var\(--type-display-weight\)/);
   assert.doesNotMatch(html, /\.alarm-head \.nav-title\{[^}]*font-size:/, 'Alarm title must not bypass the shared display role');

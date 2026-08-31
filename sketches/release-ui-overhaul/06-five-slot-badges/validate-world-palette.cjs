@@ -7,10 +7,10 @@ const requiredTokens = {
   canvas: '#ffffff',
   surface: '#ffffff',
   raised: '#f1f2ef',
-  ink: '#203028',
-  muted: '#667168',
-  faint: '#879087',
-  accent: '#486a4d',
+  ink: '#1f252b',
+  muted: '#66707a',
+  faint: '#8b939b',
+  accent: '#356f9f',
   highlight: '#c6724c',
   sun: '#c99b44',
   sky: '#7898a7'
@@ -33,7 +33,7 @@ for (const [label, foreground, background, minimum] of [
   ['body text', requiredTokens.ink, requiredTokens.canvas, 4.5],
   ['muted text', requiredTokens.muted, requiredTokens.canvas, 4.5],
   ['inactive navigation icon', requiredTokens.faint, requiredTokens.surface, 3],
-  ['green actions', requiredTokens.accent, requiredTokens.canvas, 4.5],
+  ['blue actions', requiredTokens.accent, requiredTokens.canvas, 4.5],
   ['button label', '#ffffff', requiredTokens.accent, 4.5]
 ]) {
   assert.ok(contrast(foreground, background) >= minimum, `${label} contrast is below ${minimum}:1`);
@@ -43,7 +43,7 @@ assert.ok(contrast('#ffffff', requiredTokens.highlight) >= 3, 'terracotta icon c
 
 assert.match(html, /color-scheme:light/, 'app did not switch to the light world palette');
 assert.match(html, /--tabbar-bg:#ffffff/, 'light tab bar is not fully opaque white');
-assert.match(html, /--bubble-outline:rgba\(35,48,40,\.18\)/, 'light bubble outline token missing');
+assert.match(html, /--bubble-outline:rgba\(35,43,51,\.18\)/, 'light bubble outline token missing');
 assert.match(html, /:root\[data-theme="light"\] :is\([^}]*\.insights-calendar[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/, 'remaining light-mode bubbles do not share the thin gray outline');
 assert.doesNotMatch(html, /:root\[data-theme="light"\] :is\([^}]*#alarmList \.alarm-row/, 'Ambient Paper alarm cards must stay outside the legacy outline group');
 assert.match(html, /\.insights-calendar\{[^}]*padding:16px 12px 14px[^}]*border-radius:18px[^}]*background:var\(--surface\)/, 'calendar is not a rounded outlined surface');

@@ -17,7 +17,7 @@ assert.match(html, /\.list-toolbar\{[^}]*justify-content:space-between/, 'Edit a
 assert.match(html, /\.alarm-add\{[^}]*width:44px[^}]*height:44px/, 'Alarm Add action is not a full touch target');
 assert.match(html, /\.alarm-row \.swipe-main\{[^}]*min-height:84px[^}]*padding:7px 0/, 'Alarm rows are not compact');
 assert.match(html, /\.alarm-edit\{[^}]*min-height:72px/, 'Alarm row edit target is too small');
-assert.match(html, /--tabbar-height:76px/, 'compact tab bar height missing');
+assert.match(html, /--tabbar-height:72px/, 'compact tab bar height missing');
 assert.match(html, /\.viewport\{[^}]*calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/, 'viewport does not follow the compact safe-area tab bar');
 assert.match(html, /\.tabbar\{[^}]*height:calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)[^}]*align-items:center/, 'tab bar is not compact and vertically centered');
 assert.match(html, /\.tab\{[^}]*min-height:52px[^}]*align-items:center[^}]*justify-content:center/, 'tab icons are not centered in their grid cells');
@@ -32,7 +32,7 @@ assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-copy:before\{[^}]
 assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-time\{[^}]*font-size:55px/, 'primary alarm time no longer anchors the visual hierarchy');
 assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-time\{[^}]*text-shadow:0 2px 16px rgba\(0,0,0,\.38\)/, 'main alarm time loses contrast over the bottom-left fade');
 assert.match(html, /#alarmList \.alarm-row:first-child \.swipe-main\{[^}]*background:transparent/, 'main alarm content layer obscures the faded material field');
-assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-detail\{[^}]*color:rgba\(238,244,238,\.68\)/, 'primary alarm metadata is not restrained');
+assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-detail\{[^}]*color:rgba\(241,243,245,\.68\)/, 'primary alarm metadata is not restrained');
 assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\)\{[^}]*border:0[^}]*outline:0[^}]*border-radius:24px[^}]*background:#fffffe[^}]*overflow:hidden/, 'secondary alarms do not use the Ambient Paper surface');
 assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{[^}]*min-height:72px[^}]*padding:0 16px[^}]*background:inherit/, 'secondary alarm paper content lacks compact consistent inset padding');
 assert.doesNotMatch(html, /Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header copy remains');

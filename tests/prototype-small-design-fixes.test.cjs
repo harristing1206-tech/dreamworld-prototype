@@ -26,9 +26,9 @@ test('Ambient Paper softens the alarm page and every non-primary card', () => {
   assert.match(rule[1], /outline:0/, 'Ambient Paper must override the legacy outline');
   assert.match(rule[1], /border-radius:24px/, 'secondary alarms need the softer radius');
   assert.match(rule[1], /background:#fffffe/, 'secondary alarms need an almost-white paper surface');
-  assert.match(rule[1], /box-shadow:0 16px 38px rgba\(25,40,31,\.075\)/, 'secondary alarms need broad low-opacity ambient depth');
-  assert.match(rule[1], /color:#49544e/, 'secondary alarm text needs softened forest-gray contrast');
-  assert.ok(contrastRatio('#6f7972', '#fffffe') >= 4.5, 'softened secondary text must retain WCAG AA normal-text contrast');
+  assert.match(rule[1], /box-shadow:0 16px 38px rgba\(25,32,40,\.075\)/, 'secondary alarms need broad low-opacity ambient depth');
+  assert.match(rule[1], /color:#4d555e/, 'secondary alarm text needs softened neutral-gray contrast');
+  assert.ok(contrastRatio('#6d7680', '#fffffe') >= 4.5, 'softened secondary text must retain WCAG AA normal-text contrast');
   const darkRule = html.match(/:root\[data-theme="dark"\] \.alarm-list \.alarm-row:not\(:first-child\)\{([^}]+)\}/);
   assert.ok(darkRule, 'dark-mode Ambient Paper override missing');
   assert.match(darkRule[1], /background:var\(--surface\)/);
@@ -38,7 +38,7 @@ test('Ambient Paper softens the alarm page and every non-primary card', () => {
 });
 
 test('bottom navigation spans edge to edge and labels every destination', () => {
-  assert.match(html, /--tabbar-height:82px/, 'labeled navigation needs the taller full-width height token');
+  assert.match(html, /--tabbar-height:72px/, 'labeled navigation needs the compact full-width height token');
   const bar = html.match(/\.tabbar\{left:0;right:0;bottom:0;([^}]+)\}/);
   assert.ok(bar, 'edge-to-edge navigation geometry missing');
   assert.match(bar[1], /height:calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/);

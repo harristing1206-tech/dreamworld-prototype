@@ -12,5 +12,6 @@ assert.match(html,/historySwipe\.dx>=72/,'swipe-right release threshold is missi
 assert.match(html,/event\.preventDefault\(\)[\s\S]*translateX/,'horizontal swipe feedback is missing');
 assert.match(html,/\.profile-stats\{[^}]*gap:32px/,'Profile statistics lack center breathing room');
 assert.match(html,/\.profile-stats:after\{[^}]*left:50%/,'Profile center divider is missing');
-assert.match(html,/\.profile-stat:last-child\{text-align:right\}/,'Dream Nights is not balanced away from the center divider');
+assert.match(html,/\.profile-stat\{[^}]*text-align:left/,'Profile statistics do not align from the left edge of their columns');
+assert.doesNotMatch(html,/\.profile-stat:last-child\{[^}]*text-align:right/,'Dream Nights still aligns to the far right');
 console.log('DREAMWORLD_TAB_HISTORY_PROFILE_REFINEMENT_VERIFIED');

@@ -39,23 +39,28 @@ test('Appearance offers only explicit Light and Dark modes', () => {
   assert.doesNotMatch(html, /currently System/);
 });
 
-test('operational chrome uses blue and neutral roles instead of green', () => {
-  assert.match(html, /--accent:#356f9f/);
-  assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--accent:#8fc4ef/);
-  assert.match(html, /--active:#47769d/);
-  assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--active:#73a9d1/);
+test('legacy forest-green chrome does not return outside the alarm control', () => {
   assert.doesNotMatch(html, /--green:/);
   assert.doesNotMatch(html, /#315a43|#a6c7ad|#486a4d|#a3bf92|#6e965c|#789f67|#455148|#49544e|#6f7972|#d9dcd8|#142019|#eef4ee|#17251e|#18251d|#b8d2bf|#203028|#f1eee5|rgba\(69,112,80|rgba\(72,132,92|rgba\(166,199,173/);
-  assert.ok(contrast('#356f9f', '#ffffff') >= 4.5, 'light blue text accent must retain AA contrast');
-  assert.ok(contrast('#47769d', '#ffffff') >= 4.5, 'light active status text must retain AA contrast');
-  assert.ok(contrast('#8fc4ef', '#000000') >= 4.5, 'dark blue text accent must retain AA contrast');
 });
 
 test('primary alarm switch does not override semantic active and off colors', () => {
   const primarySwitch = html.match(/#alarmList \.alarm-row:first-child \.switch\{([^}]+)\}/);
   assert.ok(primarySwitch, 'primary alarm switch positioning rule missing');
   assert.doesNotMatch(primarySwitch[1], /background:/, 'primary switch must not override semantic state colors');
-  assert.match(html, /\.switch\.on\{background:var\(--active\)\}/);
+  assert.match(html, /\.switch\.on\{background:var\(--alarm-on\)\}/);
   assert.match(html, /--switch-off:#b9c0c7/);
   assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--switch-off:#48505a/);
+});
+
+test('theme text is monochrome while enabled alarms use iOS green', () => {
+  assert.match(html, /--accent:#1f252b/);
+  assert.match(html, /--active:#1f252b/);
+  assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--accent:#f1f3f5/);
+  assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--active:#f1f3f5/);
+  assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--accent-ink:#000000/);
+  assert.match(html, /--alarm-on:#34c759/);
+  assert.match(html, /\.switch\.on\{background:var\(--alarm-on\)\}/);
+  assert.ok(contrast('#1f252b', '#ffffff') >= 4.5, 'light theme text must remain readable black');
+  assert.ok(contrast('#f1f3f5', '#000000') >= 4.5, 'dark theme text must remain readable white');
 });

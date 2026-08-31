@@ -10,7 +10,7 @@ const requiredTokens = {
   ink: '#1f252b',
   muted: '#66707a',
   faint: '#8b939b',
-  accent: '#356f9f',
+  accent: '#1f252b',
   highlight: '#c6724c',
   sun: '#c99b44',
   sky: '#7898a7'
@@ -33,7 +33,7 @@ for (const [label, foreground, background, minimum] of [
   ['body text', requiredTokens.ink, requiredTokens.canvas, 4.5],
   ['muted text', requiredTokens.muted, requiredTokens.canvas, 4.5],
   ['inactive navigation icon', requiredTokens.faint, requiredTokens.surface, 3],
-  ['blue actions', requiredTokens.accent, requiredTokens.canvas, 4.5],
+  ['monochrome actions', requiredTokens.accent, requiredTokens.canvas, 4.5],
   ['button label', '#ffffff', requiredTokens.accent, 4.5]
 ]) {
   assert.ok(contrast(foreground, background) >= minimum, `${label} contrast is below ${minimum}:1`);

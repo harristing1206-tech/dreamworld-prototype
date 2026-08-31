@@ -13,6 +13,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <script>(()=>{let choice='light',stored='';try{stored=localStorage.getItem('dreamworld:appearance')||''}catch{}if(stored==='light'||stored==='dark')choice=stored;else{choice=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';try{localStorage.setItem('dreamworld:appearance',choice)}catch{}}document.documentElement.dataset.theme=choice;document.documentElement.dataset.themePreference=choice})()</script>
   <style>
+    @font-face{font-family:"DM Sans";src:url("./dm-sans-latin-wght-normal.woff2") format("woff2-variations");font-style:normal;font-weight:100 1000;font-display:swap}
     :root{
       color-scheme:light;
       --canvas:#ffffff;
@@ -49,7 +50,7 @@
       --tabbar-height:68px;
       --device-width:402;
       --device-height:840;
-      --font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+      --font-ui:"DM Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
       --type-display-size:31px;--type-display-line:1.06;--type-display-weight:700;--type-display-tracking:-.03em;
       --type-body-size:16px;--type-body-line:1.5;--type-body-weight:400;
       --type-meta-size:13px;--type-meta-line:1.35;--type-meta-weight:500;

@@ -42,7 +42,7 @@ for (const [label, foreground, background, minimum] of [
 assert.ok(contrast('#ffffff', requiredTokens.highlight) >= 3, 'terracotta icon contrast is below 3:1');
 
 assert.match(html, /color-scheme:light/, 'app did not switch to the light world palette');
-assert.match(html, /--tabbar-bg:rgba\(250,250,248,\.76\)/, 'light tab bar is not a translucent warm material');
+assert.match(html, /--tabbar-bg:rgba\(255,255,255,.97\)/, 'light tab bar is not true white');
 assert.match(html, /--bubble-outline:rgba\(35,48,40,\.18\)/, 'light bubble outline token missing');
 assert.match(html, /:root\[data-theme="light"\] :is\([^}]*\.insights-calendar[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/, 'remaining light-mode bubbles do not share the thin gray outline');
 assert.doesNotMatch(html, /:root\[data-theme="light"\] :is\([^}]*#alarmList \.alarm-row/, 'Ambient Paper alarm cards must stay outside the legacy outline group');

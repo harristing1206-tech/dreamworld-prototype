@@ -35,7 +35,6 @@
       --phone-border:#d6d8d6;
       --status-ink:#536158;
       --tabbar-bg:rgba(250,250,248,.76);
-      --tabbar-icon:#5f6962;
       --switch-off:#bcc1b9;
       --toast-bg:#283a30;
       --toast-ink:#fffdf8;
@@ -73,7 +72,6 @@
       --phone-border:#303b32;
       --status-ink:#d8ded5;
       --tabbar-bg:rgba(12,14,17,.76);
-      --tabbar-icon:#c1c7ce;
       --switch-off:#4d574f;
       --toast-bg:#f1eee5;
       --toast-ink:#203028;
@@ -133,13 +131,13 @@
     :root{
       --canvas:#ffffff;--body-bg:#ffffff;--surface:#ffffff;--raised:#f1f2ef;--ink:#17251e;
       --muted:#667168;--faint:#8a938b;--accent:#315a43;--highlight:#c96f4a;
-      --tabbar-height:72px;--tabbar-icon:#5f6962;--radius:18px;--page-gutter:24px;
+      --tabbar-height:72px;--radius:18px;--page-gutter:24px;
       --premium-dark:#101813;--premium-raised:#1c2820;--premium-line:rgba(232,240,232,.13);--bubble-outline:rgba(35,48,40,.18);
     }
     :root[data-theme="dark"]{
       --canvas:#000000;--body-bg:#000000;--surface:#171a20;--raised:#232730;--ink:#f1f3ed;
       --muted:#aeb5bf;--faint:#7c838d;--accent:#a6c7ad;--highlight:#df8a62;
-      --tabbar-bg:rgba(12,14,17,.76);--tabbar-icon:#c1c7ce;--premium-dark:#0b1018;--premium-raised:#171c25;--bubble-outline:rgba(216,222,232,.20);
+      --tabbar-bg:rgba(12,14,17,.76);--premium-dark:#0b1018;--premium-raised:#171c25;--bubble-outline:rgba(216,222,232,.20);
     }
     :root[data-theme="light"] :is(.tabbar,.tab .plus-disc,.mic,.stop,.state-icon,.play,.primary,.secondary,.transcript,.insights-hero,.insights-calendar,.insight-detail,.profile-avatar,.sheet,.time-picker,.day,.confirm-card,.toast),:root[data-theme="dark"] :is(.tabbar,.tab .plus-disc,.mic,.stop,.state-icon,.play,.primary,.secondary,.transcript,.insights-hero,.insights-calendar,.insight-detail,.profile-avatar,.sheet,.time-picker,.day,.confirm-card,.toast){outline:1px solid var(--bubble-outline);outline-offset:-1px}
     :root[data-theme="light"] .tab:before,
@@ -147,9 +145,9 @@
     .screen{padding-top:8px;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
     .date,.log-kicker{font-size:12px;font-weight:720;letter-spacing:.08em;text-transform:uppercase}
     .nav-title,.greeting,.log-title{font-size:31px;line-height:1.04;letter-spacing:-.04em;font-weight:740}
-    .tabbar{left:max(24px,calc(env(safe-area-inset-left) + 8px));right:max(24px,calc(env(safe-area-inset-right) + 8px));bottom:max(10px,calc(env(safe-area-inset-bottom) + 6px));height:64px;padding:5px 8px;border:1px solid var(--separator);border-radius:32px;background:var(--tabbar-bg);-webkit-backdrop-filter:blur(22px) saturate(140%);backdrop-filter:blur(22px) saturate(140%);box-shadow:0 14px 40px rgba(20,32,24,.18)}
+    .tabbar{left:24px;right:24px;bottom:max(10px,calc(env(safe-area-inset-bottom) + 6px));height:64px;padding:5px 8px;border:1px solid var(--separator);border-radius:32px;background:var(--tabbar-bg);-webkit-backdrop-filter:blur(22px) saturate(140%);backdrop-filter:blur(22px) saturate(140%);box-shadow:0 14px 40px rgba(20,32,24,.18)}
     .viewport{inset-bottom:0}
-    .tab{min-height:52px;color:var(--tabbar-icon)}.tab:before{width:44px;height:40px;border-radius:15px}.tab.active:not(.log-tab):before{opacity:.7}
+    .tab{min-height:52px}.tab:before{width:44px;height:40px;border-radius:15px}.tab.active:not(.log-tab):before{opacity:.7}
     .tab.log-tab{transform:none}.tab.log-tab .plus-disc{width:50px;height:50px;min-width:50px;min-height:50px;flex-basis:50px;background:var(--ink);color:var(--canvas);box-shadow:none}.tab.log-tab.active .plus-disc{box-shadow:0 0 0 3px color-mix(in srgb,var(--highlight) 30%,transparent)}
 
     /* Alarm becomes a next-wake stage, not a flat utility list. */
@@ -213,7 +211,7 @@
     /* Profile is identity first; settings remain quiet native rows. */
     .profile-head{margin:0 -6px;padding:20px 6px 26px}.profile-avatar{width:52px;height:52px;margin:0 0 18px;border-radius:17px;font-size:18px}.profile-head h1{font-size:30px}.profile-head p{max-width:270px}.profile-stats{margin-top:24px;gap:24px}.profile-stat strong{font-size:26px}.section-label{margin-top:26px}.settings-group{margin-top:0}.setting-row{min-height:62px}.setting-icon{width:28px;height:28px;border-radius:0;background:transparent}.setting-icon svg{width:20px;height:20px}
 
-    @media(display-mode:standalone),(max-width:500px) and (pointer:coarse){.statusbar{display:none}.viewport{inset-top:max(12px,env(safe-area-inset-top))}.tabbar{bottom:max(10px,calc(env(safe-area-inset-bottom) + 6px));padding-bottom:5px;height:64px}}
+    @media(display-mode:standalone),(max-width:500px) and (pointer:coarse){.statusbar{display:none}.viewport{inset-top:max(12px,env(safe-area-inset-top))}.tabbar{bottom:max(8px,env(safe-area-inset-bottom));padding-bottom:5px;height:64px}}
   </style>
 </head>
 <body>

@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');const html=fs.readFileSync('index.html','utf8'),manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
 assert.match(html,/--canvas:#ffffff;[\s\S]*--surface:#ffffff;[\s\S]*--raised:#f1f2ef;/,'true-white light canvas and refined raised-surface hierarchy missing');
 assert.match(html,/:root\[data-theme="dark"\]\{[\s\S]*--canvas:#000000;[\s\S]*--surface:#1a221b;[\s\S]*--raised:#263227;/,'true-black dark canvas and refined raised-surface hierarchy missing');
-assert.match(html,/\.nav-title\{font-size:32px/,'major titles are not normalized');assert.match(html,/\.greeting\{[^}]*font-size:32px/,'History title is inconsistent');assert.match(html,/\.log-title\{[^}]*font-size:32px/,'Log title is inconsistent');
+assert.match(html,/\.nav-title,\.greeting,\.log-title\{font-size:var\(--type-display-size\);line-height:var\(--type-display-line\);letter-spacing:var\(--type-display-tracking\);font-weight:var\(--type-display-weight\)\}/,'major titles do not share the normalized SF Pro display role');
 assert.match(html,/\.tab:before\{[^}]*width:42px[^}]*height:38px/,'quiet selected-tab treatment missing');assert.match(html,/\.tab\.active:not\(\.log-tab\):before\{opacity:\.62/,'selected tab is still visually heavy');
 assert.match(html,/\.metric-symbol\{display:none\}/,'repeated Insight icon tiles remain');assert.match(html,/\.insight-detail\{[^}]*border-radius:14px[^}]*background:var\(--surface\)/,'Insight detail surface is inconsistent');
 assert.match(html,/\.setting-icon\{width:24px[^}]*background:transparent/,'Settings icon tiles remain');assert.match(html,/\.profile-avatar\{width:54px;height:54px/,'Profile avatar remains oversized');

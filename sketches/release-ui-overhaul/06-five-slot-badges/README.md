@@ -60,6 +60,15 @@
 - Every Delete action opens a dedicated confirmation dialog. Cancel preserves the item and restores focus; confirmed Delete is red, removes the exact alarm or dream, and cannot be triggered by the swipe itself.
 - Dream deletion is durable and immediately recalculates History, calendar markers, Insights, and Profile totals. The confirmation modal makes the obscured app inert, traps focus, and supports Escape.
 
+## Durable alarm-preview continuity
+
+- The web prototype stores alarm-preview records under immutable IDs, including time, period, label, repeat schedule, and enabled state.
+- Add, edit, toggle, partial-swipe delete, and full-swipe delete write the complete validated alarm collection before the UI reports success.
+- Reloading restores the saved collection rather than resurrecting the two sample rows; an intentionally empty collection remains empty.
+- Temporary read failure, malformed JSON, and mixed invalid/duplicate records are distinct from an empty collection. Dreamworld preserves the stored bytes, pauses editing, and shows a recovery status instead of overwriting unseen alarms.
+- If browser storage rejects a write, toggle state visibly reverts, additions create no ghost row, failed deletion preserves the alarm, and the relevant editor or confirmation context remains open.
+- These rows preview the native AlarmKit experience only. The web prototype cannot schedule or fire an iOS system alarm, and Profile no longer claims that system-alarm authorization is active.
+
 ## Audio-reactive morning capture
 
 - The recording state uses an original layered **abstract presence** with softly irregular nested fields and the existing warm botanical palette. It borrows the reference’s calm depth and breathing rhythm without copying its branding, controls, colors, or exact capsule composition.

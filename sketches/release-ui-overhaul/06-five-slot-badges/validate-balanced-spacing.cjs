@@ -26,12 +26,15 @@ assert.match(html, /\.tab\.active:not\(\.log-tab\):before\{[^}]*opacity:\.62[^}]
 assert.match(html, /\.tab\.log-tab\{[^}]*align-self:center[^}]*translateY\(-4px\)/, 'plus button is not visually aligned with the icon row');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px[^}]*flex:0 0 58px[^}]*aspect-ratio:1\/1[^}]*border-radius:50%/, 'center plus can shrink into an oval');
 assert.match(html, /<header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><p class="date">Your morning<\/p><h1 class="nav-title">Wake gently\.<br>Remember more\.<\/h1><\/header>/, 'Alarm header structure does not preserve Edit/Add inside the next-wake composition');
-assert.match(html, /#alarmList \.alarm-row:first-child\{[^}]*min-height:248px[^}]*border-radius:25px[^}]*background:#030504/, 'next enabled alarm is not presented as the dominant near-black wake stage');
+assert.match(html, /#alarmList \.alarm-row:first-child\{[^}]*min-height:208px[^}]*border-radius:25px[^}]*background:#030504/, 'next enabled alarm is not presented as the compact dominant near-black wake stage');
 assert.match(html, /#alarmList \.alarm-row:first-child:before\{[^}]*left:-150px[^}]*top:auto[^}]*bottom:-145px[^}]*background:rgba\(239,241,235,\.26\)[^}]*filter:blur\(68px\)/, 'main alarm fade does not originate below the bottom-left corner');
+assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-copy:before\{[^}]*margin-bottom:24px/, 'compact primary alarm spacing is not preserved');
+assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-time\{[^}]*font-size:55px/, 'primary alarm time no longer anchors the visual hierarchy');
 assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-time\{[^}]*text-shadow:0 2px 16px rgba\(0,0,0,\.38\)/, 'main alarm time loses contrast over the bottom-left fade');
 assert.match(html, /#alarmList \.alarm-row:first-child \.swipe-main\{[^}]*background:transparent/, 'main alarm content layer obscures the faded material field');
+assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-detail\{[^}]*color:rgba\(238,244,238,\.68\)/, 'primary alarm metadata is not restrained');
 assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\)\{[^}]*border:0[^}]*outline:0[^}]*border-radius:24px[^}]*background:#fffffe[^}]*overflow:hidden/, 'secondary alarms do not use the Ambient Paper surface');
-assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{[^}]*min-height:78px[^}]*padding:0 16px[^}]*background:inherit/, 'secondary alarm paper content lacks consistent inset padding');
+assert.match(html, /\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{[^}]*min-height:72px[^}]*padding:0 16px[^}]*background:inherit/, 'secondary alarm paper content lacks compact consistent inset padding');
 assert.doesNotMatch(html, /Dreamworld alarms use Apple’s system alarm experience\./, 'obsolete Alarm header copy remains');
 assert.match(html, /\.statusbar\{display:none\}\.viewport\{inset:max\(env\(safe-area-inset-top\),12px\)/, 'installed iPhone still shows the simulated status bar');
 

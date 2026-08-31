@@ -37,6 +37,19 @@ test('Ambient Paper softens the alarm page and every non-primary card', () => {
   assert.match(html, /button:focus-visible[^}]*outline:3px solid var\(--accent\)/, 'card controls must retain visible keyboard focus');
 });
 
+test('alarm cards use a compact rectangular hierarchy', () => {
+  const primaryRow = html.match(/#alarmList \.alarm-row:first-child\{([^}]+)\}/);
+  const primaryMain = html.match(/#alarmList \.alarm-row:first-child \.swipe-main\{([^}]+)\}/);
+  const secondaryMain = html.match(/\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{([^}]+)\}/);
+  assert.ok(primaryRow, 'primary alarm card rule missing');
+  assert.ok(primaryMain, 'primary alarm content rule missing');
+  assert.ok(secondaryMain, 'secondary alarm content rule missing');
+  assert.match(primaryRow[1], /min-height:208px/, 'primary alarm should be shorter while keeping its full available width');
+  assert.match(primaryMain[1], /min-height:208px/, 'primary alarm content should match the compact card height');
+  assert.match(secondaryMain[1], /min-height:72px/, 'non-primary alarms should be modestly smaller');
+  assert.doesNotMatch(primaryRow[1], /width:/, 'primary alarm must keep the existing full-width behavior');
+});
+
 test('both profile statistics align from the left edge of their columns', () => {
   const rule = html.match(/\.profile-stat\{([^}]+)\}/);
   assert.ok(rule, 'profile statistic rule missing');

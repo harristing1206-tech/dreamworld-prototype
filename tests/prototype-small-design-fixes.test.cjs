@@ -38,13 +38,17 @@ test('Ambient Paper softens the alarm page and every non-primary card', () => {
 });
 
 test('bottom navigation floats over visible scroll content', () => {
-  assert.match(html, /:root\{[^}]*--tabbar-bg:rgba\(250,250,248,\.76\)/, 'light navigation material must be translucent');
-  assert.match(html, /:root\[data-theme="dark"\]\{[^}]*--tabbar-bg:rgba\(12,14,17,\.76\)/, 'dark navigation material must be translucent');
-  const bar = html.match(/\.tabbar\{([^}]*left:24px[^}]*)\}/);
+  assert.match(html, /:root\{[^}]*--tabbar-bg:rgba\(250,250,248,\.76\)[^}]*--tabbar-icon:#5f6962/, 'light navigation material and inactive icons must remain legible');
+  assert.match(html, /:root\[data-theme="dark"\]\{[^}]*--tabbar-bg:rgba\(12,14,17,\.76\)[^}]*--tabbar-icon:#c1c7ce/, 'dark navigation material and inactive icons must remain legible');
+  const bar = html.match(/\.tabbar\{([^}]*left:max\(24px,calc\(env\(safe-area-inset-left\) \+ 8px\)\)[^}]*)\}/);
   assert.ok(bar, 'floating navigation geometry missing');
-  assert.match(bar[1], /right:24px/);
+  assert.match(bar[1], /right:max\(24px,calc\(env\(safe-area-inset-right\) \+ 8px\)\)/);
   assert.match(bar[1], /border-radius:32px/);
   assert.match(bar[1], /backdrop-filter:blur\(22px\) saturate\(140%\)/, 'navigation must blur the content visible behind it');
+  assert.match(html, /\.tab\{[^}]*color:var\(--tabbar-icon\)/, 'inactive navigation icons must use the controlled material-contrast token');
+  assert.ok(contrastRatio('#5f6962', '#bebebc') >= 3, 'light inactive icons must retain 3:1 contrast over the darkest composited backdrop');
+  assert.ok(contrastRatio('#c1c7ce', '#46484a') >= 3, 'dark inactive icons must retain 3:1 contrast over the lightest composited backdrop');
+  assert.match(html, /@media\(display-mode:standalone\),\(max-width:500px\) and \(pointer:coarse\)\{[\s\S]*?\.tabbar\{bottom:max\(10px,calc\(env\(safe-area-inset-bottom\) \+ 6px\)\)/, 'installed navigation must preserve the intended safe-area gap');
   assert.match(html, /\.viewport\{inset-bottom:0\}/, 'scrolling content must extend behind the floating navigation');
   assert.match(html, /\.screen\{padding-top:8px;padding-bottom:calc\(96px \+ env\(safe-area-inset-bottom\)\)\}/, 'screen needs enough end padding to keep final actions reachable above the overlay');
   assert.match(html, /\.log-screen \.capture-state\{[^}]*inset:148px 24px calc\(96px \+ env\(safe-area-inset-bottom\)\)/, 'ready capture controls must clear the navigation overlay');

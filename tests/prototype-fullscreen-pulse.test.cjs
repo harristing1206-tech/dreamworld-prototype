@@ -30,6 +30,7 @@ test('recording controls frame the focal rings instead of overlapping them', () 
   assert.match(html, /\.log-screen \.recording-state \.log-kicker\{position:absolute;left:0;right:0;top:clamp\(42px,8%,70px\);margin:0;max-width:none\}/);
   assert.match(html, /\.log-screen \.recording-state \.timer\{position:absolute;left:0;right:0;top:clamp\(72px,12%,104px\)/);
   assert.match(html, /\.log-screen \.recording-state \.stop\{position:absolute;left:50%;bottom:clamp\(96px,17%,132px\);transform:translateX\(-50%\)/);
+  assert.match(html, /\.log-screen \.recording-state \.pause-recording\{position:absolute;left:calc\(50% - 96px\);bottom:clamp\(108px,19%,144px\);width:52px;height:52px/, 'pause and stop controls need distinct non-overlapping footprints');
   assert.match(html, /\.log-screen \.recording-state \.recording-hint\{position:absolute;left:28px;right:28px;bottom:clamp\(30px,7%,54px\);margin:0!important;max-width:none\}/);
   assert.match(html, /baseRadius=Math\.min\(width\*\.225,height\*\.125\)/, 'short screens need a height-constrained focal ring');
 });

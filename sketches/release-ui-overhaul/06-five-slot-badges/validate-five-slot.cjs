@@ -21,6 +21,8 @@ const dom = new JSDOM(source, {
       static isTypeSupported(type) { return type.startsWith('audio/'); }
       constructor(_stream, options = {}) { this.mimeType = options.mimeType || 'audio/webm'; this.state = 'inactive'; }
       start() { this.state = 'recording'; }
+      pause() { if (this.state === 'recording') this.state = 'paused'; }
+      resume() { if (this.state === 'paused') this.state = 'recording'; }
       stop() { this.state = 'inactive'; this.ondataavailable?.({ data: new window.Blob(['fixture-audio'], { type: this.mimeType }) }); this.onstop?.(); }
     }
     window.MediaRecorder = FakeMediaRecorder;
@@ -116,14 +118,31 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   d.getElementById('startRecording').click();
   await wait(0);
   assert.ok(d.querySelector('[data-log-state="recording"]').classList.contains('active'));
+  const pauseRecording=d.getElementById('pauseRecording');
+  const exitRecording=d.getElementById('exitRecording');
+  assert.ok(pauseRecording,'recording surface must expose a pause control');
+  assert.ok(exitRecording,'recording surface must expose an exit control');
+  assert.equal(pauseRecording.getAttribute('aria-label'),'Pause recording');
+  assert.equal(exitRecording.getAttribute('aria-label'),'Exit and save recording');
+  pauseRecording.click();
+  assert.equal(pauseRecording.getAttribute('aria-label'),'Resume recording');
+  assert.equal(d.querySelector('[data-log-state="recording"] .log-kicker').textContent,'Paused');
+  d.querySelector('[data-tab="history"]').click();
+  assert.ok(d.querySelector('[data-screen="log"]').classList.contains('active'),'paused recording must not keep capturing off-screen');
+  pauseRecording.click();
+  assert.equal(pauseRecording.getAttribute('aria-label'),'Pause recording');
+  assert.equal(d.querySelector('[data-log-state="recording"] .log-kicker').textContent,'Recording');
   d.querySelector('[data-tab="history"]').click();
   assert.ok(d.querySelector('[data-screen="log"]').classList.contains('active'),'active recording must keep Capture on screen');
   assert.equal(d.querySelector('.tab[aria-current="page"]').dataset.tab,'log','blocked navigation must preserve the current tab');
-  assert.match(d.querySelector('.toast').textContent,/Stop and save your recording before leaving/i,'blocked navigation must explain how to leave safely');
-  assert.equal(d.activeElement,d.getElementById('stopRecording'),'blocked navigation must focus the safe stop action');
+  assert.match(d.querySelector('.toast').textContent,/Exit and save your recording before leaving/i,'blocked navigation must explain how to leave safely');
+  assert.equal(d.activeElement,d.getElementById('exitRecording'),'blocked navigation must focus the explicit exit action');
   assert.ok(d.querySelector('[data-log-state="recording"]').classList.contains('active'),'blocked navigation must not stop or finalize the recording');
-  d.getElementById('stopRecording').click();
+  exitRecording.click();
   await wait(20);
+  assert.ok(d.querySelector('[data-screen="alarm"]').classList.contains('active'),'Exit must leave Capture after preserving the recording');
+  d.querySelector('[data-tab="log"]').click();
+  await wait(10);
   assert.ok(d.querySelector('[data-log-state="draft"]').classList.contains('active'));
   d.getElementById('logDream').click();
   await wait(0);

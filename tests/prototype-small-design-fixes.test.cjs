@@ -16,10 +16,8 @@ function contrastRatio(foreground, background) {
   return (values[0] + 0.05) / (values[1] + 0.05);
 }
 
-test('Ambient Paper softens the alarm page and every non-primary card', () => {
-  const pageRule = html.match(/:root\[data-theme="light"\] \.screen\[data-screen="alarm"\]\{([^}]+)\}/);
-  assert.ok(pageRule, 'light alarm canvas rule missing');
-  assert.match(pageRule[1], /background:#f7f7f5/, 'alarm canvas must use the warm Stoic gray');
+test('Ambient Paper remains local to non-primary cards on the shared canvas', () => {
+  assert.doesNotMatch(html, /screen\[data-screen="alarm"\]\{[^}]*background:/, 'Alarm must inherit the same canvas as the other destinations');
   const rule = html.match(/\.alarm-list \.alarm-row:not\(:first-child\)\{([^}]+)\}/);
   assert.ok(rule, 'secondary alarm card rule missing');
   assert.match(rule[1], /border:0/, 'Ambient Paper removes the hard card border');

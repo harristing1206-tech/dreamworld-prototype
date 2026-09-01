@@ -5,10 +5,11 @@ const path = require('node:path');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'sketches', 'release-ui-overhaul', '06-five-slot-badges', 'index.html'), 'utf8');
 
-test('History title leads from the top-left while Edit anchors top-right', () => {
-  assert.match(html, /\.home-header\{position:relative;padding-top:4px\}/);
-  assert.match(html, /\.home-header \.list-toolbar\{position:absolute;right:0;top:0;width:auto;height:44px\}/);
+test('History uses one clear title while Edit anchors top-right', () => {
+  assert.match(html, /\.alarm-head,\.home-header\{position:relative;padding-top:52px\}/);
+  assert.match(html, /\.alarm-head \.list-toolbar,\.home-header \.list-toolbar\{position:absolute;left:0;right:0;top:0;width:auto;height:44px\}/);
   assert.match(html, /\.list-edit\{min-width:44px;min-height:44px/);
   assert.match(html, /\.list-edit\[aria-pressed="true"\]\{width:44px;min-width:44px/);
-  assert.match(html, /<header class="home-header">[\s\S]*?<button class="list-edit" id="editDreams"[^>]*>Edit<\/button>[\s\S]*?<p class="date">Your private archive<\/p>[\s\S]*?<h1 class="greeting">Dream journal\.<\/h1>[\s\S]*?<\/header>/);
+  assert.match(html, /<header class="home-header">[\s\S]*?<span aria-hidden="true"><\/span><button class="list-edit" id="editDreams"[^>]*>Edit<\/button>[\s\S]*?<h1 class="greeting">Dream journal\.<\/h1>[\s\S]*?<\/header>/);
+  assert.doesNotMatch(html, />Your private archive</);
 });

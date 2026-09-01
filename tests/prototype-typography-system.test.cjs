@@ -7,7 +7,7 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'sketches', 'release-ui-
 
 test('Dreamworld uses one restrained DM Sans typography token system', () => {
   assert.match(html, /--font-ui:"DM Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif/);
-  assert.match(html, /--type-display-size:31px;--type-display-line:1\.06;--type-display-weight:650;--type-display-tracking:-\.03em/);
+  assert.match(html, /--type-display-size:31px;--type-display-line:1\.08;--type-display-weight:650;--type-display-tracking:-\.03em/);
   assert.match(html, /--type-body-size:16px;--type-body-line:1\.5;--type-body-weight:400/);
   assert.match(html, /--type-meta-size:13px;--type-meta-line:1\.35;--type-meta-weight:500/);
   assert.match(html, /--type-label-size:11px;--type-label-line:1\.08;--type-label-weight:550/);

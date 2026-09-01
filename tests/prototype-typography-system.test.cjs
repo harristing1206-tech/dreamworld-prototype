@@ -7,10 +7,12 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'sketches', 'release-ui-
 
 test('Dreamworld uses one restrained DM Sans typography token system', () => {
   assert.match(html, /--font-ui:"DM Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif/);
-  assert.match(html, /--type-display-size:31px;--type-display-line:1\.06;--type-display-weight:650;--type-display-tracking:-\.03em/);
-  assert.match(html, /--type-body-size:16px;--type-body-line:1\.5;--type-body-weight:400/);
-  assert.match(html, /--type-meta-size:13px;--type-meta-line:1\.35;--type-meta-weight:500/);
-  assert.match(html, /--type-label-size:11px;--type-label-line:1\.08;--type-label-weight:550/);
+  assert.match(html, /--type-display-size:31px;--type-display-line:34px;--type-display-weight:620;--type-display-tracking:-\.018em/);
+  assert.match(html, /--type-section-size:22px;--type-section-line:27px;--type-section-weight:600/);
+  assert.match(html, /--type-body-size:16px;--type-body-line:24px;--type-body-weight:400/);
+  assert.match(html, /--type-operational-size:15px;--type-operational-line:20px;--type-operational-weight:550/);
+  assert.match(html, /--type-meta-size:13px;--type-meta-line:18px;--type-meta-weight:500/);
+  assert.match(html, /--type-label-size:11px;--type-label-line:14px;--type-label-weight:600/);
   assert.match(html, /body\{[^}]*font-family:var\(--font-ui\)/, 'body must inherit the single DM Sans stack');
   assert.match(html, /\.nav-title,\.greeting,\.log-title\{[^}]*font-size:var\(--type-display-size\)[^}]*font-weight:var\(--type-display-weight\)/);
   assert.doesNotMatch(html, /\.alarm-head \.nav-title\{[^}]*font-size:/, 'Alarm title must not bypass the shared display role');
@@ -31,7 +33,7 @@ test('core reading and numeric surfaces use the refined typography roles', () =>
 test('DM Sans uses deliberately lighter variable-font roles', () => {
   const uiCSS = html.replace(/@font-face\{[^}]+\}/g, '');
   const weights = [...uiCSS.matchAll(/font-weight:(\d+)/g)].map(match => Number(match[1]));
-  const unexpected = [...new Set(weights.filter(weight => ![400, 500, 550, 650].includes(weight)))];
+  const unexpected = [...new Set(weights.filter(weight => ![400, 500, 550, 600, 620, 650].includes(weight)))];
   assert.deepEqual(unexpected, [], `unexpected font weights: ${unexpected.join(', ')}`);
-  assert.doesNotMatch(uiCSS, /font-weight:(?:600|700)/, 'legacy heavy UI weights remain');
+  assert.doesNotMatch(uiCSS, /font-weight:700/, 'unreviewed browser-bold UI weights remain');
 });

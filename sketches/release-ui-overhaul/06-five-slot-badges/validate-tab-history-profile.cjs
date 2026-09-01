@@ -2,8 +2,8 @@ const assert=require('node:assert/strict');const fs=require('node:fs');const htm
 assert.match(html,/\.tab\.log-tab\{transform:none;gap:0\}/,'center plus is not aligned with the compact tab row');
 assert.match(html,/\.tab\.log-tab \.plus-disc\{[^}]*width:44px[^}]*height:44px/,'center plus compact size changed');
 assert.match(html,/\.history-entry\{[^}]*grid-template-columns:50px minmax\(0,1fr\)[^}]*min-height:86px[^}]*padding:12px 0 13px/,'History rows do not use the compact editorial date rail');
-assert.match(html,/\.history-date-rail strong\{[^}]*font-size:21px/,'History date rail lacks compact numeric hierarchy');
-assert.match(html,/\.history-entry-excerpt\{[^}]*font-size:12px[^}]*white-space:nowrap[^}]*text-overflow:ellipsis/,'History excerpts are not bounded to one compact line');
+assert.match(html,/\.history-date-rail strong\{[^}]*font-size:var\(--type-section-size\)/,'History date rail lacks the accepted section hierarchy');
+assert.match(html,/\.history-entry-excerpt\{[^}]*font-size:var\(--type-meta-size\)[^}]*white-space:nowrap[^}]*text-overflow:ellipsis/,'History excerpts are not bounded to one compact metadata line');
 assert.match(html,/\.history-entry-arrow\{display:none\}/,'redundant entry action still consumes vertical space');
 assert.match(html,/historyDateLabel=record[\s\S]*month:'short',day:'numeric',year:'numeric'/,'History date format is missing');
 assert.match(html,/button\.append\(rail,title,date,excerpt,arrow\)/,'History row hierarchy is not date rail, title, excerpt, and entry action');

@@ -5,12 +5,12 @@ const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','sketches','release-ui-overhaul','06-five-slot-badges','index.html'),'utf8');
 
 const functionalLabels=[
-  ['History fact labels',/\.history-focus-fact span\{[^}]*font-size:11px/],
+  ['History fact labels',/\.history-focus-fact span\{[^}]*font-size:var\(--type-label-size\)/],
   ['Calendar weekday labels',/\.calendar-weekdays span\{[^}]*font-size:11px/],
   ['Insight metric suffixes',/\.metric-value span\{[^}]*font-size:11px/],
   ['Insight detail labels',/\.detail-fact span\{[^}]*font-size:11px/],
   ['Next Wake label',/#alarmList \.alarm-row:first-child \.alarm-copy:before\{[^}]*font-size:11px/],
-  ['History month labels',/\.history-date-rail span\{[^}]*font-size:11px/],
+  ['History month labels',/\.history-date-rail span\{[^}]*font-size:var\(--type-label-size\)/],
   ['Recall Index period label',/\.insights-hero-label\{[^}]*font-size:11px/]
 ];
 

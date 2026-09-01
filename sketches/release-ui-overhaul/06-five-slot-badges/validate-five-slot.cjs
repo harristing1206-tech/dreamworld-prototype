@@ -97,7 +97,7 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
 
   d.querySelector('[data-tab="profile"]').click();
   assert.ok(d.querySelector('[data-screen="profile"]').classList.contains('active'));
-  assert.equal(d.querySelector('[data-screen="profile"] > h1.tab-heading').textContent, 'My Profile');
+  assert.equal(d.querySelector('[data-screen="profile"] > h1.sr-only').textContent, 'Profile');
   assert.equal(d.querySelector('.profile-identity-copy strong').textContent, 'Harris');
   assert.equal(d.querySelector('.profile-identity-copy span').textContent, 'Show profile');
 

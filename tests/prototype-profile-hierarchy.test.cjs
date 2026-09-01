@@ -8,7 +8,7 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'sketches', 'release-ui-
 test('bottom navigation is slightly shorter with labels closer to icons', () => {
   assert.match(html, /--tabbar-height:68px/);
   assert.match(html, /--type-label-size:11px;--type-label-line:1\.08;--type-label-weight:550/);
-  assert.match(html, /\.tab\{min-height:58px;padding:5px 1px 1px;flex-direction:column;justify-content:flex-start;gap:0\}/);
+  assert.match(html, /\.tab\{min-height:58px;padding:1px 1px 1px;flex-direction:column;gap:0\}/);
   assert.match(html, /\.tab svg\{width:20px;height:20px\}/);
   assert.match(html, /\.tab-label\{[^}]*font-size:var\(--type-label-size\)/);
   assert.match(html, /\.tab\.log-tab \.plus-disc\{width:44px;height:44px/);
@@ -16,7 +16,7 @@ test('bottom navigation is slightly shorter with labels closer to icons', () => 
 
 test('Profile follows title, identity row, then settings hierarchy', () => {
   const profile = html.match(/<section class="screen" data-screen="profile"[\s\S]*?<\/section>/)?.[0] || '';
-  assert.match(profile, /<h1 class="tab-heading">My Profile<\/h1>/);
+  assert.match(profile, /<h1 class="sr-only">Profile<\/h1>/);
   assert.match(profile, /<button class="profile-identity" id="showProfile"[^>]*aria-label="Show Harris profile"/);
   assert.match(profile, /<span class="profile-avatar">H<\/span>/);
   assert.match(profile, /<span class="profile-identity-copy"><strong>Harris<\/strong><span>Show profile<\/span><\/span>/);

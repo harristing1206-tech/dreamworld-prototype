@@ -17,7 +17,7 @@ function contrast(a, b) {
 
 test('labeled bottom navigation is compact without shrinking icons or labels', () => {
   assert.match(html, /--tabbar-height:68px/);
-  assert.match(html, /\.tab\{min-height:58px;padding:5px 1px 1px;[^}]*justify-content:flex-start[^}]*gap:0/);
+  assert.match(html, /\.tab\{min-height:58px;padding:1px 1px 1px;[^}]*gap:0/);
   assert.match(html, /\.tab svg\{width:20px;height:20px\}/);
   assert.match(html, /\.tab-label\{[^}]*font-size:var\(--type-label-size\)/);
   assert.match(html, /\.tab\.log-tab \.plus-disc\{width:44px;height:44px/);

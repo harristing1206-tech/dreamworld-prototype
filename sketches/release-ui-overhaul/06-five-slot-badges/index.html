@@ -155,15 +155,14 @@
     .screen{padding-top:8px;padding-bottom:44px}
     .date,.log-kicker{font-size:12px;font-weight:550;letter-spacing:.06em;text-transform:uppercase}
     .nav-title,.greeting,.log-title{font-size:var(--type-display-size);line-height:var(--type-display-line);letter-spacing:var(--type-display-tracking);font-weight:var(--type-display-weight)}
-    .tab-heading{margin:0;font-size:var(--type-display-size);line-height:var(--type-display-line);letter-spacing:var(--type-display-tracking);font-weight:var(--type-display-weight)}
     .tabbar{left:0;right:0;bottom:0;height:calc(var(--tabbar-height) + env(safe-area-inset-bottom));padding:4px max(8px,calc(env(safe-area-inset-right) + 4px)) max(4px,env(safe-area-inset-bottom)) max(8px,calc(env(safe-area-inset-left) + 4px));border:0;border-top:1px solid var(--separator);border-radius:0;outline:0;background:var(--tabbar-bg);box-shadow:0 -10px 30px rgba(25,32,40,.08)}
     .viewport{inset-bottom:calc(var(--tabbar-height) + env(safe-area-inset-bottom))}
-    .tab{min-height:58px;padding:5px 1px 1px;flex-direction:column;justify-content:flex-start;gap:0}.tab:before{display:none}.tab svg{width:20px;height:20px}.tab-label{position:relative;z-index:1;display:block;color:var(--muted);font-size:var(--type-label-size);line-height:var(--type-label-line);font-weight:var(--type-label-weight);letter-spacing:.01em;white-space:nowrap}.tab.active .tab-label{color:var(--accent);font-weight:650}
+    .tab{min-height:58px;padding:1px 1px 1px;flex-direction:column;gap:0}.tab:before{display:none}.tab svg{width:20px;height:20px}.tab-label{position:relative;z-index:1;display:block;color:var(--muted);font-size:var(--type-label-size);line-height:var(--type-label-line);font-weight:var(--type-label-weight);letter-spacing:.01em;white-space:nowrap}.tab.active .tab-label{color:var(--accent);font-weight:650}
     .tab.log-tab{transform:none;gap:0}.tab.log-tab .plus-disc{width:44px;height:44px;min-width:44px;min-height:44px;flex-basis:44px;background:var(--ink);color:var(--canvas);box-shadow:none}.tab.log-tab svg{width:23px;height:23px}.tab.log-tab.active .plus-disc{box-shadow:0 0 0 3px color-mix(in srgb,var(--highlight) 30%,transparent)}
 
     /* Alarm becomes a next-wake stage, not a flat utility list. */
     :root[data-theme="light"] .screen[data-screen="alarm"]{background:#f7f7f5}
-    .alarm-head{padding-top:4px}.alarm-head .list-toolbar{position:absolute;right:var(--page-gutter);top:8px;width:auto;gap:6px}.alarm-head .list-edit{background:transparent;color:var(--muted);padding:0}.alarm-head .tab-heading{max-width:245px}
+    .alarm-head{padding-top:4px}.alarm-head .list-toolbar{position:absolute;right:var(--page-gutter);top:8px;width:auto;gap:6px}.alarm-head .list-edit{background:transparent;color:var(--muted);padding:0}.alarm-head .date{margin:8px 0 8px}.alarm-head .nav-title{max-width:255px;margin:0}
     .alarm-list{margin-top:22px;border:0;display:flex;flex-direction:column;gap:10px}.alarm-row{border:0}.alarm-row .swipe-main{background:var(--canvas)}
     #alarmList .alarm-row:first-child{min-height:208px;margin-bottom:0;border-radius:25px;background:#030504;color:#f1f3f5;overflow:hidden;isolation:isolate;box-shadow:0 20px 48px rgba(25,32,40,.10)}
     #alarmList .alarm-row:first-child:before,#alarmList .alarm-row:first-child:after{content:"";position:absolute;pointer-events:none;border-radius:50%;filter:blur(1px)}
@@ -185,7 +184,7 @@
     .sleep-note{margin-top:18px;padding:15px 2px;border-bottom:1px solid var(--separator);font-size:12px}
 
     /* Journal is an editorial date rail, not repeated generic cards. */
-    .home-header{position:relative;padding-top:4px}.home-header .list-toolbar{position:absolute;right:0;top:0;width:auto;height:44px}.home-header .tab-heading{padding-right:72px}
+    .home-header{position:relative;padding-top:4px}.home-header .list-toolbar{position:absolute;right:0;top:0;width:auto;height:44px}.home-header .date{margin:8px 72px 8px 0}.home-header .greeting{margin:0;font-size:31px}
     .history-list{margin-top:24px;border:0}.history-swipe-row{display:grid;grid-template-columns:0 minmax(0,1fr);align-items:stretch;border:0!important;margin:0;transition:grid-template-columns 240ms cubic-bezier(.22,.61,.36,1)}.history-swipe-row .swipe-main{background:var(--canvas)}
     .history-entry{display:grid;grid-template-columns:50px minmax(0,1fr);column-gap:13px;min-height:86px;padding:12px 0 13px;border-top:1px solid var(--separator)}
     .history-swipe-row .edit-minus{position:relative;left:auto;top:auto;min-width:0;align-self:center;justify-self:center;transform:scale(.65);grid-column:1;grid-row:1}.history-swipe-row .swipe-main{grid-column:2;grid-row:1;width:100%;transform:none}#historyList.editing .history-swipe-row{grid-template-columns:50px minmax(0,1fr)}#historyList.editing .edit-minus{transform:scale(1)}#historyList.editing .history-swipe-row .swipe-main{width:100%;transform:none}#historyList.editing .history-swipe-row.actions-open .swipe-main{width:calc(100% - 88px);transform:none}
@@ -234,7 +233,8 @@
       <section class="screen" data-screen="history" aria-label="Dream history">
         <header class="home-header">
           <div class="list-toolbar"><button class="list-edit" id="editDreams" type="button" aria-pressed="false">Edit</button><span aria-hidden="true"></span></div>
-          <h1 class="tab-heading">Dream Logs</h1>
+          <p class="date">Your private archive</p>
+          <h1 class="sr-only">History</h1>
         </header>
         <section class="history-focus" id="historyFocus" aria-labelledby="historyFocusTitle" hidden>
           <button class="history-focus-back" id="historyFocusBack" type="button">‹ All dreams</button>
@@ -250,7 +250,7 @@
       </section>
 
       <section class="screen active" data-screen="alarm" aria-label="Alarms">
-        <header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms" type="button" aria-pressed="false">Edit</button><button class="alarm-add" id="addAlarm" type="button" aria-label="Add alarm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></button></div><h1 class="tab-heading">Good Morning, Harris</h1></header>
+        <header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms" type="button" aria-pressed="false">Edit</button><button class="alarm-add" id="addAlarm" type="button" aria-label="Add alarm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></button></div><p class="date">Your morning</p><h1 class="sr-only">Alarms</h1></header>
         <div class="alarm-list" id="alarmList">
           <article class="alarm-row" data-hour="6" data-minute="30" data-period="AM" data-label="Wake up" data-repeat="Weekdays"><button class="alarm-edit" type="button" aria-label="Edit 6:30 AM Wake up alarm"><div class="alarm-copy"><div class="alarm-time"><span class="alarm-value">6:30</span> <span class="alarm-period">AM</span></div><div class="alarm-detail">Wake up · Weekdays</div></div></button><button class="switch on" type="button" role="switch" aria-checked="true" aria-label="Toggle 6:30 AM alarm"></button></article>
           <article class="alarm-row" data-hour="8" data-minute="00" data-period="AM" data-label="Weekend" data-repeat="Saturday, Sunday"><button class="alarm-edit" type="button" aria-label="Edit 8:00 AM Weekend alarm"><div class="alarm-copy"><div class="alarm-time"><span class="alarm-value">8:00</span> <span class="alarm-period">AM</span></div><div class="alarm-detail">Weekend · Saturday, Sunday</div></div></button><button class="switch" type="button" role="switch" aria-checked="false" aria-label="Toggle 8:00 AM alarm"></button></article>
@@ -276,7 +276,7 @@
       </section>
 
       <section class="screen" data-screen="insights" aria-label="Dream insights and sleep analytics">
-        <header class="insights-head"><h1 class="tab-heading">Sleep Patterns</h1></header>
+        <header class="insights-head"><p class="date">Your patterns</p><h1 class="sr-only">Insights</h1></header>
         <section class="insights-hero" aria-label="Monthly recall index">
           <p class="insights-hero-label">RECALL INDEX · THIS MONTH</p>
           <div class="insights-index"><strong id="recallIndex">67</strong><span>steady</span></div>
@@ -298,7 +298,7 @@
       </section>
 
       <section class="screen" data-screen="profile" aria-label="Profile and settings">
-        <h1 class="tab-heading">My Profile</h1>
+        <h1 class="sr-only">Profile</h1>
         <button class="profile-identity" id="showProfile" type="button" aria-label="Show Harris profile"><span class="profile-avatar">H</span><span class="profile-identity-copy"><strong>Harris</strong><span>Show profile</span></span><span class="profile-chevron" aria-hidden="true">›</span></button>
         <h2 class="settings-heading">Settings</h2>
         <p class="section-label">Appearance</p>

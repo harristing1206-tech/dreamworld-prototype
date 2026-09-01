@@ -23,10 +23,13 @@ test('labeled bottom navigation is compact without shrinking icons or labels', (
   assert.match(html, /\.tab\.log-tab \.plus-disc\{width:44px;height:44px/);
 });
 
-test('History edit minus occupies a centered dedicated row rail', () => {
-  assert.match(html, /#historyList\.editing \.history-swipe-row\{display:grid;grid-template-columns:50px minmax\(0,1fr\);align-items:stretch\}/);
-  assert.match(html, /#historyList\.editing \.edit-minus\{position:relative;left:auto;top:auto;align-self:center;justify-self:center;transform:none/);
-  assert.match(html, /#historyList\.editing \.history-swipe-row \.swipe-main\{grid-column:2;grid-row:1;width:100%;transform:none\}/);
+test('History edit minus occupies a centered rail that glides open', () => {
+  assert.match(html, /\.history-swipe-row\{display:grid;grid-template-columns:0 minmax\(0,1fr\);align-items:stretch[^}]*transition:grid-template-columns 240ms cubic-bezier\(\.22,\.61,\.36,1\)/);
+  assert.match(html, /\.history-swipe-row \.edit-minus\{position:relative;left:auto;top:auto;min-width:0;align-self:center;justify-self:center;transform:scale\(\.65\);grid-column:1;grid-row:1\}/);
+  assert.match(html, /\.history-swipe-row \.swipe-main\{grid-column:2;grid-row:1;width:100%;transform:none\}/);
+  assert.match(html, /#historyList\.editing \.history-swipe-row\{grid-template-columns:50px minmax\(0,1fr\)\}/);
+  assert.match(html, /#historyList\.editing \.edit-minus\{transform:scale\(1\)\}/);
+  assert.match(html, /#historyList\.editing \.history-swipe-row \.swipe-main\{width:100%;transform:none\}/);
 });
 
 test('Appearance offers only explicit Light and Dark modes', () => {

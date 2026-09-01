@@ -163,7 +163,7 @@
     .tab.log-tab{transform:none;gap:0}.tab.log-tab .plus-disc{width:44px;height:44px;min-width:44px;min-height:44px;flex-basis:44px;background:var(--ink);color:var(--canvas);box-shadow:none}.tab.log-tab svg{width:23px;height:23px}.tab.log-tab.active .plus-disc{box-shadow:0 0 0 3px color-mix(in srgb,var(--highlight) 30%,transparent)}
 
     /* Alarm becomes a next-wake stage, not a flat utility list. */
-    .alarm-head,.home-header{position:relative;padding-top:52px}.insights-head,.profile-head{position:relative;padding-top:0}.alarm-head .list-toolbar,.home-header .list-toolbar{position:absolute;left:0;right:0;top:0;width:auto;height:44px}.alarm-head .nav-title,.home-header .greeting,.insights-head .nav-title,.profile-head h1,.log-screen .log-title{margin:0;font-size:var(--type-display-size);line-height:var(--type-display-line);letter-spacing:var(--type-display-tracking);font-weight:var(--type-display-weight)}
+    .alarm-head,.home-header,.insights-head,.profile-head{position:relative;padding-top:52px}.alarm-head .list-toolbar,.home-header .list-toolbar{position:absolute;left:0;right:0;top:0;width:auto;height:44px}.alarm-head .nav-title,.home-header .greeting,.insights-head .nav-title,.profile-head h1{margin:0;font-size:var(--type-display-size);line-height:var(--type-display-line);letter-spacing:var(--type-display-tracking);font-weight:var(--type-display-weight)}
     .context-rail{position:absolute;left:0;right:0;top:0;height:44px;display:flex;align-items:center;justify-content:space-between}
     .rail-meta{min-width:0;max-width:100%;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--type-meta-size);line-height:var(--type-meta-line);font-weight:550;color:var(--muted);letter-spacing:0;text-transform:none;background:transparent;border:0;box-shadow:none;pointer-events:none}
     .rail-meta-right{margin-left:auto;text-align:right;justify-content:flex-end}.rail-meta svg{width:14px;height:14px;flex:0 0 14px;margin-right:6px}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
@@ -206,13 +206,12 @@
 
     /* Capture becomes an immersive chamber with controls anchored low. */
     .log-screen{padding:0!important;overflow:hidden!important;background:var(--premium-dark);color:#f1f3f5}
-    .log-screen>header{position:absolute;z-index:3;left:24px;right:24px;top:8px}.log-screen .log-kicker{color:rgba(241,243,245,.55)}.log-screen .log-title{max-width:290px}.log-screen .log-copy{max-width:270px;color:rgba(241,243,245,.62)}
+    .log-screen>header{position:absolute;z-index:3;left:24px;right:24px;top:8px;padding-top:52px}.log-screen .log-kicker{color:rgba(241,243,245,.55)}.log-screen .log-title{max-width:290px;margin:0;font-size:var(--type-display-size);line-height:var(--type-display-line);letter-spacing:var(--type-display-tracking);font-weight:var(--type-display-weight)}.log-screen .log-copy{max-width:270px;color:rgba(241,243,245,.62)}.log-screen .rail-meta{color:rgba(241,243,245,.72)}
     .log-screen:before,.log-screen:after{content:"";position:absolute;pointer-events:none;border-radius:50%;filter:blur(3px)}
     .log-screen:before{width:430px;height:430px;left:-185px;top:135px;background:rgba(62,104,138,.22);filter:blur(72px)}
     .log-screen:after{width:330px;height:330px;right:-185px;bottom:-40px;border:1px solid rgba(223,138,98,.26);box-shadow:0 0 0 38px rgba(223,138,98,.025),0 0 0 84px rgba(143,196,239,.02)}
     .log-screen .capture-state{position:absolute;z-index:2;inset:213px 24px 20px;padding:0;align-content:end}.log-screen .capture-state.active{display:grid}.log-screen .capture-state>p{color:rgba(241,243,245,.65)}
     .log-screen .mic{width:112px;height:112px;justify-self:center;background:#f1f3f5;color:#1f2a33;box-shadow:0 18px 55px rgba(0,0,0,.36)}.log-screen .mic svg{width:40px;height:40px}.log-screen .mic-label{color:#f1f3f5}.log-screen .quiet{color:rgba(241,243,245,.65)}
-    .capture-privacy-note{margin:10px auto 0;display:flex;align-items:center;justify-content:center;font-size:var(--type-meta-size);line-height:var(--type-meta-line);font-weight:550;color:rgba(241,243,245,.72)}.capture-privacy-note svg{width:14px;height:14px;flex:0 0 14px;margin-right:6px}
     .log-screen:has(.capture-state.active:not([data-log-state="ready"]))>header{visibility:hidden}.log-screen .capture-state.active:not([data-log-state="ready"]){inset:0;padding:24px;overflow-y:auto;align-content:safe center;background:var(--premium-dark)}.log-screen .recording-state{align-content:center;isolation:isolate;overflow:hidden!important}.log-screen .recording-state>*:not(.voice-visual){position:relative;z-index:2}.log-screen .recording-state .voice-visual{position:absolute;z-index:0;inset:0;width:100%;height:100%;margin:0;pointer-events:none}.log-screen .recording-state .log-kicker{position:absolute;left:0;right:0;top:clamp(42px,8%,70px);margin:0;max-width:none}.log-screen .recording-state .timer{position:absolute;left:0;right:0;top:clamp(72px,12%,104px);margin:0}.log-screen .recording-state .stop{position:absolute;left:50%;bottom:clamp(96px,17%,132px);transform:translateX(-50%);margin:0}.log-screen .recording-state .recording-hint{position:absolute;left:28px;right:28px;bottom:clamp(30px,7%,54px);margin:0!important;max-width:none}.log-screen .recording-state .exit-recording{position:absolute;top:max(18px,env(safe-area-inset-top));right:18px;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:rgba(241,243,245,.10);color:#f1f3f5;font-size:28px;line-height:1;cursor:pointer}.log-screen .recording-state .pause-recording{position:absolute;left:calc(50% - 96px);bottom:clamp(108px,19%,144px);width:52px;height:52px;padding:0;border:1px solid var(--premium-line);border-radius:50%;background:rgba(241,243,245,.08);color:#f1f3f5;display:grid;place-items:center;cursor:pointer}.pause-recording:before{content:"";width:14px;height:18px;border-left:4px solid currentColor;border-right:4px solid currentColor}.pause-recording[data-paused="true"]:before{width:0;height:0;border:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:16px solid currentColor;transform:translateX(2px)}.log-screen .stop{background:#f1f3f5;border-color:#f1f3f5}.log-screen .stop:after{background:var(--premium-dark)}.log-screen .state-icon{background:rgba(241,243,245,.10);color:#a9c9e3}.log-screen .draft-row{border-color:var(--premium-line)}
     .log-screen .primary{background:#f1f3f5;color:#1f252b;border-radius:16px}.log-screen .secondary{background:transparent;border-color:var(--premium-line);color:#f1f3f5;border-radius:16px}.log-screen .transcript{background:rgba(241,243,245,.07);border-color:var(--premium-line);color:#f1f3f5}.log-screen .transcript-provenance{color:rgba(241,243,245,.55)}
 
@@ -227,7 +226,7 @@
     :root[data-theme="dark"] .insights-wave i{background:#62b4ff;opacity:.14}
     :root[data-theme="dark"] .insights-wave i[data-rating="Faint"]{background:#8fc8ff;opacity:.52}
     :root[data-theme="dark"] .insights-wave i[data-rating="Clear"]{background:#27a2ff;opacity:.96}
-    .insights-calendar{margin-top:0;padding:16px 0 14px;border:0;border-radius:18px;background:var(--surface)}.insights-calendar .calendar-toolbar{padding:0 12px;justify-content:space-between;gap:12px}.insights-calendar .calendar-toolbar h2{min-width:0;white-space:normal}.calendar-weekdays,.calendar-grid{gap:3px}
+    .insights-calendar{margin-top:0;padding:16px 0 14px;border:0;border-radius:18px;background:var(--surface)}.insights-calendar .calendar-toolbar{padding:0 12px;justify-content:flex-end}.calendar-weekdays,.calendar-grid{gap:3px}
     .insight-metrics{margin-top:20px}.insight-metric{min-height:66px;gap:0}.metric-symbol{display:none}.metric-copy strong{font-size:14px}.metric-copy span{max-width:190px}.metric-value strong{font-size:17px}.insight-detail{border-radius:18px;padding:18px}
 
     /* Profile is identity first; settings remain quiet native rows. */
@@ -273,10 +272,10 @@
       </section>
 
       <section class="screen log-screen" data-screen="log" aria-label="Log a dream">
-        <header><h1 class="log-title">What do you remember?</h1><p class="log-copy">Start with any detail. Silence is okay.</p></header>
+        <header><div class="context-rail"><span class="rail-meta rail-meta-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Private capture</span></div><h1 class="log-title">What do you remember?</h1><p class="log-copy">Start with any detail. Silence is okay.</p></header>
         <div class="capture-state active" data-log-state="ready">
           <button class="mic" id="startRecording" type="button" aria-label="Start recording"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="8" y="2" width="8" height="14" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 19v3M9 22h6"/></svg></button>
-          <p class="mic-label">Tap to record</p><p class="capture-privacy-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Private recording · transcription uses your private server</p><button class="quiet" id="noDream" type="button">No dream this morning</button>
+          <p class="mic-label">Tap to record</p><button class="quiet" id="noDream" type="button">No dream this morning</button>
         </div>
         <div class="capture-state recording-state" data-log-state="recording"><p class="log-kicker" id="recordingStatus" role="status">Recording</p><div class="timer" id="timer">00:00</div><div class="voice-visual" id="voiceVisual" data-reactive="false" data-energy="idle" aria-hidden="true"><canvas class="voice-field-canvas" id="voiceCanvas" aria-hidden="true"></canvas></div><button class="exit-recording" id="exitRecording" type="button" aria-label="Exit and save recording">×</button><button class="pause-recording" id="pauseRecording" type="button" aria-label="Pause recording" data-paused="false"></button><button class="stop" id="stopRecording" type="button" aria-label="Stop and save recording"></button><p class="recording-hint">Pause whenever you need. Exit always preserves your audio.</p></div>
         <div class="capture-state" data-log-state="draft"><div class="state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h8V3M9 17h6"/></svg></div><h2>Recording saved.</h2><p>Your raw audio is preserved. Logging sends it through your private transcription server.</p><div class="draft-row"><button class="play" id="playDraft" type="button" aria-label="Play saved recording">▶</button><div><strong>Dream recording</strong><span id="draftTime">Saved draft</span></div></div><button class="primary" id="logDream" type="button">Log Dream</button><button class="secondary" id="recordAgain" type="button">Discard and record again</button></div>
@@ -289,14 +288,14 @@
       </section>
 
       <section class="screen" data-screen="insights" aria-label="Dream insights and sleep analytics">
-        <header class="insights-head"><h1 class="nav-title">Insights</h1></header>
+        <header class="insights-head"><div class="context-rail"><span class="rail-meta rail-meta-right" id="insightsRailPeriod">September 2026</span></div><h1 class="nav-title">Insights</h1></header>
         <section class="insights-hero" aria-label="Monthly recall index">
           <p class="insights-hero-label" id="recallPeriodLabel">RECALL INDEX · THIS MONTH</p>
           <div class="insights-index"><strong id="recallIndex">—</strong><span id="recallTrend">No rated dreams yet</span></div>
           <div class="insights-wave" id="insightsWave" role="img" aria-label="No recall ratings this month" hidden></div>
         </section>
         <section class="insights-calendar" aria-labelledby="insightsMonth">
-          <div class="calendar-toolbar"><h2 id="insightsMonth">This month</h2><span class="calendar-legend">Dream logged</span></div>
+          <div class="calendar-toolbar"><h2 class="visually-hidden" id="insightsMonth">This month</h2><span class="calendar-legend">Dream logged</span></div>
           <div class="calendar-weekdays" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
           <div class="calendar-grid" id="insightsCalendar" aria-label="Dream days this month"></div>
         </section>
@@ -311,7 +310,7 @@
       </section>
 
       <section class="screen" data-screen="profile" aria-label="Profile and settings">
-        <header class="profile-head"><h1>My Dream World</h1></header>
+        <header class="profile-head"><div class="context-rail"><span class="rail-meta rail-meta-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Private profile</span></div><h1>My Dream World</h1></header>
         <button class="profile-identity" id="showProfile" type="button" aria-label="Show Harris profile"><span class="profile-avatar">H</span><span class="profile-identity-copy"><strong>Harris</strong><span>Show profile</span></span><span class="profile-chevron" aria-hidden="true">›</span></button>
         <h2 class="settings-heading">Settings</h2>
         <p class="section-label">Appearance</p>
@@ -468,7 +467,7 @@
   };
   const renderInsightsCalendar=(periodDate=new Date())=>{
     const calendar=document.getElementById('insightsCalendar');calendar.replaceChildren();const year=periodDate.getFullYear(),month=periodDate.getMonth(),prefix=`${year}-${String(month+1).padStart(2,'0')}`,monthLabel=periodDate.toLocaleDateString(undefined,{month:'long',year:'numeric'}),selectedRecord=sortedJournalRecords().find(record=>record.dateKey?.startsWith(prefix))||null,selectedKey=selectedRecord?.dateKey||localDateKey(periodDate);
-    document.getElementById('insightsMonth').textContent=monthLabel;calendar.setAttribute('aria-label',`Dream days in ${monthLabel}`);
+    document.getElementById('insightsRailPeriod').textContent=monthLabel;document.getElementById('insightsMonth').textContent=monthLabel;calendar.setAttribute('aria-label',`Dream days in ${monthLabel}`);
     const firstWeekday=new Date(year,month,1).getDay(),daysInMonth=new Date(year,month+1,0).getDate();
     for(let blank=0;blank<firstWeekday;blank++){const spacer=document.createElement('span');spacer.className='calendar-blank';spacer.setAttribute('aria-hidden','true');calendar.appendChild(spacer)}
     for(let day=1;day<=daysInMonth;day++){

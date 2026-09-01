@@ -11,11 +11,11 @@ test('Alarm swaps Edit left and Add bubble right while History keeps Edit left',
   assert.doesNotMatch(html,/id="addAlarm"[\s\S]{0,500}background:var\(--highlight\)/,'header Add must not compete with Capture');
 });
 
-test('every root title uses one shared top-left origin and font metrics',()=>{
-  assert.match(html,/\.alarm-head,\.home-header,\.insights-head,\.profile-head\{position:relative;padding-top:52px\}/);
-  assert.match(html,/\.alarm-head \.nav-title,\.home-header \.greeting,\.insights-head \.nav-title,\.profile-head h1\{margin:0;font-size:var\(--type-display-size\);line-height:var\(--type-display-line\);letter-spacing:var\(--type-display-tracking\);font-weight:var\(--type-display-weight\)\}/);
-  assert.match(html,/\.log-screen>header\{[^}]*left:24px;right:24px;top:8px;padding-top:52px\}/);
-  assert.match(html,/\.log-screen \.log-title\{[^}]*margin:0[^}]*font-size:var\(--type-display-size\)/);
+test('both header archetypes share gutters and title metrics',()=>{
+  assert.match(html,/\.alarm-head,\.home-header\{position:relative;padding-top:52px\}/);
+  assert.match(html,/\.insights-head,\.profile-head\{position:relative;padding-top:0\}/);
+  assert.match(html,/\.alarm-head \.nav-title,\.home-header \.greeting,\.insights-head \.nav-title,\.profile-head h1,\.log-screen \.log-title\{margin:0;font-size:var\(--type-display-size\);line-height:var\(--type-display-line\);letter-spacing:var\(--type-display-tracking\);font-weight:var\(--type-display-weight\)\}/);
+  assert.match(html,/\.log-screen>header\{[^}]*left:24px;right:24px;top:8px\}/);
 });
 
 test('header actions use contained semantic-click illumination without layout animation',()=>{

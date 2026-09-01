@@ -10,7 +10,7 @@ assert.match(html,/button\.append\(rail,title,date,excerpt,arrow\)/,'History row
 assert.match(html,/historyFocus\.addEventListener\('touchstart'/,'dream detail swipe start is missing');
 assert.match(html,/historySwipe\.dx>=72/,'swipe-right release threshold is missing');
 assert.match(html,/event\.preventDefault\(\)[\s\S]*translateX/,'horizontal swipe feedback is missing');
-assert.match(html,/<header class="profile-head"><div class="context-rail">[\s\S]*?Private profile[\s\S]*?<\/div><h1>My Dream World<\/h1><\/header>/,'Profile title hierarchy and privacy context are missing');
+assert.match(html,/<header class="profile-head"><h1>My Dream World<\/h1><\/header>/,'Profile direct-content title hierarchy is missing');
 assert.match(html,/class="profile-identity"[^>]*aria-label="Show Harris profile"/,'Profile identity row is missing');
 assert.match(html,/\.profile-identity\{[^}]*min-height:92px[^}]*border-bottom:1px solid var\(--separator\)/,'Profile identity row lacks native separation');
 assert.match(html,/<h2 class="settings-heading">Settings<\/h2>/,'Settings heading is missing');

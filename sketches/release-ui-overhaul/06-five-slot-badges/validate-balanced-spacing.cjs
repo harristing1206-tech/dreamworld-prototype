@@ -12,7 +12,8 @@ assert.match(html, /\.phone\{[^}]*aspect-ratio:402\/840[^}]*border-radius:42px/,
 assert.match(html, /@media\(max-width:500px\) and \(pointer:fine\)/, 'narrow laptop preview is incorrectly treated as a phone');
 assert.match(html, /@media\(display-mode:standalone\),\(max-width:500px\) and \(pointer:coarse\)/, 'real phone and installed-app fullscreen behavior missing');
 assert.match(html, /\.screen\{[^}]*padding:[^}]*env\(safe-area-inset-right\)[^}]*env\(safe-area-inset-left\)/, 'screen safe-area gutters missing');
-assert.match(html, /\.alarm-head,\.home-header,\.insights-head,\.profile-head\{[^}]*padding-top:52px/, 'Root destinations do not share the unified title geometry');
+assert.match(html, /\.alarm-head,\.home-header\{[^}]*padding-top:52px/, 'Action headers do not share toolbar geometry');
+assert.match(html, /\.insights-head,\.profile-head\{[^}]*padding-top:0/, 'Direct-content headers still reserve an empty toolbar');
 assert.match(html, /\.alarm-head \.list-toolbar,\.home-header \.list-toolbar\{[^}]*left:0[^}]*right:0[^}]*top:0[^}]*height:44px/, 'Alarm Edit does not share History’s stable top-right slot');
 assert.match(html, /\.alarm-add\{[^}]*width:44px[^}]*height:44px[^}]*border-radius:50%[^}]*background:var\(--raised\)/, 'header Add Alarm bubble is not a full quiet touch target');
 assert.match(html, /\.alarm-row \.swipe-main\{[^}]*min-height:84px[^}]*padding:7px 0/, 'Alarm rows are not compact');

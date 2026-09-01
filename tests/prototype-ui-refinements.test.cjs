@@ -51,7 +51,7 @@ test('primary alarm switch does not override semantic active and off colors', ()
   const primarySwitch = html.match(/#alarmList \.alarm-row:first-child \.switch\{([^}]+)\}/);
   assert.ok(primarySwitch, 'primary alarm switch positioning rule missing');
   assert.doesNotMatch(primarySwitch[1], /background:/, 'primary switch must not override semantic state colors');
-  assert.match(html, /\.switch\.on\{background:var\(--alarm-on\)\}/);
+  assert.match(html, /\.switch\.on:before\{background:var\(--alarm-on\)\}/);
   assert.match(html, /--switch-off:#b9c0c7/);
   assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--switch-off:#48505a/);
 });
@@ -63,7 +63,7 @@ test('theme text is monochrome while enabled alarms use iOS green', () => {
   assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--active:#f1f3f5/);
   assert.match(html, /:root\[data-theme="dark"\]\{[\s\S]*--accent-ink:#000000/);
   assert.match(html, /--alarm-on:#34c759/);
-  assert.match(html, /\.switch\.on\{background:var\(--alarm-on\)\}/);
+  assert.match(html, /\.switch\.on:before\{background:var\(--alarm-on\)\}/);
   assert.ok(contrast('#1f252b', '#ffffff') >= 4.5, 'light theme text must remain readable black');
   assert.ok(contrast('#f1f3f5', '#000000') >= 4.5, 'dark theme text must remain readable white');
 });

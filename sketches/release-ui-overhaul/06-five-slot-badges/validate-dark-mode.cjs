@@ -16,10 +16,10 @@ const d=dom.window.document,wait=ms=>new Promise(resolve=>dom.window.setTimeout(
   assert.match(source,/:root\[data-theme="dark"\] \.alarm-list \.alarm-row:not\(:first-child\)\{background:var\(--surface\);color:var\(--ink\);box-shadow:0 16px 38px rgba\(0,0,0,\.22\)\}/,'dark secondary alarms lack the Ambient Paper override');
   assert.match(source,/:root\[data-theme="dark"\] \.insights-hero\{background:#06264d;color:#f4f8ff;box-shadow:0 18px 42px rgba\(0,111,230,\.24\)\}/,'dark Recall Index does not use the vibrant blue field');
   assert.match(source,/:root\[data-theme="dark"\] \.insights-hero:after\{background:rgba\(34,155,255,\.72\);filter:blur\(52px\)\}/,'dark Recall Index blue fade is missing');
-  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child\{background:#d9dcdf;color:#1f252b\}/,'main alarm bubble does not finish in the requested soft gray in dark mode');
-  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child:before\{background:rgba\(0,0,0,\.72\)\}/,'dark-mode main alarm lacks the visible opposite black-to-white fade');
-  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-time\{color:#f5f7f9;[^}]*text-shadow:0 2px 16px rgba\(0,0,0,\.48\)/,'inverted main alarm time lacks contrast over the black corner');
-  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-detail\{color:rgba\(245,247,249,\.76\)\}/,'inverted main alarm supporting text lacks light contrast over the black corner');
+  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child\{background:#171a20;color:#f5f7f9\}/,'dark main alarm must use one stable high-contrast surface');
+  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child:before\{background:rgba\(95,142,168,\.22\)\}/,'dark-mode main alarm lacks its restrained atmospheric haze');
+  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-time\{color:#f5f7f9;[^}]*text-shadow:0 2px 16px rgba\(0,0,0,\.48\)/,'dark main alarm time lacks stable contrast');
+  assert.match(source,/:root\[data-theme="dark"\] #alarmList \.alarm-row:first-child \.alarm-detail\{color:#c4c9cf\}/,'dark main alarm supporting text lacks stable contrast');
   assert.doesNotMatch(source,/appearanceMedia\.addEventListener|\['system','light','dark'\]/);
   assert.equal(d.documentElement.dataset.theme,'dark');
   assert.equal(d.documentElement.dataset.themePreference,'dark');

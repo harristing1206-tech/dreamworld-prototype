@@ -8,7 +8,7 @@ const requiredTokens = {
   surface: '#ffffff',
   raised: '#f1f2ef',
   ink: '#1f252b',
-  muted: '#66707a',
+  muted: '#646f79',
   faint: '#8b939b',
   accent: '#1f252b',
   highlight: '#c6724c',
@@ -46,7 +46,7 @@ assert.match(html, /--tabbar-bg:#ffffff/, 'light tab bar is not fully opaque whi
 assert.match(html, /--bubble-outline:rgba\(35,43,51,\.18\)/, 'light bubble outline token missing');
 assert.match(html, /:root\[data-theme="light"\] :is\([^}]*\.insights-calendar[^}]*\.profile-avatar[^}]*\)\{outline:1px solid var\(--bubble-outline\);outline-offset:-1px\}/, 'remaining light-mode bubbles do not share the thin gray outline');
 assert.doesNotMatch(html, /:root\[data-theme="light"\] :is\([^}]*#alarmList \.alarm-row/, 'Ambient Paper alarm cards must stay outside the legacy outline group');
-assert.match(html, /\.insights-calendar\{[^}]*padding:16px 12px 14px[^}]*border-radius:18px[^}]*background:var\(--surface\)/, 'calendar is not a rounded outlined surface');
+assert.match(html, /\.insights-calendar\{[^}]*padding:16px 0 14px[^}]*border-radius:18px[^}]*background:var\(--surface\)/, 'calendar is not a rounded accessible-target surface');
 assert.match(html, /\.tabbar\{[^}]*background:var\(--tabbar-bg\)/, 'tab bar does not use the semantic theme token');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*background:var\(--highlight\)/, 'log action is not using terracotta');
 assert.match(html, /\.mic\{[^}]*background:var\(--highlight\)/, 'capture action is not using terracotta');

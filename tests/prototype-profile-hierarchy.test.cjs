@@ -16,7 +16,7 @@ test('bottom navigation is slightly shorter with labels closer to icons', () => 
 
 test('Profile follows title, identity row, then settings hierarchy', () => {
   const profile = html.match(/<section class="screen" data-screen="profile"[\s\S]*?<\/section>/)?.[0] || '';
-  assert.match(profile, /<h1 class="sr-only">Profile<\/h1>/);
+  assert.match(profile, /<header class="profile-head"><h1>My Dream World<\/h1><\/header>/);
   assert.match(profile, /<button class="profile-identity" id="showProfile"[^>]*aria-label="Show Harris profile"/);
   assert.match(profile, /<span class="profile-avatar">H<\/span>/);
   assert.match(profile, /<span class="profile-identity-copy"><strong>Harris<\/strong><span>Show profile<\/span><\/span>/);

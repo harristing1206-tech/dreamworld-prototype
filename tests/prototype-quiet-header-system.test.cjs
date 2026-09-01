@@ -9,7 +9,7 @@ test('destination headers use one clear title without repeated kickers',()=>{
   assert.match(html,/<header class="alarm-head">[\s\S]*?<h1 class="nav-title">Alarm<\/h1><\/header>/);
   assert.match(html,/<header class="home-header">[\s\S]*?<h1 class="greeting">Dream journal\.<\/h1>\s*<\/header>/);
   assert.match(html,/<header><div class="context-rail">[\s\S]*?Private capture[\s\S]*?<\/div><h1 class="log-title">What do you remember\?<\/h1><p class="log-copy">Start with any detail\. Silence is okay\.<\/p><\/header>/);
-  assert.match(html,/<header class="insights-head"><div class="context-rail">[\s\S]*?id="insightsRailPeriod"[\s\S]*?<\/div><h1 class="nav-title">Insights<\/h1><\/header>/);
+  assert.match(html,/<header class="insights-head"><div class="context-rail insights-latest-rail">[\s\S]*?id="latestDreamRail"[\s\S]*?<\/div><h1 class="nav-title">Insights<\/h1><\/header>/);
   assert.match(html,/--type-display-size:31px;--type-display-line:34px;--type-display-weight:620/,'the accepted display scale must remain');
 });
 

@@ -16,7 +16,7 @@ test('Add bubble matches Edit material without a decorative outline',()=>{
 test('every root rail contains truthful actions or context',()=>{
   assert.match(html,/<header class="home-header">[\s\S]*?<button[^>]*id="editDreams"[\s\S]*?<span class="rail-meta rail-meta-right" id="historyRailCount">6 dreams<\/span>/);
   assert.match(html,/<header><div class="context-rail"><span class="rail-meta rail-meta-left"><svg[^>]*aria-hidden="true"[\s\S]*?<\/svg>Private capture<\/span><\/div><h1 class="log-title">/);
-  assert.match(html,/<header class="insights-head"><div class="context-rail"><span class="rail-meta rail-meta-right" id="insightsRailPeriod">[\s\S]*?<\/span><\/div><h1 class="nav-title">Insights<\/h1><\/header>/);
+  assert.match(html,/<header class="insights-head"><div class="context-rail insights-latest-rail">[\s\S]*?id="latestDreamRail"[\s\S]*?<\/div><h1 class="nav-title">Insights<\/h1><\/header>/);
   assert.match(html,/<header class="profile-head"><div class="context-rail"><span class="rail-meta rail-meta-left"><svg[^>]*aria-hidden="true"[\s\S]*?<\/svg>Private profile<\/span><\/div><h1>My Dream World<\/h1><\/header>/);
   assert.doesNotMatch(html,/class="rail-meta[^"]*"[^>]*(?:role="button"|tabindex=|onclick=)/);
 });
@@ -31,7 +31,7 @@ test('rail metadata is plain subordinate text, not a false affordance',()=>{
 test('History count and Insights period share their canonical data sources',()=>{
   assert.match(html,/const updateHistoryRailCount=\(\)=>\{const count=journalRecords\.length;document\.getElementById\('historyRailCount'\)\.textContent=`\$\{count\} dream\$\{count===1\?'':'s'\}`\}/);
   assert.match(html,/const renderHistoryList=\(\)=>\{[\s\S]*?updateHistoryRailCount\(\)/);
-  assert.match(html,/document\.getElementById\('insightsRailPeriod'\)\.textContent=monthLabel/);
-  assert.match(html,/<h2 class="visually-hidden" id="insightsMonth">This month<\/h2>/);
-  assert.match(html,/\.visually-hidden\{position:absolute[^}]*clip:rect\(0 0 0 0\)/);
+  assert.match(html,/document\.getElementById\('insightsMonth'\)\.textContent=monthLabel/);
+  assert.match(html,/<h2 id="insightsMonth">This month<\/h2>/);
+  assert.doesNotMatch(html,/insightsRailPeriod/);
 });

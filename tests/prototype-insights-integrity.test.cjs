@@ -32,7 +32,7 @@ test('Calendar selection and detail cannot retain a record from another month', 
 test('one period snapshot refreshes the whole screen on entry and month rollover', () => {
   assert.match(html, /const renderInsightsCalendar=\(periodDate=new Date\(\)\)=>/);
   assert.match(html, /const updateInsights=\(periodDate=new Date\(\)\)=>/);
-  assert.match(html, /const refreshInsights=\(periodDate=new Date\(\)\)=>\{renderInsightsCalendar\(periodDate\);updateInsights\(periodDate\);insightsPeriodKey=/);
+  assert.match(html, /const refreshInsights=\(periodDate=new Date\(\)\)=>\{renderInsightsSourceRail\(\);renderInsightsCalendar\(periodDate\);updateInsights\(periodDate\);insightsPeriodKey=/);
   assert.match(html, /if\(name==='insights'\)refreshInsights\(new Date\(\)\)/);
   assert.match(html, /visibilitychange[\s\S]*setInterval\(refreshInsightsIfPeriodChanged,60000\)/);
 });

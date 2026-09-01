@@ -167,6 +167,7 @@
     .context-rail{position:absolute;left:0;right:0;top:0;height:44px;display:flex;align-items:center;justify-content:space-between}
     .rail-meta{min-width:0;max-width:100%;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--type-meta-size);line-height:var(--type-meta-line);font-weight:550;color:var(--muted);letter-spacing:0;text-transform:none;background:transparent;border:0;box-shadow:none;pointer-events:none}
     .rail-meta-right{margin-left:auto;text-align:right;justify-content:flex-end}.rail-meta svg{width:14px;height:14px;flex:0 0 14px;margin-right:6px}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    .insights-latest-rail button{width:100%;height:44px;min-width:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--muted);display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer}.latest-dream-date{width:49px;flex:0 0 49px;display:flex;flex-direction:column;line-height:1}.latest-dream-date strong{font-size:15px;font-weight:600;color:var(--ink)}.latest-dream-date span{margin-top:4px;font-size:var(--type-label-size);line-height:var(--type-label-line);font-weight:var(--type-label-weight);letter-spacing:.1em;text-transform:uppercase}.latest-dream-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--type-meta-size);line-height:var(--type-meta-line);font-weight:550}.insights-latest-rail button:hover .latest-dream-title{color:var(--ink)}.latest-dream-empty{font-size:var(--type-meta-size);line-height:var(--type-meta-line);font-weight:550;color:var(--muted)}
     #editAlarms,#addAlarm,#editDreams{position:relative;isolation:isolate;overflow:hidden;transition:scale 220ms cubic-bezier(.22,.61,.36,1),background-color 220ms cubic-bezier(.22,.61,.36,1),box-shadow 220ms cubic-bezier(.22,.61,.36,1)}
     #editAlarms:active,#addAlarm:active,#editDreams:active{scale:.96;transition-duration:90ms}
     .header-action:after{content:"";position:absolute;z-index:-1;inset:0;border-radius:inherit;background:rgba(198,114,76,.18);background:color-mix(in srgb,var(--highlight) 22%,transparent);opacity:0;transform:scale(.72);pointer-events:none}
@@ -226,7 +227,7 @@
     :root[data-theme="dark"] .insights-wave i{background:#62b4ff;opacity:.14}
     :root[data-theme="dark"] .insights-wave i[data-rating="Faint"]{background:#8fc8ff;opacity:.52}
     :root[data-theme="dark"] .insights-wave i[data-rating="Clear"]{background:#27a2ff;opacity:.96}
-    .insights-calendar{margin-top:0;padding:16px 0 14px;border:0;border-radius:18px;background:var(--surface)}.insights-calendar .calendar-toolbar{padding:0 12px;justify-content:flex-end}.calendar-weekdays,.calendar-grid{gap:3px}
+    .insights-calendar{margin-top:0;padding:16px 0 14px;border:0;border-radius:18px;background:var(--surface)}.insights-calendar .calendar-toolbar{padding:0 12px;justify-content:space-between;gap:12px}.insights-calendar .calendar-toolbar h2{min-width:0;white-space:normal}.calendar-weekdays,.calendar-grid{gap:3px}
     .insight-metrics{margin-top:20px}.insight-metric{min-height:66px;gap:0}.metric-symbol{display:none}.metric-copy strong{font-size:14px}.metric-copy span{max-width:190px}.metric-value strong{font-size:17px}.insight-detail{border-radius:18px;padding:18px}
 
     /* Profile is identity first; settings remain quiet native rows. */
@@ -288,14 +289,14 @@
       </section>
 
       <section class="screen" data-screen="insights" aria-label="Dream insights and sleep analytics">
-        <header class="insights-head"><div class="context-rail"><span class="rail-meta rail-meta-right" id="insightsRailPeriod">September 2026</span></div><h1 class="nav-title">Insights</h1></header>
+        <header class="insights-head"><div class="context-rail insights-latest-rail"><button id="latestDreamRail" type="button" aria-label="Open latest dream"><span class="latest-dream-date"><strong id="latestDreamRailDay">25</strong><span id="latestDreamRailMonth">AUG</span></span><span class="latest-dream-title" id="latestDreamRailTitle">The station beneath the lake</span></button><span class="latest-dream-empty" id="latestDreamRailEmpty" hidden>No dreams logged yet</span></div><h1 class="nav-title">Insights</h1></header>
         <section class="insights-hero" aria-label="Monthly recall index">
           <p class="insights-hero-label" id="recallPeriodLabel">RECALL INDEX · THIS MONTH</p>
           <div class="insights-index"><strong id="recallIndex">—</strong><span id="recallTrend">No rated dreams yet</span></div>
           <div class="insights-wave" id="insightsWave" role="img" aria-label="No recall ratings this month" hidden></div>
         </section>
         <section class="insights-calendar" aria-labelledby="insightsMonth">
-          <div class="calendar-toolbar"><h2 class="visually-hidden" id="insightsMonth">This month</h2><span class="calendar-legend">Dream logged</span></div>
+          <div class="calendar-toolbar"><h2 id="insightsMonth">This month</h2><span class="calendar-legend">Dream logged</span></div>
           <div class="calendar-weekdays" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
           <div class="calendar-grid" id="insightsCalendar" aria-label="Dream days this month"></div>
         </section>
@@ -465,9 +466,12 @@
     document.getElementById('insightDetailDream').textContent=record?formatSeconds(record.recording):'—';
     document.getElementById('insightDetailRecall').textContent=record?(record.recall||'Unrated'):'—';
   };
+  let latestInsightsRecord=null;
+  const renderInsightsSourceRail=()=>{const latest=sortedJournalRecords()[0]||null;latestInsightsRecord=latest;const button=document.getElementById('latestDreamRail'),empty=document.getElementById('latestDreamRailEmpty');button.hidden=!latest;empty.hidden=Boolean(latest);if(!latest)return;const parts=historyDateParts(latest);document.getElementById('latestDreamRailDay').textContent=parts.day;document.getElementById('latestDreamRailMonth').textContent=parts.month.toUpperCase();document.getElementById('latestDreamRailTitle').textContent=latest.title;document.getElementById('latestDreamRail').setAttribute('aria-label',`Open latest dream, ${latest.title}`)};
+  document.getElementById('latestDreamRail').addEventListener('click',()=>{if(latestInsightsRecord)openDreamFromInsights(latestInsightsRecord)});
   const renderInsightsCalendar=(periodDate=new Date())=>{
     const calendar=document.getElementById('insightsCalendar');calendar.replaceChildren();const year=periodDate.getFullYear(),month=periodDate.getMonth(),prefix=`${year}-${String(month+1).padStart(2,'0')}`,monthLabel=periodDate.toLocaleDateString(undefined,{month:'long',year:'numeric'}),selectedRecord=sortedJournalRecords().find(record=>record.dateKey?.startsWith(prefix))||null,selectedKey=selectedRecord?.dateKey||localDateKey(periodDate);
-    document.getElementById('insightsRailPeriod').textContent=monthLabel;document.getElementById('insightsMonth').textContent=monthLabel;calendar.setAttribute('aria-label',`Dream days in ${monthLabel}`);
+    document.getElementById('insightsMonth').textContent=monthLabel;calendar.setAttribute('aria-label',`Dream days in ${monthLabel}`);
     const firstWeekday=new Date(year,month,1).getDay(),daysInMonth=new Date(year,month+1,0).getDate();
     for(let blank=0;blank<firstWeekday;blank++){const spacer=document.createElement('span');spacer.className='calendar-blank';spacer.setAttribute('aria-hidden','true');calendar.appendChild(spacer)}
     for(let day=1;day<=daysInMonth;day++){
@@ -506,7 +510,7 @@
     hero.setAttribute('aria-label',currentScore===null?`Monthly recall index for ${monthName}: not enough data`:`Monthly recall index for ${monthName}: ${currentScore}. ${recallTrend.textContent}`);renderRecallWave(ratedRecords);
   };
   let insightsPeriodKey='';
-  const refreshInsights=(periodDate=new Date())=>{renderInsightsCalendar(periodDate);updateInsights(periodDate);insightsPeriodKey=localDateKey(periodDate).slice(0,7)};
+  const refreshInsights=(periodDate=new Date())=>{renderInsightsSourceRail();renderInsightsCalendar(periodDate);updateInsights(periodDate);insightsPeriodKey=localDateKey(periodDate).slice(0,7)};
   const refreshInsightsIfPeriodChanged=()=>{const periodDate=new Date(),periodKey=localDateKey(periodDate).slice(0,7);if(document.querySelector('[data-screen="insights"]').classList.contains('active')&&periodKey!==insightsPeriodKey)refreshInsights(periodDate)};
   const showTab=name=>{if(name!=='log'&&['recording','paused'].includes(mediaRecorder?.state)){showToast('Exit and save your recording before leaving.');document.getElementById('exitRecording').focus();return false}const historyPlaybackHadFocus=name!=='history'&&document.getElementById('historyAudioPlayer').contains(document.activeElement),draftPlaybackHadFocus=name!=='log'&&playbackAudio&&document.querySelector('[data-screen="log"]').contains(document.activeElement);if(name!=='history'&&historyPlaybackAudio)stopHistoryAudio({restoreContainedFocus:false});if(name!=='log'&&playbackAudio)stopDraftPlayback();screens.forEach(s=>s.classList.toggle('active',s.dataset.screen===name));tabs.forEach(t=>{const selected=t.dataset.tab===name;t.classList.toggle('active',selected);if(selected)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});if(historyPlaybackHadFocus||draftPlaybackHadFocus)document.querySelector(`[data-tab="${name}"]`)?.focus();if(name==='insights')refreshInsights(new Date());if(name!=='log'){recordingRequestGeneration+=1;recordingStartInFlight=false;clearInterval(ticker)}return true};
   const showLogState=name=>{states.forEach(s=>s.classList.toggle('active',s.dataset.logState===name));};

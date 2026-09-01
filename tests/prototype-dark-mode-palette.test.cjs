@@ -40,5 +40,5 @@ test('dark Recall Index uses a vibrant blue field with the existing fade composi
   assert.match(fade[1], /filter:blur\(52px\)/);
   assert.ok(contrast('#f4f8ff', '#06264d') >= 4.5, 'Recall Index text must retain AA contrast');
   assert.match(html, /:root\[data-theme="dark"\] \.insights-wave i\{[^}]*background:#62b4ff/);
-  assert.match(html, /:root\[data-theme="dark"\] \.insights-wave i:nth-child\(6\)\{[^}]*background:#27a2ff/);
+  assert.match(html, /:root\[data-theme="dark"\] \.insights-wave i\[data-rating="Clear"\]\{[^}]*background:#27a2ff/);
 });

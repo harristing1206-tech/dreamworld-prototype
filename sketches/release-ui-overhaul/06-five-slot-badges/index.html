@@ -207,14 +207,14 @@
     /* Insights opens with one index stage, then a ruled contributor ledger. */
     .insights-head{padding-top:4px}.insights-head .date{margin:8px 0}.insights-hero{position:relative;min-height:194px;margin:20px 0 18px;padding:22px;border-radius:25px;overflow:hidden;background:var(--premium-dark);color:#f1f3f5;box-shadow:0 18px 38px rgba(15,28,20,.20)}
     .insights-hero:after{content:"";position:absolute;width:270px;height:270px;right:-100px;top:-120px;border-radius:50%;background:rgba(53,111,159,.30);filter:blur(52px)}
-    .insights-hero-label{position:relative;z-index:1;margin:0;color:rgba(241,243,245,.58);font-size:10px;font-weight:650;letter-spacing:.13em}.insights-index{position:relative;z-index:1;display:flex;align-items:baseline;gap:9px;margin-top:8px}.insights-index strong{font-size:58px;line-height:1;font-weight:500;letter-spacing:-.06em}.insights-index span{color:rgba(241,243,245,.58);font-size:14px}.insights-wave{position:absolute;left:22px;right:22px;bottom:25px;height:48px;border-bottom:1px solid rgba(241,243,245,.18);display:flex;align-items:flex-end;gap:7px}.insights-wave i{flex:1;display:block;border-radius:5px 5px 1px 1px;background:#7fa7c4;opacity:.25}.insights-wave i:nth-child(2),.insights-wave i:nth-child(5){opacity:.7}.insights-wave i:nth-child(6){background:#df8a62;opacity:.85}
+    .insights-hero.no-data{min-height:150px}.insights-hero-label{position:relative;z-index:1;margin:0;color:rgba(241,243,245,.58);font-size:10px;font-weight:650;letter-spacing:.13em}.insights-index{position:relative;z-index:1;display:flex;align-items:baseline;gap:9px;margin-top:8px}.insights-index strong{font-size:58px;line-height:1;font-weight:500;letter-spacing:-.06em}.insights-index span{color:rgba(241,243,245,.58);font-size:14px}.insights-wave{position:absolute;left:22px;right:22px;bottom:25px;height:48px;border-bottom:1px solid rgba(241,243,245,.18);display:grid;grid-template-columns:repeat(7,1fr);align-items:end;gap:7px}.insights-wave i{display:block;border-radius:5px 5px 1px 1px;background:#7fa7c4;opacity:.12}.insights-wave i[data-rating="Faint"]{opacity:.42}.insights-wave i[data-rating="Clear"]{background:#df8a62;opacity:.9}
     :root[data-theme="dark"] .insights-hero{background:#06264d;color:#f4f8ff;box-shadow:0 18px 42px rgba(0,111,230,.24)}
     :root[data-theme="dark"] .insights-hero:after{background:rgba(34,155,255,.72);filter:blur(52px)}
     :root[data-theme="dark"] .insights-hero-label,:root[data-theme="dark"] .insights-index span{color:rgba(218,235,255,.72)}
     :root[data-theme="dark"] .insights-wave{border-bottom-color:rgba(167,211,255,.26)}
-    :root[data-theme="dark"] .insights-wave i{background:#62b4ff;opacity:.32}
-    :root[data-theme="dark"] .insights-wave i:nth-child(2),:root[data-theme="dark"] .insights-wave i:nth-child(5){background:#8fc8ff;opacity:.72}
-    :root[data-theme="dark"] .insights-wave i:nth-child(6){background:#27a2ff;opacity:.96}
+    :root[data-theme="dark"] .insights-wave i{background:#62b4ff;opacity:.14}
+    :root[data-theme="dark"] .insights-wave i[data-rating="Faint"]{background:#8fc8ff;opacity:.52}
+    :root[data-theme="dark"] .insights-wave i[data-rating="Clear"]{background:#27a2ff;opacity:.96}
     .insights-calendar{margin-top:0;padding:16px 12px 14px;border:0;border-radius:18px;background:var(--surface)}
     .insight-metrics{margin-top:20px}.insight-metric{min-height:66px;gap:0}.metric-symbol{display:none}.metric-copy strong{font-size:14px}.metric-copy span{max-width:190px}.metric-value strong{font-size:17px}.insight-detail{border-radius:18px;padding:18px}
 
@@ -277,22 +277,22 @@
       <section class="screen" data-screen="insights" aria-label="Dream insights and sleep analytics">
         <header class="insights-head"><p class="date">Your patterns</p><h1 class="nav-title">Insights</h1></header>
         <section class="insights-hero" aria-label="Monthly recall index">
-          <p class="insights-hero-label">RECALL INDEX · THIS MONTH</p>
-          <div class="insights-index"><strong id="recallIndex">67</strong><span>steady</span></div>
-          <div class="insights-wave" aria-hidden="true"><i style="height:28%"></i><i style="height:62%"></i><i style="height:44%"></i><i style="height:72%"></i><i style="height:52%"></i><i style="height:86%"></i><i style="height:68%"></i></div>
+          <p class="insights-hero-label" id="recallPeriodLabel">RECALL INDEX · THIS MONTH</p>
+          <div class="insights-index"><strong id="recallIndex">—</strong><span id="recallTrend">No rated dreams yet</span></div>
+          <div class="insights-wave" id="insightsWave" role="img" aria-label="No recall ratings this month" hidden></div>
         </section>
         <section class="insights-calendar" aria-labelledby="insightsMonth">
-          <div class="calendar-toolbar"><h2 id="insightsMonth">August 2026</h2><span class="calendar-legend">Dream logged</span></div>
+          <div class="calendar-toolbar"><h2 id="insightsMonth">This month</h2><span class="calendar-legend">Dream logged</span></div>
           <div class="calendar-weekdays" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-          <div class="calendar-grid" id="insightsCalendar" aria-label="Dream days in August 2026"></div>
+          <div class="calendar-grid" id="insightsCalendar" aria-label="Dream days this month"></div>
         </section>
         <div class="insight-metrics" aria-label="Dream and sleep summary">
-          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18V7m16 11V9M4 14h16M7 10h4a3 3 0 0 1 3 3v1H7z"/></svg></span><div class="metric-copy"><strong>Dream nights</strong><span>Days with at least one logged dream</span></div><div class="metric-value"><strong id="insightDreamNights">6</strong><span>this month</span></div></div>
-          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 15.5A8 8 0 1 1 8.5 4 6.5 6.5 0 0 0 20 15.5Z"/></svg></span><div class="metric-copy"><strong>Average sleep</strong><span>Across nights with sleep data</span></div><div class="metric-value"><strong id="insightAverageSleep">7h 25m</strong><span>6 nights</span></div></div>
-          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><div class="metric-copy"><strong>Average recording</strong><span>Spoken dream capture length</span></div><div class="metric-value"><strong id="insightAverageDream">1m 14s</strong><span>per dream</span></div></div>
-          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12c2.2-4 4.9-6 8-6s5.8 2 8 6c-2.2 4-4.9 6-8 6s-5.8-2-8-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></span><div class="metric-copy"><strong>Recall clarity</strong><span>How clearly the dream was remembered</span></div><div class="metric-value"><strong id="insightRecall">4 of 6</strong><span>clear</span></div></div>
+          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18V7m16 11V9M4 14h16M7 10h4a3 3 0 0 1 3 3v1H7z"/></svg></span><div class="metric-copy"><strong>Dream nights</strong><span>Days with at least one logged dream</span></div><div class="metric-value"><strong id="insightDreamNights">0</strong><span id="insightDreamNightsBasis">this month</span></div></div>
+          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 15.5A8 8 0 1 1 8.5 4 6.5 6.5 0 0 0 20 15.5Z"/></svg></span><div class="metric-copy"><strong>Average sleep</strong><span>Across nights with sleep data</span></div><div class="metric-value"><strong id="insightAverageSleep">—</strong><span id="insightAverageSleepBasis">No sleep data</span></div></div>
+          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><div class="metric-copy"><strong>Average recording</strong><span>Spoken dream capture length</span></div><div class="metric-value"><strong id="insightAverageDream">—</strong><span id="insightAverageDreamBasis">No recordings</span></div></div>
+          <div class="insight-metric"><span class="metric-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12c2.2-4 4.9-6 8-6s5.8 2 8 6c-2.2 4-4.9 6-8 6s-5.8-2-8-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></span><div class="metric-copy"><strong>Recall clarity</strong><span>How clearly the dream was remembered</span></div><div class="metric-value"><strong id="insightRecall">Not rated</strong><span id="insightRecallBasis">No rated dreams</span></div></div>
         </div>
-        <section class="insight-detail" aria-live="polite"><p class="insight-detail-date" id="insightDetailDate">Tuesday, August 25</p><h2 id="insightDetailTitle">The station beneath the lake</h2><div class="detail-facts"><div class="detail-fact"><strong id="insightDetailSleep">7h 42m</strong><span>Sleep</span></div><div class="detail-fact"><strong id="insightDetailDream">1m 18s</strong><span>Recording</span></div><div class="detail-fact"><strong id="insightDetailRecall">Clear</strong><span>Recall</span></div></div></section>
+        <section class="insight-detail" aria-live="polite"><p class="insight-detail-date" id="insightDetailDate">No dream logged</p><h2 id="insightDetailTitle">No dream entry for this month</h2><div class="detail-facts"><div class="detail-fact"><strong id="insightDetailSleep">—</strong><span>Sleep</span></div><div class="detail-fact"><strong id="insightDetailDream">—</strong><span>Recording</span></div><div class="detail-fact"><strong id="insightDetailRecall">—</strong><span>Recall</span></div></div></section>
         <p class="insights-disclosure">Sleep duration is sample data in this prototype. A native release can read Apple Health sleep data only after you grant permission.</p>
       </section>
 
@@ -379,7 +379,7 @@
   const setSwipeRowOpen=(row,open)=>{if(openSwipeRow&&openSwipeRow!==row){openSwipeRow.classList.remove('actions-open');openSwipeRow.style.setProperty('--swipe-reveal','0px');openSwipeRow.style.setProperty('--trash-shift','0px');openSwipeRow.querySelector('.swipe-main').style.transform=''}row.classList.toggle('actions-open',open);row.style.setProperty('--swipe-reveal',open?'88px':'0px');row.style.setProperty('--trash-shift',open?'10px':'0px');row.querySelector('.swipe-main').style.transform='';openSwipeRow=open?row:null};
   const wireSwipeRow=(row,onFullSwipe)=>{if(row.dataset.swipeWired)return;row.dataset.swipeWired='true';const main=row.querySelector('.swipe-main');let gesture=null,suppressClickUntil=0,renderFrame=0,pendingOffset=0;const renderOffset=()=>{renderFrame=0;main.style.transform=`translate3d(${pendingOffset}px,0,0)`;row.style.setProperty('--swipe-reveal',`${Math.abs(pendingOffset)}px`);row.style.setProperty('--trash-shift',`${Math.max(0,Math.abs(pendingOffset)/2-34)}px`)};const queueOffset=offset=>{pendingOffset=offset;if(!renderFrame)renderFrame=requestAnimationFrame(renderOffset)};const flushOffset=()=>{if(renderFrame){cancelAnimationFrame(renderFrame);renderOffset()}};main.addEventListener('touchstart',event=>{if(event.touches.length!==1||row.closest('.editing')||row.closest('.storage-locked'))return;const touch=event.touches[0];gesture={startX:touch.clientX,startY:touch.clientY,startOffset:row.classList.contains('actions-open')?-88:0,offset:0,swipeWidth:main.clientWidth||row.clientWidth||320,horizontal:false};pendingOffset=gesture.startOffset;main.style.transition='none'},{passive:true});main.addEventListener('touchmove',event=>{if(!gesture||event.touches.length!==1)return;const touch=event.touches[0],dx=touch.clientX-gesture.startX,dy=touch.clientY-gesture.startY;if(!gesture.horizontal&&Math.abs(dx)>6&&Math.abs(dx)>Math.abs(dy)*1.1)gesture.horizontal=true;if(!gesture.horizontal)return;row.classList.add('swiping');event.preventDefault();gesture.swipeWidth=main.clientWidth||row.clientWidth||gesture.swipeWidth;gesture.offset=Math.max(-gesture.swipeWidth,Math.min(0,gesture.startOffset+dx));queueOffset(gesture.offset)},{passive:false});const finish=commit=>{if(!gesture)return;flushOffset();const fullSwipe=commit&&gesture.horizontal&&Math.abs(gesture.offset)>=gesture.swipeWidth*.92,onFull=onFullSwipe,width=gesture.swipeWidth,open=commit&&gesture.horizontal&&gesture.offset<=-60,moved=gesture.horizontal&&Math.abs(gesture.offset-gesture.startOffset)>6;gesture=null;main.style.transition='';if(fullSwipe&&onFull){row.classList.remove('actions-open');row.style.setProperty('--swipe-reveal',`${width}px`);row.style.setProperty('--trash-shift',`${Math.max(0,width/2-34)}px`);main.style.transition='transform 200ms cubic-bezier(.22,.61,.36,1)';main.style.transform=`translate3d(-${width}px,0,0)`;openSwipeRow=null;suppressClickUntil=Date.now()+500;setTimeout(()=>{row.classList.remove('swiping');void onFull()},200);return}row.classList.remove('swiping');setSwipeRowOpen(row,open);if(moved)suppressClickUntil=Date.now()+400};main.addEventListener('touchend',()=>finish(true),{passive:true});main.addEventListener('touchcancel',()=>finish(false),{passive:true});main.addEventListener('click',event=>{if(Date.now()<suppressClickUntil||row.classList.contains('actions-open')){event.preventDefault();event.stopImmediatePropagation();if(row.classList.contains('actions-open')&&Date.now()>=suppressClickUntil)setSwipeRowOpen(row,false)}},true)};
   const setListEditing=(list,button,editing)=>{list.classList.toggle('editing',editing);button.setAttribute('aria-pressed',String(editing));button.setAttribute('aria-label',editing?'Done editing':'Edit list');button.textContent=editing?'✓':'Edit';list.querySelectorAll('.swipe-row').forEach(row=>setSwipeRowOpen(row,false))};
-  const refreshJournalSurfaces=()=>{dreamCount=journalRecords.length;renderHistoryList();renderInsightsCalendar();updateInsights()};
+  const refreshJournalSurfaces=()=>{dreamCount=journalRecords.length;renderHistoryList();refreshInsights()};
   const openDreamEditor=record=>{editingDreamRecord=record;const row=document.querySelector(`.history-swipe-row[data-entry-id="${record.id}"]`);if(row)setSwipeRowOpen(row,false);document.getElementById('dreamEditName').value=record.title;document.getElementById('dreamEditSummary').value=record.excerpt||'';document.getElementById('dreamEditSheet').classList.add('open');requestAnimationFrame(()=>document.getElementById('dreamEditName').focus())};
   const closeDreamEditor=()=>{document.getElementById('dreamEditSheet').classList.remove('open');editingDreamRecord=null};
   const setDeleteModalInert=active=>{document.querySelector('.viewport').inert=active;document.querySelector('.tabbar').inert=active};
@@ -444,33 +444,50 @@
     document.getElementById('insightDetailDream').textContent=record?formatSeconds(record.recording):'—';
     document.getElementById('insightDetailRecall').textContent=record?(record.recall||'Unrated'):'—';
   };
-  const renderInsightsCalendar=()=>{
-    const calendar=document.getElementById('insightsCalendar');calendar.replaceChildren();const today=new Date(),year=today.getFullYear(),month=today.getMonth(),prefix=`${year}-${String(month+1).padStart(2,'0')}`;
-    document.getElementById('insightsMonth').textContent=today.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  const renderInsightsCalendar=(periodDate=new Date())=>{
+    const calendar=document.getElementById('insightsCalendar');calendar.replaceChildren();const year=periodDate.getFullYear(),month=periodDate.getMonth(),prefix=`${year}-${String(month+1).padStart(2,'0')}`,monthLabel=periodDate.toLocaleDateString(undefined,{month:'long',year:'numeric'}),selectedRecord=sortedJournalRecords().find(record=>record.dateKey?.startsWith(prefix))||null,selectedKey=selectedRecord?.dateKey||localDateKey(periodDate);
+    document.getElementById('insightsMonth').textContent=monthLabel;calendar.setAttribute('aria-label',`Dream days in ${monthLabel}`);
     const firstWeekday=new Date(year,month,1).getDay(),daysInMonth=new Date(year,month+1,0).getDate();
     for(let blank=0;blank<firstWeekday;blank++){const spacer=document.createElement('span');spacer.className='calendar-blank';spacer.setAttribute('aria-hidden','true');calendar.appendChild(spacer)}
     for(let day=1;day<=daysInMonth;day++){
       const dateKey=`${prefix}-${String(day).padStart(2,'0')}`,records=sortedJournalRecords().filter(record=>record.dateKey===dateKey),record=records[0],button=document.createElement('button');
       button.type='button';button.className='calendar-day';button.textContent=String(day);button.dataset.day=String(day);button.dataset.dateKey=dateKey;
-      button.setAttribute('aria-label',record?`${record.date}, ${records.length} dream${records.length===1?'':'s'} logged`:`${today.toLocaleDateString(undefined,{month:'long'})} ${day}, no dream logged`);
-      button.classList.toggle('has-dream',Boolean(record));button.classList.toggle('selected',dateKey===localDateKey(today));
+      button.setAttribute('aria-label',record?`${record.date}, ${records.length} dream${records.length===1?'':'s'} logged`:`${periodDate.toLocaleDateString(undefined,{month:'long'})} ${day}, no dream logged`);
+      button.classList.toggle('has-dream',Boolean(record));button.classList.toggle('selected',dateKey===selectedKey);
       button.addEventListener('click',()=>{calendar.querySelectorAll('.calendar-day').forEach(item=>item.classList.remove('selected'));button.classList.add('selected');if(record)openDreamFromInsights(record);else renderInsightDetail(null)});calendar.appendChild(button);
     }
+    renderInsightDetail(selectedRecord);
   };
-  const updateInsights=()=>{
-    const monthPrefix=localDateKey(new Date()).slice(0,7),monthRecords=journalRecords.filter(record=>record.dateKey?.startsWith(monthPrefix)),dreamNights=new Set(monthRecords.map(record=>record.dateKey)).size;
-    const sleepRecords=monthRecords.filter(record=>Number.isFinite(record.sleep)),recordingRecords=monthRecords.filter(record=>Number.isFinite(record.recording)),ratedRecords=monthRecords.filter(record=>record.recall&&record.recall!=='Unrated');
-    const averageSleep=sleepRecords.length?Math.round(sleepRecords.reduce((sum,item)=>sum+item.sleep,0)/sleepRecords.length):null;
-    const averageRecording=recordingRecords.length?Math.round(recordingRecords.reduce((sum,item)=>sum+item.recording,0)/recordingRecords.length):null;
-    const clearRecall=ratedRecords.filter(item=>item.recall==='Clear').length;dreamCount=journalRecords.length;
+  const isRatedRecall=record=>Boolean(record&&['Clear','Faint'].includes(record.recall));
+  const recallScore=records=>records.length?Math.round(records.filter(item=>item.recall==='Clear').length/records.length*100):null;
+  const renderRecallWave=ratedRecords=>{
+    const wave=document.getElementById('insightsWave');wave.replaceChildren();
+    if(!ratedRecords.length){wave.hidden=true;wave.setAttribute('aria-label','No recall ratings this month');return}
+    const recent=[...ratedRecords].sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt))).slice(-7),slots=[...Array(7-recent.length).fill(null),...recent];
+    slots.forEach(record=>{const bar=document.createElement('i');if(record){bar.dataset.rating=record.recall;bar.style.height=record.recall==='Clear'?'86%':'38%'}else{bar.dataset.rating='Empty';bar.style.height='4%'}wave.appendChild(bar)});
+    wave.hidden=false;wave.setAttribute('aria-label',`Recent recall ratings: ${recent.map(record=>record.recall).join(', ')}`);
+  };
+  const updateInsights=(periodDate=new Date())=>{
+    const monthPrefix=localDateKey(periodDate).slice(0,7),monthRecords=journalRecords.filter(record=>record.dateKey?.startsWith(monthPrefix)),dreamNights=new Set(monthRecords.map(record=>record.dateKey)).size,previousMonthDate=new Date(periodDate.getFullYear(),periodDate.getMonth()-1,1),previousPrefix=localDateKey(previousMonthDate).slice(0,7),previousRatedRecords=journalRecords.filter(record=>record.dateKey?.startsWith(previousPrefix)&&isRatedRecall(record));
+    const sleepRecords=monthRecords.filter(record=>Number.isFinite(record.sleep)),recordingRecords=monthRecords.filter(record=>Number.isFinite(record.recording)),ratedRecords=monthRecords.filter(isRatedRecall);
+    const averageSleep=sleepRecords.length?Math.round(sleepRecords.reduce((sum,item)=>sum+item.sleep,0)/sleepRecords.length):null,averageRecording=recordingRecords.length?Math.round(recordingRecords.reduce((sum,item)=>sum+item.recording,0)/recordingRecords.length):null,clearRecall=ratedRecords.filter(item=>item.recall==='Clear').length,currentScore=recallScore(ratedRecords),previousScore=recallScore(previousRatedRecords);dreamCount=journalRecords.length;
     document.getElementById('insightDreamNights').textContent=String(dreamNights);
+    document.getElementById('insightDreamNightsBasis').textContent='this month';
     document.getElementById('insightAverageSleep').textContent=formatMinutes(averageSleep);
+    document.getElementById('insightAverageSleepBasis').textContent=sleepRecords.length?`${sleepRecords.length} night${sleepRecords.length===1?'':'s'}`:'No sleep data';
     document.getElementById('insightAverageDream').textContent=formatSeconds(averageRecording);
+    document.getElementById('insightAverageDreamBasis').textContent=recordingRecords.length?`${recordingRecords.length} entr${recordingRecords.length===1?'y':'ies'}`:'No recordings';
     document.getElementById('insightRecall').textContent=ratedRecords.length?`${clearRecall} of ${ratedRecords.length}`:'Not rated';
-
-    const recallIndex=document.getElementById('recallIndex');if(recallIndex)recallIndex.textContent=String(ratedRecords.length?Math.round(clearRecall/ratedRecords.length*100):0);
+    document.getElementById('insightRecallBasis').textContent=ratedRecords.length?'clear':'No rated dreams';
+    const monthName=periodDate.toLocaleDateString(undefined,{month:'long'}).toUpperCase(),hero=document.querySelector('.insights-hero'),recallIndex=document.getElementById('recallIndex'),recallTrend=document.getElementById('recallTrend');document.getElementById('recallPeriodLabel').textContent=`RECALL INDEX · ${monthName}`;
+    hero.classList.toggle('no-data',currentScore===null);recallIndex.textContent=currentScore===null?'—':String(currentScore);
+    if(currentScore===null)recallTrend.textContent='No rated dreams yet';else if(previousScore===null)recallTrend.textContent=`Based on ${ratedRecords.length} rated dream${ratedRecords.length===1?'':'s'}`;else{const change=currentScore-previousScore;recallTrend.textContent=Math.abs(change)<5?'steady from last month':`${change>0?'+':''}${change} points from last month`}
+    hero.setAttribute('aria-label',currentScore===null?`Monthly recall index for ${monthName}: not enough data`:`Monthly recall index for ${monthName}: ${currentScore}. ${recallTrend.textContent}`);renderRecallWave(ratedRecords);
   };
-  const showTab=name=>{screens.forEach(s=>s.classList.toggle('active',s.dataset.screen===name));tabs.forEach(t=>{const selected=t.dataset.tab===name;t.classList.toggle('active',selected);if(selected)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});if(name!=='log'){recordingRequestGeneration+=1;recordingStartInFlight=false;clearInterval(ticker);if(mediaRecorder?.state==='recording')mediaRecorder.stop()}};
+  let insightsPeriodKey='';
+  const refreshInsights=(periodDate=new Date())=>{renderInsightsCalendar(periodDate);updateInsights(periodDate);insightsPeriodKey=localDateKey(periodDate).slice(0,7)};
+  const refreshInsightsIfPeriodChanged=()=>{const periodDate=new Date(),periodKey=localDateKey(periodDate).slice(0,7);if(document.querySelector('[data-screen="insights"]').classList.contains('active')&&periodKey!==insightsPeriodKey)refreshInsights(periodDate)};
+  const showTab=name=>{screens.forEach(s=>s.classList.toggle('active',s.dataset.screen===name));tabs.forEach(t=>{const selected=t.dataset.tab===name;t.classList.toggle('active',selected);if(selected)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});if(name==='insights')refreshInsights(new Date());if(name!=='log'){recordingRequestGeneration+=1;recordingStartInFlight=false;clearInterval(ticker);if(mediaRecorder?.state==='recording')mediaRecorder.stop()}};
   const showLogState=name=>{states.forEach(s=>s.classList.toggle('active',s.dataset.logState===name));};
   const openDraftDB=()=>new Promise((resolve,reject)=>{if(typeof indexedDB==='undefined'){reject(new Error('IndexedDB unavailable'));return}const request=indexedDB.open(DRAFT_DB,2);request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(DRAFT_STORE))request.result.createObjectStore(DRAFT_STORE);if(!request.result.objectStoreNames.contains(JOURNAL_STORE))request.result.createObjectStore(JOURNAL_STORE)};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error||new Error('Dreamworld storage unavailable'))});
   const saveAudioDraft=async draft=>{try{const db=await openDraftDB();return await new Promise((resolve,reject)=>{const tx=db.transaction(DRAFT_STORE,'readwrite');tx.objectStore(DRAFT_STORE).put(draft,DRAFT_KEY);tx.oncomplete=()=>{db.close();resolve(true)};tx.onerror=()=>{db.close();reject(tx.error)}})}catch{return false}};
@@ -480,7 +497,7 @@
   const deleteJournalRecord=async id=>{try{const db=await openDraftDB();return await new Promise((resolve,reject)=>{const tx=db.transaction(JOURNAL_STORE,'readwrite');tx.objectStore(JOURNAL_STORE).delete(id);tx.oncomplete=()=>{db.close();resolve(true)};tx.onerror=()=>{db.close();reject(tx.error)}})}catch{return false}};
   const loadJournalRecords=async()=>{try{const db=await openDraftDB();return await new Promise((resolve,reject)=>{const tx=db.transaction(JOURNAL_STORE,'readonly'),request=tx.objectStore(JOURNAL_STORE).getAll();request.onsuccess=()=>{db.close();resolve(Array.isArray(request.result)?request.result:[])};request.onerror=()=>{db.close();reject(request.error)}})}catch{return []}};
   const validJournalRecord=record=>Boolean(record&&typeof record.id==='string'&&/^[A-Za-z0-9_-]{8,120}$/.test(record.id)&&/^\d{4}-\d{2}-\d{2}$/.test(record.dateKey)&&typeof record.createdAt==='string'&&typeof record.title==='string'&&record.title.length<=160&&typeof record.transcript==='string'&&record.transcript.length>0&&record.transcript.length<=12000&&typeof record.excerpt==='string'&&record.excerpt.length<=400&&Number.isFinite(record.recording)&&record.recording>=0&&(!record.audio||(typeof record.audio.size==='number'&&typeof record.audio.type==='string')));
-  const hydrateJournal=async()=>{const persisted=(await loadJournalRecords()).filter(validJournalRecord);let started=false;try{started=localStorage.getItem(JOURNAL_STARTED_KEY)==='1'}catch{}journalRecords=persisted.length?persisted:(started?[]:[...sampleDreams]);renderHistoryList();renderInsightsCalendar();updateInsights()};
+  const hydrateJournal=async()=>{const persisted=(await loadJournalRecords()).filter(validJournalRecord);let started=false;try{started=localStorage.getItem(JOURNAL_STARTED_KEY)==='1'}catch{}journalRecords=persisted.length?persisted:(started?[]:[...sampleDreams]);renderHistoryList();refreshInsights()};
   const journalChannel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('dreamworld-journal'):null;journalChannel?.addEventListener('message',()=>void hydrateJournal());
   const formatDuration=duration=>`${Math.floor(duration/60)}:${String(duration%60).padStart(2,'0')}`;
   const preferredRecordingMime=()=>{const candidates=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'];return candidates.find(type=>typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported?.(type))||''};
@@ -621,8 +638,8 @@
   document.getElementById('noDream').addEventListener('click',()=>showLogState('empty'));
   document.getElementById('remembered').addEventListener('click',()=>showLogState('ready'));
   renderHistoryList();
-  renderInsightsCalendar();
-  updateInsights();
+  refreshInsights();
+  window.addEventListener('focus',refreshInsightsIfPeriodChanged);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshInsightsIfPeriodChanged()});setInterval(refreshInsightsIfPeriodChanged,60000);
   const reviewParams=new URLSearchParams(window.location.search);
   const reviewTheme=reviewParams.get('theme');if(['light','dark'].includes(reviewTheme))applyAppearance(reviewTheme);
   const reviewScreen=reviewParams.get('screen');

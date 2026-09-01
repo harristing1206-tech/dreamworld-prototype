@@ -89,6 +89,7 @@
     }
     *{box-sizing:border-box}
     [hidden]{display:none!important}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     html,body{min-height:100%}
     body{margin:0;background:var(--body-bg);color:var(--ink);font-family:var(--font-ui);-webkit-font-smoothing:antialiased}
     h1,h2,h3,strong,b{font-weight:650}
@@ -233,7 +234,7 @@
         <header class="home-header">
           <div class="list-toolbar"><button class="list-edit" id="editDreams" type="button" aria-pressed="false">Edit</button><span aria-hidden="true"></span></div>
           <p class="date">Your private archive</p>
-          <h1 class="greeting">Dream journal.</h1>
+          <h1 class="sr-only">History</h1>
         </header>
         <section class="history-focus" id="historyFocus" aria-labelledby="historyFocusTitle" hidden>
           <button class="history-focus-back" id="historyFocusBack" type="button">‹ All dreams</button>
@@ -249,7 +250,7 @@
       </section>
 
       <section class="screen active" data-screen="alarm" aria-label="Alarms">
-        <header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms" type="button" aria-pressed="false">Edit</button><button class="alarm-add" id="addAlarm" type="button" aria-label="Add alarm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></button></div><p class="date">Your morning</p><h1 class="nav-title">Wake gently.<br>Remember more.</h1></header>
+        <header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms" type="button" aria-pressed="false">Edit</button><button class="alarm-add" id="addAlarm" type="button" aria-label="Add alarm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></button></div><p class="date">Your morning</p><h1 class="sr-only">Alarms</h1></header>
         <div class="alarm-list" id="alarmList">
           <article class="alarm-row" data-hour="6" data-minute="30" data-period="AM" data-label="Wake up" data-repeat="Weekdays"><button class="alarm-edit" type="button" aria-label="Edit 6:30 AM Wake up alarm"><div class="alarm-copy"><div class="alarm-time"><span class="alarm-value">6:30</span> <span class="alarm-period">AM</span></div><div class="alarm-detail">Wake up · Weekdays</div></div></button><button class="switch on" type="button" role="switch" aria-checked="true" aria-label="Toggle 6:30 AM alarm"></button></article>
           <article class="alarm-row" data-hour="8" data-minute="00" data-period="AM" data-label="Weekend" data-repeat="Saturday, Sunday"><button class="alarm-edit" type="button" aria-label="Edit 8:00 AM Weekend alarm"><div class="alarm-copy"><div class="alarm-time"><span class="alarm-value">8:00</span> <span class="alarm-period">AM</span></div><div class="alarm-detail">Weekend · Saturday, Sunday</div></div></button><button class="switch" type="button" role="switch" aria-checked="false" aria-label="Toggle 8:00 AM alarm"></button></article>
@@ -259,7 +260,7 @@
       </section>
 
       <section class="screen log-screen" data-screen="log" aria-label="Log a dream">
-        <header><p class="log-kicker">Dream log</p><h1 class="log-title">What do you remember?</h1><p class="log-copy">Start with any detail. Silence is okay.</p></header>
+        <header><p class="log-kicker">Dream log</p><h1 class="sr-only">Log a dream</h1><p class="log-copy">Start with any detail. Silence is okay.</p></header>
         <div class="capture-state active" data-log-state="ready">
           <button class="mic" id="startRecording" type="button" aria-label="Start recording"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="8" y="2" width="8" height="14" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 19v3M9 22h6"/></svg></button>
           <p class="mic-label">Tap to record</p><button class="quiet" id="noDream" type="button">No dream this morning</button>
@@ -275,7 +276,7 @@
       </section>
 
       <section class="screen" data-screen="insights" aria-label="Dream insights and sleep analytics">
-        <header class="insights-head"><p class="date">Your patterns</p><h1 class="nav-title">Insights</h1></header>
+        <header class="insights-head"><p class="date">Your patterns</p><h1 class="sr-only">Insights</h1></header>
         <section class="insights-hero" aria-label="Monthly recall index">
           <p class="insights-hero-label">RECALL INDEX · THIS MONTH</p>
           <div class="insights-index"><strong id="recallIndex">67</strong><span>steady</span></div>
@@ -297,7 +298,7 @@
       </section>
 
       <section class="screen" data-screen="profile" aria-label="Profile and settings">
-        <header class="profile-head"><h1>My Dream World</h1></header>
+        <h1 class="sr-only">Profile</h1>
         <button class="profile-identity" id="showProfile" type="button" aria-label="Show Harris profile"><span class="profile-avatar">H</span><span class="profile-identity-copy"><strong>Harris</strong><span>Show profile</span></span><span class="profile-chevron" aria-hidden="true">›</span></button>
         <h2 class="settings-heading">Settings</h2>
         <p class="section-label">Appearance</p>

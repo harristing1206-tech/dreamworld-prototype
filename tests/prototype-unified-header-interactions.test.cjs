@@ -6,7 +6,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','sketches','release-ui-overh
 
 test('Alarm swaps Edit left and Add bubble right while History keeps Edit left',()=>{
   assert.match(html,/<header class="alarm-head"><div class="list-toolbar"><button class="list-edit header-action" id="editAlarms"[^>]*>Edit<\/button><button class="alarm-add header-action" id="addAlarm"[^>]*aria-label="Add alarm"/);
-  assert.match(html,/<header class="home-header">[\s\S]*?<div class="list-toolbar"><button class="list-edit header-action" id="editDreams"[^>]*>Edit<\/button><span aria-hidden="true"><\/span><\/div>/);
+  assert.match(html,/<header class="home-header">[\s\S]*?<div class="list-toolbar"><button class="list-edit header-action" id="editDreams"[^>]*>Edit<\/button><span class="rail-meta rail-meta-right" id="historyRailCount">/);
   assert.match(html,/\.alarm-add\{width:44px;height:44px[^}]*border-radius:50%[^}]*background:var\(--raised\)[^}]*box-shadow:/);
   assert.doesNotMatch(html,/id="addAlarm"[\s\S]{0,500}background:var\(--highlight\)/,'header Add must not compete with Capture');
 });
@@ -14,7 +14,7 @@ test('Alarm swaps Edit left and Add bubble right while History keeps Edit left',
 test('every root title uses one shared top-left origin and font metrics',()=>{
   assert.match(html,/\.alarm-head,\.home-header,\.insights-head,\.profile-head\{position:relative;padding-top:52px\}/);
   assert.match(html,/\.alarm-head \.nav-title,\.home-header \.greeting,\.insights-head \.nav-title,\.profile-head h1\{margin:0;font-size:var\(--type-display-size\);line-height:var\(--type-display-line\);letter-spacing:var\(--type-display-tracking\);font-weight:var\(--type-display-weight\)\}/);
-  assert.match(html,/\.log-screen>header\{[^}]*left:24px;right:24px;top:60px\}/);
+  assert.match(html,/\.log-screen>header\{[^}]*left:24px;right:24px;top:8px;padding-top:52px\}/);
   assert.match(html,/\.log-screen \.log-title\{[^}]*margin:0[^}]*font-size:var\(--type-display-size\)/);
 });
 

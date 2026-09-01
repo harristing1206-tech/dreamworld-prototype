@@ -8,7 +8,7 @@ test('Alarm and History reserve the same left-side Edit slot',()=>{
   assert.match(html,/\.alarm-head,\.home-header,\.insights-head,\.profile-head\{position:relative;padding-top:52px\}/);
   assert.match(html,/\.alarm-head \.list-toolbar,\.home-header \.list-toolbar\{position:absolute;left:0;right:0;top:0;width:auto;height:44px\}/);
   assert.doesNotMatch(html,/\.alarm-head \.list-edit\{[^}]*background:transparent/,'Alarm Edit must use the same raised pill as History');
-  assert.match(html,/<header class="home-header">[\s\S]*?<button class="list-edit header-action" id="editDreams"[\s\S]*?<span aria-hidden="true"><\/span>/);
+  assert.match(html,/<header class="home-header">[\s\S]*?<button class="list-edit header-action" id="editDreams"[\s\S]*?<span class="rail-meta rail-meta-right" id="historyRailCount">/);
   assert.match(html,/<header class="alarm-head">[\s\S]*?<button class="list-edit header-action" id="editAlarms"[\s\S]*?<button class="alarm-add header-action" id="addAlarm"/);
 });
 

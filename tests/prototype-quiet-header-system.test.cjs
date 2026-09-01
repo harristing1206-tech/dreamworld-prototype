@@ -13,12 +13,12 @@ test('destination headers use one clear title without repeated kickers',()=>{
   assert.match(html,/--type-display-size:31px;--type-display-line:34px;--type-display-weight:620/,'the accepted display scale must remain');
 });
 
-test('Alarm uses one native action rail with Add left and Edit right',()=>{
-  assert.match(html,/<header class="alarm-head"><div class="list-toolbar"><button class="alarm-add" id="addAlarm"[^>]*aria-label="Add alarm"[\s\S]*?<\/button><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><\/div><h1 class="nav-title">Alarm<\/h1><\/header>/);
+test('Alarm uses one native action rail with Edit left and Add right',()=>{
+  assert.match(html,/<header class="alarm-head"><div class="list-toolbar"><button class="list-edit header-action" id="editAlarms"[^>]*>Edit<\/button><button class="alarm-add header-action" id="addAlarm"[^>]*aria-label="Add alarm"[\s\S]*?<\/button><\/div><h1 class="nav-title">Alarm<\/h1><\/header>/);
   assert.doesNotMatch(html,/alarm-create-row|class="alarm-create"|<span>Add alarm<\/span>/);
   assert.match(html,/\.alarm-head \.list-toolbar,\.home-header \.list-toolbar\{position:absolute;left:0;right:0;top:0;width:auto;height:44px\}/);
-  assert.match(html,/\.alarm-head,\.home-header\{position:relative;padding-top:52px\}/);
-  assert.match(html,/\.alarm-add\{width:44px;height:44px[^}]*background:transparent/);
+  assert.match(html,/\.alarm-head,\.home-header,\.insights-head,\.profile-head\{position:relative;padding-top:52px\}/);
+  assert.match(html,/\.alarm-add\{width:44px;height:44px[^}]*border-radius:50%[^}]*background:var\(--raised\)/);
 });
 
 test('Alarm inherits the shared light and dark canvas',()=>{

@@ -16,7 +16,7 @@ test('Dreamworld uses one restrained DM Sans typography token system', () => {
   assert.match(html, /body\{[^}]*font-family:var\(--font-ui\)/, 'body must inherit the single DM Sans stack');
   assert.match(html, /\.nav-title,\.greeting,\.log-title\{[^}]*font-size:var\(--type-display-size\)[^}]*font-weight:var\(--type-display-weight\)/);
   assert.doesNotMatch(html, /\.alarm-head \.nav-title\{[^}]*font-size:/, 'Alarm title must not bypass the shared display role');
-  assert.doesNotMatch(html, /\.log-screen \.log-title\{[^}]*font-size:/, 'Log title must not bypass the shared display role');
+  assert.match(html, /\.log-screen \.log-title\{[^}]*font-size:var\(--type-display-size\)[^}]*line-height:var\(--type-display-line\)[^}]*font-weight:var\(--type-display-weight\)/, 'Capture title must share the root display metrics');
   assert.match(html, /\.profile-head h1\{[^}]*font-weight:650/);
   assert.match(html, /\.settings-heading\{[^}]*font-weight:650/);
   assert.match(html, /h1,h2,h3,strong,b\{font-weight:650\}/, 'native heading and strong defaults must not fall back to browser 700');

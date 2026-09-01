@@ -15,7 +15,9 @@ assert.match(html,/data-log-state="transcription-failed"/,'recoverable transcrip
 assert.match(html,/retryFailedTranscript/,'same-recording retry missing');
 assert.match(html,/Discard and record again/,'explicit audio discard path missing');
 assert.match(html,/server retains no audio/,'retention disclosure missing');
-assert.match(html,/name!==\'log\'[\s\S]*mediaRecorder\?\.state===\'recording\'[\s\S]*mediaRecorder\.stop\(\)/,'microphone recording can continue invisibly after leaving Log');
+const showTab=html.match(/const showTab=name=>\{([\s\S]*?)\};\n  const showLogState/)?.[1]||'';
+assert.match(showTab,/name!==\'log\'&&mediaRecorder\?\.state===\'recording\'[\s\S]*Stop and save your recording before leaving\.[\s\S]*getElementById\('stopRecording'\)\.focus\(\)[\s\S]*return false/,'active recording navigation is not blocked with an accessible recovery path');
+assert.doesNotMatch(showTab,/mediaRecorder\.stop\(\)/,'navigation must not silently stop an active recording');
 assert.match(html,/Transcribing with whisper\.cpp on your private server/,'private-server processing disclosure missing');
 assert.doesNotMatch(html,/<textarea[^>]*id="dreamTranscript"[^>]*>[^<]+<\/textarea>/,'production transcript contains canned text');
 assert.doesNotMatch(html,/sk-[A-Za-z0-9_-]{10,}|owk_live_[A-Za-z0-9_-]+/,'provider credential embedded in client');

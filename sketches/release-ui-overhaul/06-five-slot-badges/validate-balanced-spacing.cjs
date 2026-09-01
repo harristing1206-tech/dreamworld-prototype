@@ -13,8 +13,8 @@ assert.match(html, /@media\(max-width:500px\) and \(pointer:fine\)/, 'narrow lap
 assert.match(html, /@media\(display-mode:standalone\),\(max-width:500px\) and \(pointer:coarse\)/, 'real phone and installed-app fullscreen behavior missing');
 assert.match(html, /\.screen\{[^}]*padding:[^}]*env\(safe-area-inset-right\)[^}]*env\(safe-area-inset-left\)/, 'screen safe-area gutters missing');
 assert.match(html, /\.alarm-head\{[^}]*padding-top:8px/, 'Alarm header does not match the other tab headers');
-assert.match(html, /\.list-toolbar\{[^}]*justify-content:space-between/, 'Edit and Add actions are not balanced');
-assert.match(html, /\.alarm-add\{[^}]*width:44px[^}]*height:44px/, 'Alarm Add action is not a full touch target');
+assert.match(html, /\.alarm-head \.list-toolbar\{[^}]*right:0[^}]*top:0[^}]*height:44px/, 'Alarm Edit does not share History’s stable top-right slot');
+assert.match(html, /\.alarm-create\{[^}]*min-height:44px[^}]*display:flex[^}]*gap:6px/, 'contextual Add Alarm action is not a full labeled touch target');
 assert.match(html, /\.alarm-row \.swipe-main\{[^}]*min-height:84px[^}]*padding:7px 0/, 'Alarm rows are not compact');
 assert.match(html, /\.alarm-edit\{[^}]*min-height:72px/, 'Alarm row edit target is too small');
 assert.match(html, /--tabbar-height:68px/, 'compact tab bar height missing');
@@ -25,7 +25,7 @@ assert.match(html, /\.tab:before\{[^}]*width:42px[^}]*height:38px[^}]*border-rad
 assert.match(html, /\.tab\.active:not\(\.log-tab\):before\{[^}]*opacity:\.62[^}]*scale\(1\)/, 'selected-tab treatment does not activate');
 assert.match(html, /\.tab\.log-tab\{[^}]*align-self:center[^}]*translateY\(-4px\)/, 'plus button is not visually aligned with the icon row');
 assert.match(html, /\.tab\.log-tab \.plus-disc\{[^}]*width:58px[^}]*height:58px[^}]*flex:0 0 58px[^}]*aspect-ratio:1\/1[^}]*border-radius:50%/, 'center plus can shrink into an oval');
-assert.match(html, /<header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><button[^>]*aria-label="Add alarm"><svg[\s\S]*?<path d="M12 5v14M5 12h14"\/><\/svg><\/button><\/div><p class="date">Your morning<\/p><h1 class="nav-title">Wake gently\.<br>Remember more\.<\/h1><\/header>/, 'Alarm header structure does not preserve Edit/Add inside the next-wake composition');
+assert.match(html, /<header class="alarm-head"><div class="list-toolbar"><button class="list-edit" id="editAlarms"[^>]*>Edit<\/button><\/div><p class="date">Your morning<\/p><h1 class="nav-title">Wake gently\.<br>Remember more\.<\/h1><\/header>[\s\S]*?<div class="alarm-create-row" id="alarmCreateRow"><button class="alarm-create" id="addAlarm"[^>]*aria-label="Add alarm"/, 'Alarm header and contextual creation action do not follow the continuity contract');
 assert.match(html, /#alarmList \.alarm-row:first-child\{[^}]*min-height:208px[^}]*border-radius:25px[^}]*background:#030504/, 'next enabled alarm is not presented as the compact dominant near-black wake stage');
 assert.match(html, /#alarmList \.alarm-row:first-child:before\{[^}]*left:-150px[^}]*top:auto[^}]*bottom:-145px[^}]*background:rgba\(239,241,235,\.26\)[^}]*filter:blur\(68px\)/, 'main alarm fade does not originate below the bottom-left corner');
 assert.match(html, /#alarmList \.alarm-row:first-child \.alarm-copy:before\{[^}]*margin-bottom:24px/, 'compact primary alarm spacing is not preserved');

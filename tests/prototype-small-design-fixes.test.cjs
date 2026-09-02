@@ -72,5 +72,5 @@ test('profile identity copy aligns from a consistent left edge', () => {
   const rule = html.match(/\.profile-identity-copy\{([^}]+)\}/);
   assert.ok(rule, 'profile identity copy rule missing');
   assert.match(rule[1], /text-align:left/, 'profile identity text must align left');
-  assert.match(html, /\.profile-avatar\{[^}]*width:64px[^}]*height:64px/, 'profile avatar geometry missing');
+  assert.match(html, /\.profile-avatar\{[^}]*width:52px[^}]*height:52px/, 'compact profile avatar geometry missing');
 });

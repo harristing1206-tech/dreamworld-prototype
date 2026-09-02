@@ -28,8 +28,8 @@ test('Profile follows title, identity row, then settings hierarchy', () => {
 
 test('Airbnb-inspired profile rows preserve Dreamworld structure and native spacing', () => {
   assert.match(html, /\.profile-head\{[^}]*padding:18px 0 20px/);
-  assert.match(html, /\.profile-identity\{[^}]*min-height:92px[^}]*border-bottom:1px solid var\(--separator\)/);
-  assert.match(html, /\.profile-avatar\{width:64px;height:64px/);
+  assert.match(html, /\.profile-identity\{[^}]*min-height:76px[^}]*padding:10px 0[^}]*border-top:1px solid var\(--separator\)[^}]*border-bottom:1px solid var\(--separator\)/);
+  assert.match(html, /\.profile-avatar\{width:52px;height:52px/);
   assert.match(html, /\.profile-identity-copy\{flex:1;min-width:0;text-align:left\}/);
   assert.match(html, /\.settings-heading\{margin:34px 0 12px;font-size:23px/);
   assert.match(html, /\.setting-row\{min-height:60px/);

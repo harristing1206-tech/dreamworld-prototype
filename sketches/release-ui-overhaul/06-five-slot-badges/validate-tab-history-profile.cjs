@@ -12,7 +12,7 @@ assert.match(html,/historySwipe\.dx>=72/,'swipe-right release threshold is missi
 assert.match(html,/event\.preventDefault\(\)[\s\S]*translateX/,'horizontal swipe feedback is missing');
 assert.match(html,/<header class="profile-head"><div class="context-rail">[\s\S]*?Private profile[\s\S]*?<\/div><h1>My Dream World<\/h1><\/header>/,'Profile title hierarchy and privacy context are missing');
 assert.match(html,/class="profile-identity"[^>]*aria-label="Show Harris profile"/,'Profile identity row is missing');
-assert.match(html,/\.profile-identity\{[^}]*min-height:92px[^}]*border-bottom:1px solid var\(--separator\)/,'Profile identity row lacks native separation');
+assert.match(html,/\.profile-identity\{[^}]*min-height:76px[^}]*border-top:1px solid var\(--separator\)[^}]*border-bottom:1px solid var\(--separator\)/,'Compact Profile identity row lacks two-sided native separation');
 assert.match(html,/<h2 class="settings-heading">Settings<\/h2>/,'Settings heading is missing');
 assert.doesNotMatch(html,/profile-stats|profileDreamCount|profileDreamNights/,'legacy profile statistics remain');
 console.log('DREAMWORLD_TAB_HISTORY_PROFILE_REFINEMENT_VERIFIED');

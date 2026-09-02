@@ -50,8 +50,9 @@ test('bottom navigation spans edge to edge and labels the four destination tabs'
   for (const [tab, label] of [['alarm', 'Alarm'], ['history', 'History'], ['insights', 'Insights'], ['profile', 'Profile']]) {
     assert.match(html, new RegExp(`data-tab="${tab}"[\\s\\S]*?<span class="tab-label">${label}<\\/span>[\\s\\S]*?<\\/button>`), `${label} tab title missing`);
   }
-  assert.match(html, /data-tab="log" aria-label="Log a dream"/, 'icon-only center action needs an accessible name');
-  assert.doesNotMatch(html, /<span class="tab-label">Log<\/span>/, 'center plus action should not show a Log label');
+  assert.match(html, /data-tab="log" aria-label="Capture a dream"/, 'icon-only center action needs an accessible name');
+  assert.doesNotMatch(html, /<span class="tab-label">Capture<\/span>/, 'center Capture action should not repeat a visible label');
+  assert.match(html, /class="capture-tab-mic"/, 'center Capture action needs a microphone signifier');
   assert.match(html, /@media\(display-mode:standalone\),\(max-width:500px\) and \(pointer:coarse\)\{[\s\S]*?\.tabbar\{bottom:0;[^}]*height:calc\(var\(--tabbar-height\) \+ env\(safe-area-inset-bottom\)\)/, 'installed mode must remain edge to edge through the safe area');
 });
 

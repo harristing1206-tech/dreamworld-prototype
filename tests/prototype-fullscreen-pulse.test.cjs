@@ -35,9 +35,11 @@ test('recording controls frame the focal rings instead of overlapping them', () 
   assert.match(html, /baseRadius=Math\.min\(width\*\.225,height\*\.125\)/, 'short screens need a height-constrained focal ring');
 });
 
-test('center plus action has an accessible name but no visible Log label', () => {
-  const logTab = html.match(/<button class="tab log-tab"[^>]*aria-label="Log a dream"[\s\S]*?<\/button>/);
-  assert.ok(logTab, 'accessible Log action is missing');
-  assert.doesNotMatch(logTab[0], /<span class="tab-label">Log<\/span>/);
+test('center Capture action has a truthful microphone but no redundant visible label', () => {
+  const logTab = html.match(/<button class="tab log-tab"[^>]*aria-label="Capture a dream"[\s\S]*?<\/button>/);
+  assert.ok(logTab, 'accessible Capture action is missing');
+  assert.doesNotMatch(logTab[0], /<span class="tab-label">Capture<\/span>/);
   assert.match(logTab[0], /<span class="plus-disc">/);
+  assert.match(logTab[0], /class="capture-tab-mic"/);
+  assert.doesNotMatch(logTab[0], /M12 5v14M5 12h14/);
 });

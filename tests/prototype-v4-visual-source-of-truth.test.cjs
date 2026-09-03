@@ -40,11 +40,11 @@ test('History uses stable metadata, timer durations, chevrons, and real search',
 });
 
 test('Insights keeps behavior while adopting the v4 order and calendar card',()=>{
-  assert.match(html,/<header class="insights-head page-header">[\s\S]*?<section class="insights-hero"[\s\S]*?<section class="insights-calendar"[\s\S]*?<div class="insights-latest-card">[\s\S]*?id="latestDreamRail"[\s\S]*?<div class="insight-metrics"/);
+  assert.match(html,/<header class="insights-head page-header">[\s\S]*?<div class="insights-latest-card">[\s\S]*?id="latestDreamRail"[\s\S]*?<section class="insights-patterns"[\s\S]*?<section class="insights-hero"[\s\S]*?<div class="insight-metrics"[\s\S]*?<section class="insights-calendar"/);
   assert.match(html,/\.insights-calendar\{[^}]*border:1px solid var\(--defined-border\)[^}]*border-radius:22px/);
   assert.match(html,/\.insights-calendar\{min-height:314px/);
   assert.match(html,/\.calendar-day,\.calendar-blank\{[^}]*height:44px/);
-  assert.match(html,/\.insights-latest-card button\{[^}]*min-height:74px[^}]*border:1px solid var\(--defined-border\)[^}]*border-radius:14px/);
+  assert.match(html,/\.insights-reference-remodel \.insights-latest-card button\{[^}]*min-height:148px[^}]*border:1px solid var\(--insights-border\)[^}]*border-radius:24px/);
   assert.match(html,/document\.getElementById\('insightsHeaderMeta'\)\.textContent=/);
   assert.match(html,/if\(currentScore===null\)recallTrend\.textContent='Rate recall when reviewing a dream\.'/);
 });
@@ -55,5 +55,5 @@ test('Capture and navigation adopt v4 geometry without replacing behavior',()=>{
   assert.match(html,/\.recording-controls :is\(\.pause-recording,\.stop\)\{[^}]*width:100%!important;height:54px!important/);
   assert.match(html,/\.tab svg\{[^}]*width:20px;height:20px[^}]*stroke-width:1\.75/);
   assert.match(html,/\.tab\.active:not\(\.log-tab\):after\{[^}]*width:3px;height:3px/);
-  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-84'/);
+  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-85'/);
 });

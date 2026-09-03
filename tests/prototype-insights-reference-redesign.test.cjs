@@ -16,7 +16,8 @@ test('Insights adopts the supplied latest-log-first pattern hierarchy without dr
  const latest=cssRule('.insights-reference-remodel .insights-latest-card button');assert.match(latest,/min-height:148px/);assert.match(latest,/border-radius:24px/);assert.match(latest,/background:var\(--insights-card\)/);
  const metrics=cssRule('.insights-reference-remodel .insight-metrics');assert.match(metrics,/display:grid/);assert.match(metrics,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  const metric=cssRule('.insights-reference-remodel .insight-metric');assert.match(metric,/border-radius:20px/);assert.match(metric,/background:var\(--insights-card\)/);
- const calendar=cssRule('.insights-reference-remodel .insights-calendar');assert.match(calendar,/border-radius:24px/);assert.match(calendar,/background:var\(--insights-card\)/);
+ const calendar=cssRule('.insights-reference-remodel .insights-calendar');assert.match(calendar,/padding:18px 8px 14px/);assert.match(calendar,/border-radius:24px/);assert.match(calendar,/background:var\(--insights-card\)/);
+ const calendarGrid=cssRule('.insights-reference-remodel .calendar-weekdays,.insights-reference-remodel .calendar-grid');assert.match(calendarGrid,/gap:0/);
 });
 
 test('latest Insights card uses the real newest record title, date, summary, and existing detail route',()=>{
@@ -30,7 +31,7 @@ test('Insights redesign preserves recall, calendar, metrics, selected detail, di
  for(const id of['insightsHeaderMeta','recallPeriodLabel','recallIndex','recallTrend','insightsWave','insightsMonth','insightsCalendar','insightDreamNights','insightDreamNightsBasis','insightAverageSleep','insightAverageSleepBasis','insightAverageDream','insightAverageDreamBasis','insightRecall','insightRecallBasis','insightDetailDate','insightDetailTitle','insightDetailSleep','insightDetailDream','insightDetailRecall'])assert.match(html,new RegExp(`id="${id}"`),`Missing Insights hook #${id}`);
  for(const behavior of['renderInsightsSourceRail()','renderInsightsCalendar(periodDate)','updateInsights(periodDate)',"button.addEventListener('click',()=>{calendar.querySelectorAll('.calendar-day')","if(record)openDreamFromInsights(record);else renderInsightDetail(null)","hero.classList.toggle('no-data',currentScore===null)"])assert.ok(html.includes(behavior),`Missing Insights behavior: ${behavior}`);
  assert.match(html,/Sleep duration is sample data in this prototype/);
- assert.match(worker,/const CACHE='dreamworld-pwa-20260830-85'/);
+ assert.match(worker,/const CACHE='dreamworld-pwa-20260830-86'/);
 });
 
 test('Insights compact labels and recall guidance meet WCAG AA contrast',()=>{
@@ -41,4 +42,6 @@ test('Insights compact labels and recall guidance meet WCAG AA contrast',()=>{
  assert.ok(contrast('#5f5e59','#e3e8e4')>=4.5,`recall guidance contrast is ${contrast('#5f5e59','#e3e8e4').toFixed(2)}:1`);
  assert.ok(contrast('#77736c','#ffffff')>=4.5);
  assert.ok(contrast('#b8cbaa','#111310')>=4.5);
+ const weekdayRule=cssRule('.insights-reference-remodel .calendar-weekdays span');assert.match(weekdayRule,/color:var\(--insights-muted\)/);
+ assert.ok(contrast('#b4b1a9','#1a1c19')>=4.5);
 });

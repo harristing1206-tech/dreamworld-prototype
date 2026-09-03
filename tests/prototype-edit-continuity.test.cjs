@@ -4,12 +4,11 @@ const fs=require('node:fs');
 const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','sketches','release-ui-overhaul','06-five-slot-badges','index.html'),'utf8');
 
-test('Alarm and History reserve the same left-side Edit slot',()=>{
-  assert.match(html,/\.alarm-head,\.home-header,\.insights-head,\.profile-head\{position:relative;padding-top:52px\}/);
-  assert.match(html,/\.alarm-head \.list-toolbar,\.home-header \.list-toolbar\{position:absolute;left:0;right:0;top:0;width:auto;height:44px\}/);
-  assert.doesNotMatch(html,/\.alarm-head \.list-edit\{[^}]*background:transparent/,'Alarm Edit must use the same raised pill as History');
-  assert.match(html,/<header class="home-header">[\s\S]*?<button class="list-edit header-action" id="editDreams"[\s\S]*?<span class="rail-meta rail-meta-right" id="historyRailCount">/);
-  assert.match(html,/<header class="alarm-head">[\s\S]*?<button class="list-edit header-action" id="editAlarms"[\s\S]*?<button class="alarm-add header-action" id="addAlarm"/);
+test('Alarm and History retain reachable Edit actions in the v4 metadata rows',()=>{
+  assert.match(html,/\.page-header\{height:96px;margin-top:14px/);
+  assert.match(html,/<header class="home-header page-header"><div class="header-meta-row">[\s\S]*?<button class="header-meta-action" id="editDreams"/);
+  assert.match(html,/<header class="alarm-head page-header"><div class="header-meta-row">[\s\S]*?<button class="header-meta-action" id="editAlarms"/);
+  assert.match(html,/\.header-meta-action\{min-width:44px;height:44px/);
 });
 
 test('Add Alarm is a native right-side header bubble',()=>{
@@ -21,6 +20,7 @@ test('Add Alarm is a native right-side header bubble',()=>{
 
 test('Alarm edit mode suppresses creation and sheet closure restores focus',()=>{
   assert.match(html,/list\.id==='alarmList'[\s\S]*addAlarm[\s\S]*hidden=editing/);
-  assert.match(html,/alarmSheetReturnFocus=document\.activeElement/);
-  assert.match(html,/alarmSheetReturnFocus\?\.focus\(\)/);
+  assert.match(html,/editorSheetReturnFocus\.set\(dialog,document\.activeElement\)/);
+  assert.match(html,/const returnFocus=editorSheetReturnFocus\.get\(dialog\)/);
+  assert.match(html,/returnFocus\?\.focus\?\.\(\)/);
 });

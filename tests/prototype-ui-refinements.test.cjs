@@ -48,7 +48,7 @@ test('legacy forest-green chrome does not return outside the alarm control', () 
 });
 
 test('primary alarm switch does not override semantic active and off colors', () => {
-  const primarySwitch = html.match(/#alarmList \.alarm-row:first-child \.switch\{([^}]+)\}/);
+  const primarySwitch = html.match(/#alarmList \.alarm-row\.next-alarm \.switch\{([^}]+)\}/);
   assert.ok(primarySwitch, 'primary alarm switch positioning rule missing');
   assert.doesNotMatch(primarySwitch[1], /background:/, 'primary switch must not override semantic state colors');
   assert.match(html, /\.switch\.on:before\{background:var\(--alarm-on\)\}/);

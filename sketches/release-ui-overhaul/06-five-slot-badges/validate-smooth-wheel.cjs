@@ -15,9 +15,10 @@ const dom = new JSDOM(source, {
   beforeParse(window){window.matchMedia=()=>({matches:false,media:'',addEventListener(){},removeEventListener(){}})}
 });
 const d = dom.window.document;
-const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
+const nextTurn = () => new Promise(resolve => dom.window.setTimeout(resolve, 0));
 
 (async () => {
+  await nextTurn();
   assert.match(source, /scroll-snap-type:y mandatory/, 'wheel snap contract missing');
   assert.match(source, /-webkit-overflow-scrolling:touch/, 'iOS momentum scrolling missing');
   assert.match(source, /touch-action:pan-y/, 'vertical touch gesture contract missing');
@@ -35,7 +36,6 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.getElementById('alarmPeriod').value, 'AM');
 
   d.getElementById('addAlarm').click();
-  await wait(25);
   assert.ok(d.getElementById('alarmSheet').classList.contains('open'));
 
   d.getElementById('hourWheel').dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
@@ -45,10 +45,12 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   pm.click();
   assert.equal(d.getElementById('alarmPeriod').value, 'PM');
 
-  const before = d.querySelectorAll('.alarm-row').length;
+  const beforeIDs = new Set([...d.querySelectorAll('.alarm-row')].map(row => row.dataset.id));
+  const before = beforeIDs.size;
   d.getElementById('saveAlarm').click();
   assert.equal(d.querySelectorAll('.alarm-row').length, before + 1);
-  const added = d.querySelector('.alarm-row:last-child');
+  const added = [...d.querySelectorAll('.alarm-row')].find(row => !beforeIDs.has(row.dataset.id));
+  assert.ok(added, 'new alarm must be identifiable by its immutable dataset ID');
   assert.equal(added.querySelector('.alarm-value').textContent, '8:00');
   assert.equal(added.querySelector('.alarm-period').textContent, 'PM');
   assert.deepEqual(runtimeErrors, []);

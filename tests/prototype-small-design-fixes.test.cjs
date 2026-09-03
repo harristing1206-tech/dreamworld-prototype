@@ -18,7 +18,7 @@ function contrastRatio(foreground, background) {
 
 test('Ambient Paper remains local to non-primary cards on the shared canvas', () => {
   assert.doesNotMatch(html, /screen\[data-screen="alarm"\]\{[^}]*background:/, 'Alarm must inherit the same canvas as the other destinations');
-  const rule = html.match(/\.alarm-list \.alarm-row:not\(:first-child\)\{([^}]+)\}/);
+  const rule = html.match(/\.alarm-list \.alarm-row:not\(\.next-alarm\)\{([^}]+)\}/);
   assert.ok(rule, 'secondary alarm card rule missing');
   assert.match(rule[1], /border:0/, 'Ambient Paper removes the hard card border');
   assert.match(rule[1], /outline:0/, 'Ambient Paper must override the legacy outline');
@@ -27,7 +27,7 @@ test('Ambient Paper remains local to non-primary cards on the shared canvas', ()
   assert.match(rule[1], /box-shadow:0 16px 38px rgba\(25,32,40,\.075\)/, 'secondary alarms need broad low-opacity ambient depth');
   assert.match(rule[1], /color:#4d555e/, 'secondary alarm text needs softened neutral-gray contrast');
   assert.ok(contrastRatio('#6d7680', '#fffffe') >= 4.5, 'softened secondary text must retain WCAG AA normal-text contrast');
-  const darkRule = html.match(/:root\[data-theme="dark"\] \.alarm-list \.alarm-row:not\(:first-child\)\{([^}]+)\}/);
+  const darkRule = html.match(/:root\[data-theme="dark"\] \.alarm-list \.alarm-row:not\(\.next-alarm\)\{([^}]+)\}/);
   assert.ok(darkRule, 'dark-mode Ambient Paper override missing');
   assert.match(darkRule[1], /background:var\(--surface\)/);
   assert.match(darkRule[1], /color:var\(--ink\)/);
@@ -57,9 +57,9 @@ test('bottom navigation spans edge to edge and labels the four destination tabs'
 });
 
 test('alarm cards use a compact rectangular hierarchy', () => {
-  const primaryRow = html.match(/#alarmList \.alarm-row:first-child\{([^}]+)\}/);
-  const primaryMain = html.match(/#alarmList \.alarm-row:first-child \.swipe-main\{([^}]+)\}/);
-  const secondaryMain = html.match(/\.alarm-list \.alarm-row:not\(:first-child\) \.swipe-main\{([^}]+)\}/);
+  const primaryRow = html.match(/#alarmList \.alarm-row\.next-alarm\{([^}]+)\}/);
+  const primaryMain = html.match(/#alarmList \.alarm-row\.next-alarm \.swipe-main\{([^}]+)\}/);
+  const secondaryMain = html.match(/\.alarm-list \.alarm-row:not\(\.next-alarm\) \.swipe-main\{([^}]+)\}/);
   assert.ok(primaryRow, 'primary alarm card rule missing');
   assert.ok(primaryMain, 'primary alarm content rule missing');
   assert.ok(secondaryMain, 'secondary alarm content rule missing');

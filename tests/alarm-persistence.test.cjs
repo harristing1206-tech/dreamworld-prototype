@@ -19,6 +19,7 @@ function makeDom(savedAlarms = null, { storageReadFails = false } = {}) {
     beforeParse(window) {
       window.matchMedia = () => ({ matches: false, media: '', addEventListener() {}, removeEventListener() {} });
       Object.defineProperty(window.navigator, 'serviceWorker', { configurable: true, value: { register: async () => ({ update: async () => {} }) } });
+      const stores=new Map();let version=0;window.indexedDB={open(_name,nextVersion){const request={};window.setTimeout(()=>{const db={objectStoreNames:{contains:name=>stores.has(name)},createObjectStore(name){stores.set(name,new Map())},transaction(name){const tx={error:null,objectStore(){const store=stores.get(name);return{getAll(){const result={};window.setTimeout(()=>{result.result=[...store.values()];result.onsuccess?.()},0);return result},put(value,key){store.set(key,value);window.setTimeout(()=>tx.oncomplete?.(),0)},delete(key){store.delete(key);window.setTimeout(()=>tx.oncomplete?.(),0)}}}};return tx},close(){}};request.result=db;if(nextVersion>version){version=nextVersion;request.onupgradeneeded?.()}request.onsuccess?.()},0);return request}};
       if (savedAlarms !== null) window.localStorage.setItem(STORAGE_KEY, savedAlarms);
       if (storageReadFails) window.Storage.prototype.getItem = function getItemDenied() { throw new Error('storage read denied'); };
     }
@@ -34,6 +35,7 @@ test('alarm edits, enabled state, additions, and deletion survive reload', async
   await wait(first.dom, 10);
 
   const firstRow = document.querySelector('#alarmList .alarm-row');
+  const firstAlarmID = firstRow.dataset.id;
   firstRow.querySelector('.switch').click();
   assert.equal(firstRow.querySelector('.switch').getAttribute('aria-checked'), 'false');
 
@@ -53,7 +55,7 @@ test('alarm edits, enabled state, additions, and deletion survive reload', async
   await wait(second.dom, 10);
   const restored = [...second.dom.window.document.querySelectorAll('#alarmList .alarm-row')];
   assert.equal(restored.length, 3);
-  assert.equal(restored[0].querySelector('.switch').getAttribute('aria-checked'), 'false');
+  assert.equal(restored.find(row => row.dataset.id === firstAlarmID).querySelector('.switch').getAttribute('aria-checked'), 'false');
   const added = restored.find(row => row.dataset.label === 'Dream review');
   assert.ok(added, 'added alarm must survive reload');
   assert.deepEqual(
@@ -78,6 +80,72 @@ test('alarm edits, enabled state, additions, and deletion survive reload', async
   assert.deepEqual(second.errors, []);
   assert.deepEqual(third.errors, []);
   third.dom.window.close();
+});
+
+test('NEXT WAKE follows the next enabled alarm instead of DOM position', async () => {
+  const fixture=makeDom();
+  const document=fixture.dom.window.document;
+  await wait(fixture.dom,10);
+  const rows=[...document.querySelectorAll('#alarmList .alarm-row')];
+  assert.equal(rows.filter(row=>row.classList.contains('next-alarm')).length,1);
+  const initialNext=document.querySelector('#alarmList .alarm-row.next-alarm'),initialID=initialNext.dataset.id;
+  const other=rows.find(row=>row!==initialNext);
+  const otherID=other.dataset.id;
+  if(other.querySelector('.switch').getAttribute('aria-checked')!=='true')other.querySelector('.switch').click();
+  document.querySelector(`#alarmList .alarm-row[data-id="${initialID}"] .switch`).click();
+  assert.equal(document.querySelector(`#alarmList .alarm-row[data-id="${initialID}"]`).classList.contains('next-alarm'),false);
+  assert.equal(document.querySelector(`#alarmList .alarm-row[data-id="${otherID}"]`).classList.contains('next-alarm'),true);
+  assert.equal(document.querySelector('#alarmList .alarm-row').dataset.id,otherID,'next enabled alarm must move to the primary card position');
+  assert.deepEqual(fixture.errors,[]);
+  fixture.dom.window.close();
+});
+
+test('a stale alarm tab merges mutations with newer durable records and storage events resync the UI', async () => {
+  const fixture=makeDom();const {document}=fixture.dom.window;await wait(fixture.dom,10);
+  const current=JSON.parse(fixture.dom.window.localStorage.getItem(STORAGE_KEY));
+  const external={id:'alarm-external-abcdefgh',hour:'9',minute:'45',period:'AM',label:'Other tab',repeat:'Once',enabled:true};
+  const newer=[...current,external];fixture.dom.window.localStorage.setItem(STORAGE_KEY,JSON.stringify(newer));
+  document.querySelector('#alarmList .alarm-row .switch').click();
+  const merged=JSON.parse(fixture.dom.window.localStorage.getItem(STORAGE_KEY));
+  assert.equal(merged.length,3,'stale toggle must not drop a newer alarm');
+  assert.ok(merged.some(record=>record.id===external.id),'cross-tab addition must survive stale mutation');
+  fixture.dom.window.localStorage.setItem(STORAGE_KEY,JSON.stringify(newer));
+  fixture.dom.window.dispatchEvent(new fixture.dom.window.StorageEvent('storage',{key:STORAGE_KEY,newValue:JSON.stringify(newer)}));await wait(fixture.dom,10);
+  assert.ok(document.querySelector(`#alarmList .alarm-row[data-id="${external.id}"]`),'storage event must refresh alarm UI');
+  assert.deepEqual(fixture.errors,[]);fixture.dom.window.close();
+});
+
+test('alarm and dream sheets contain focus and restore it on close', async () => {
+  const fixture=makeDom();
+  const document=fixture.dom.window.document;
+  await wait(fixture.dom,10);
+  const add=document.getElementById('addAlarm');add.focus();add.click();await wait(fixture.dom,10);
+  assert.equal(document.querySelector('.viewport').inert,true);
+  assert.equal(document.querySelector('.tabbar').inert,true);
+  assert.equal(document.activeElement,document.getElementById('cancelAlarm'));
+  document.getElementById('hourWheel').focus();document.getElementById('hourWheel').dispatchEvent(new fixture.dom.window.KeyboardEvent('keydown',{key:'Tab',bubbles:true}));
+  assert.equal(document.activeElement,document.getElementById('minuteWheel'),'Tab must skip wheel options with tabindex -1');
+  document.getElementById('alarmLabel').focus();document.getElementById('alarmLabel').dispatchEvent(new fixture.dom.window.KeyboardEvent('keydown',{key:'Tab',bubbles:true}));
+  assert.ok(document.getElementById('alarmSheet').contains(document.activeElement));
+  document.getElementById('cancelAlarm').click();await wait(fixture.dom,10);
+  assert.equal(document.querySelector('.viewport').inert,false);
+  assert.equal(document.activeElement,add);
+  const alarmEdit=document.querySelector('#alarmList .alarm-row .alarm-edit'),alarmID=alarmEdit.closest('.alarm-row').dataset.id;alarmEdit.focus();alarmEdit.click();await wait(fixture.dom,10);document.getElementById('saveAlarm').click();await wait(fixture.dom,10);
+  assert.equal(document.activeElement,document.querySelector(`#alarmList .alarm-row[data-id="${alarmID}"] .alarm-edit`),'alarm save must restore focus by immutable ID after hydration');
+  const liveEdit=document.querySelector(`#alarmList .alarm-row[data-id="${alarmID}"] .alarm-edit`);liveEdit.click();await wait(fixture.dom,10);const durable=JSON.parse(fixture.dom.window.localStorage.getItem(STORAGE_KEY)),pending={id:'alarm-pending-sync-abcdefgh',hour:'10',minute:'10',period:'AM',label:'Pending sync',repeat:'Once',enabled:true};fixture.dom.window.localStorage.setItem(STORAGE_KEY,JSON.stringify([...durable,pending]));fixture.dom.window.dispatchEvent(new fixture.dom.window.StorageEvent('storage',{key:STORAGE_KEY,newValue:JSON.stringify([...durable,pending])}));document.getElementById('cancelAlarm').click();await wait(fixture.dom,10);
+  assert.ok(document.querySelector(`#alarmList .alarm-row[data-id="${pending.id}"]`),'deferred storage event must hydrate after the editor closes');
+  assert.equal(document.activeElement.classList.contains('alarm-edit'),true,document.activeElement.outerHTML);
+  assert.equal(document.activeElement.closest('.alarm-row')?.dataset.id,alarmID,'deferred hydration must restore focus to the live opener alarm identity');
+
+  document.querySelector('[data-tab="history"]').click();document.getElementById('editDreams').click();
+  const entry=document.querySelector('#historyList .history-entry');entry.focus();entry.click();await wait(fixture.dom,10);
+  assert.equal(document.querySelector('.viewport').inert,true);
+  assert.equal(document.activeElement,document.getElementById('dreamEditName'));
+  document.getElementById('cancelDreamEdit').click();await wait(fixture.dom,10);
+  assert.equal(document.querySelector('.viewport').inert,false);
+  assert.equal(document.activeElement,entry);
+  assert.deepEqual(fixture.errors,[]);
+  fixture.dom.window.close();
 });
 
 test('alarm storage failure cannot appear saved, toggled, or deleted', async () => {

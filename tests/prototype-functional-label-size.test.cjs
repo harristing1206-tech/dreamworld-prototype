@@ -9,8 +9,8 @@ const functionalLabels=[
   ['Calendar weekday labels',/\.calendar-weekdays span\{[^}]*font-size:11px/],
   ['Insight metric suffixes',/\.metric-value span\{[^}]*font-size:11px/],
   ['Insight detail labels',/\.detail-fact span\{[^}]*font-size:11px/],
-  ['Next Wake label',/#alarmList \.alarm-row:first-child \.alarm-copy:before\{[^}]*font-size:11px/],
-  ['History month labels',/\.history-date-rail span\{[^}]*font-size:var\(--type-label-size\)/],
+  ['Next Wake label',/#alarmList \.alarm-row\.next-alarm \.alarm-copy:before\{[^}]*font-size:11px/],
+  ['History entry metadata',/\.history-entry-meta\{[^}]*font-size:11px/],
   ['Latest dream labels',/\.latest-dream-label\{[^}]*font-size:var\(--type-label-size\)/],
   ['Recall Index period label',/\.insights-hero-label\{[^}]*font-size:11px/]
 ];
@@ -20,7 +20,7 @@ test('all compact functional labels meet the 11px readability floor',()=>{
 });
 
 test('known functional label selectors do not retain 9px or 10px overrides',()=>{
-  for(const selector of ['history-focus-fact span','calendar-weekdays span','metric-value span','detail-fact span','alarm-copy:before','history-date-rail span','latest-dream-label','insights-hero-label']){
+  for(const selector of ['history-focus-fact span','calendar-weekdays span','metric-value span','detail-fact span','alarm-copy:before','history-entry-meta','latest-dream-label','insights-hero-label']){
     const escaped=selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/ /g,'\\s+');
     assert.doesNotMatch(html,new RegExp(`${escaped}\\{[^}]*font-size:(?:9|10)px`),`${selector} regressed below 11px`);
   }

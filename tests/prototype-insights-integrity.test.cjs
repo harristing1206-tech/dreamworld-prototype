@@ -6,7 +6,7 @@ const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '..', 'sketches', 'release-ui-overhaul', '06-five-slot-badges', 'index.html'), 'utf8');
 
 test('Insights ships an honest neutral state instead of static sample analytics', () => {
-  assert.match(html, /<strong id="recallIndex">—<\/strong><span id="recallTrend">No rated dreams yet<\/span>/);
+  assert.match(html, /<strong id="recallIndex">—<\/strong><span id="recallTrend">Rate recall when reviewing a dream\.<\/span>/);
   assert.match(html, /class="insights-wave" id="insightsWave" role="img" aria-label="No recall ratings this month" hidden/);
   assert.doesNotMatch(html, /id="recallIndex">67|<span>steady<\/span>|style="height:(?:28|62|44|72|52|86|68)%"/);
   assert.doesNotMatch(html, /id="insightsMonth">August 2026|aria-label="Dream days in August 2026"/);
@@ -16,7 +16,7 @@ test('Recall score, trend, wave, and supporting metrics share the current period
   assert.match(html, /const renderRecallWave=ratedRecords=>/);
   assert.match(html, /const isRatedRecall=record=>Boolean\(record&&\['Clear','Faint'\]\.includes\(record\.recall\)\)/);
   assert.match(html, /previousMonthDate=new Date\(periodDate\.getFullYear\(\),periodDate\.getMonth\(\)-1,1\)/);
-  assert.match(html, /recallTrend\.textContent='No rated dreams yet'/);
+  assert.match(html, /recallTrend\.textContent='Rate recall when reviewing a dream\.'/);
   assert.match(html, /recallTrend\.textContent=`Based on \$\{ratedRecords\.length\} rated dream/);
   assert.match(html, /document\.getElementById\('insightAverageSleepBasis'\)\.textContent=/);
   assert.match(html, /document\.getElementById\('insightAverageDreamBasis'\)\.textContent=/);

@@ -1,15 +1,13 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const html=fs.readFileSync(path.join(__dirname,'..','sketches','release-ui-overhaul','06-five-slot-badges','index.html'),'utf8');
 
-const html = fs.readFileSync(path.join(__dirname, '..', 'sketches', 'release-ui-overhaul', '06-five-slot-badges', 'index.html'), 'utf8');
-
-test('History uses one clear title while Edit anchors top-left', () => {
-  assert.match(html, /\.alarm-head,\.home-header,\.insights-head,\.profile-head\{position:relative;padding-top:52px\}/);
-  assert.match(html, /\.alarm-head \.list-toolbar,\.home-header \.list-toolbar\{position:absolute;left:0;right:0;top:0;width:auto;height:44px\}/);
-  assert.match(html, /\.list-edit\{min-width:44px;min-height:44px/);
-  assert.match(html, /\.list-edit\[aria-pressed="true"\]\{width:44px;min-width:44px/);
-  assert.match(html, /<header class="home-header">[\s\S]*?<button class="list-edit header-action" id="editDreams"[^>]*>Edit<\/button><span class="rail-meta rail-meta-right" id="historyRailCount">[\s\S]*?<\/span>[\s\S]*?<h1 class="greeting">Dream journal\.<\/h1>[\s\S]*?<\/header>/);
-  assert.doesNotMatch(html, />Your private archive</);
+test('History uses the stable v4 archive header without crowding its title',()=>{
+  assert.match(html,/\.page-header\{height:96px;margin-top:14px;padding:0 0 14px;border:0\}/);
+  assert.match(html,/\.header-meta-action\{min-width:44px;height:44px/);
+  assert.match(html,/<header class="home-header page-header"><div class="header-meta-row"><span class="header-meta">Private dream archive<\/span><span class="visually-hidden" id="historyRailCount">6 dreams<\/span><button class="header-meta-action" id="editDreams"[^>]*>Edit<\/button><\/div><div class="header-title-row"><h1 class="greeting">Mapped fragments<\/h1><\/div><\/header>/);
+  assert.doesNotMatch(html,/>August 2026 · Dream journal</);
+  assert.match(html,/<input id="historySearch" type="search"[^>]*placeholder="Search dreams"/);
 });

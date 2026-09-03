@@ -4,34 +4,24 @@ const fs=require('node:fs');
 const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','sketches','release-ui-overhaul','06-five-slot-badges','index.html'),'utf8');
 
-test('Add bubble matches Edit material without a decorative outline',()=>{
-  const rule=html.match(/\.alarm-add\{([^}]+)\}/)?.[1]||'';
-  assert.match(rule,/border:0/);
-  assert.match(rule,/outline:0/);
-  assert.match(rule,/background:var\(--raised\)/);
-  assert.match(rule,/box-shadow:/);
-  assert.match(html,/button:focus-visible[^}]*outline:3px solid var\(--accent\)[^}]*outline-offset:3px/,'keyboard focus ring must remain independent');
+test('Add remains a distinct accessible header action',()=>{
+  assert.match(html,/<button class="alarm-add header-action" id="addAlarm"[^>]*aria-label="Add alarm"/);
+  assert.match(html,/\.page-header \.header-action\{min-width:44px;height:44px[^}]*border-radius:22px/);
+  assert.match(html,/button:focus-visible[^}]*outline:3px solid var\(--accent\)[^}]*outline-offset:3px/);
 });
 
-test('every root rail contains truthful actions or context',()=>{
-  assert.match(html,/<header class="home-header">[\s\S]*?<button[^>]*id="editDreams"[\s\S]*?<span class="rail-meta rail-meta-right" id="historyRailCount">6 dreams<\/span>/);
-  assert.match(html,/<header><div class="context-rail"><span class="rail-meta rail-meta-left"><svg[^>]*aria-hidden="true"[\s\S]*?<\/svg>Private capture<\/span><\/div><h1 class="log-title">/);
-  assert.match(html,/<header class="insights-head"><div class="context-rail insights-latest-rail">[\s\S]*?id="latestDreamRail"[\s\S]*?<\/div><h1 class="nav-title">Insights<\/h1><\/header>/);
-  assert.match(html,/<header class="profile-head"><div class="context-rail"><span class="rail-meta rail-meta-left"><svg[^>]*aria-hidden="true"[\s\S]*?<\/svg>Private profile<\/span><\/div><h1>My Dream World<\/h1><\/header>/);
-  assert.doesNotMatch(html,/class="rail-meta[^"]*"[^>]*(?:role="button"|tabindex=|onclick=)/);
-});
-
-test('rail metadata is plain subordinate text, not a false affordance',()=>{
-  assert.match(html,/\.context-rail\{position:absolute;left:0;right:0;top:0;height:44px;display:flex;align-items:center;justify-content:space-between\}/);
-  assert.match(html,/\.rail-meta\{[^}]*font-size:var\(--type-meta-size\)[^}]*line-height:var\(--type-meta-line\)[^}]*font-weight:550[^}]*color:var\(--muted\)[^}]*background:transparent[^}]*border:0[^}]*box-shadow:none/);
-  assert.match(html,/\.rail-meta svg\{width:14px;height:14px[^}]*margin-right:6px/);
-  assert.match(html,/\.log-screen \.rail-meta\{color:rgba\(241,243,245,\.72\)\}/);
+test('every root header contains truthful metadata and one editorial title',()=>{
+  assert.match(html,/<header class="home-header page-header">[\s\S]*?Private dream archive[\s\S]*?<h1 class="greeting">Mapped fragments<\/h1>/);
+  assert.match(html,/<header class="page-header">[\s\S]*?Private capture[\s\S]*?<h1 class="log-title">Capture<\/h1>/);
+  assert.match(html,/<header class="insights-head page-header">[\s\S]*?id="insightsHeaderMeta"[\s\S]*?<h1 class="nav-title">Your terrain<\/h1>/);
+  assert.match(html,/<header class="profile-head page-header">[\s\S]*?Private profile[\s\S]*?<h1>My Dream World<\/h1>/);
+  assert.doesNotMatch(html,/class="header-meta"[^>]*(?:role="button"|tabindex=|onclick=)/);
+  assert.match(html,/\.header-meta\{[^}]*color:var\(--muted\)[^}]*font-size:12px/);
 });
 
 test('History count and Insights period share their canonical data sources',()=>{
   assert.match(html,/const updateHistoryRailCount=\(\)=>\{const count=journalRecords\.length;document\.getElementById\('historyRailCount'\)\.textContent=`\$\{count\} dream\$\{count===1\?'':'s'\}`\}/);
   assert.match(html,/const renderHistoryList=\(\)=>\{[\s\S]*?updateHistoryRailCount\(\)/);
   assert.match(html,/document\.getElementById\('insightsMonth'\)\.textContent=monthLabel/);
-  assert.match(html,/<h2 id="insightsMonth">This month<\/h2>/);
-  assert.doesNotMatch(html,/insightsRailPeriod/);
+  assert.match(html,/document\.getElementById\('insightsHeaderMeta'\)\.textContent=`\$\{monthLabel\} · \$\{dreamNights\} dream night/);
 });

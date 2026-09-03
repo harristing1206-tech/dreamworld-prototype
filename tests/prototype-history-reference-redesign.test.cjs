@@ -122,7 +122,7 @@ test('opened dream redesign preserves back, transcript, metadata, playback, and 
     "requestAnimationFrame(()=>document.getElementById('historyFocusTitle').focus())"
   ]) assert.ok(html.includes(behavior), `Missing detail behavior: ${behavior}`);
   assert.doesNotMatch(html, /Symbols Identified|Phone Booth|Grey Fog|Heavy Coat/, 'Reference-only fabricated symbols must not enter real History');
-  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-82'/);
+  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-83'/);
 });
 
 test('History compact text meets the WCAG AA contrast floor in light and dark themes', () => {
@@ -151,6 +151,8 @@ test('History compact text meets the WCAG AA contrast floor in light and dark th
 });
 
 test('History edit and revealed-delete controls preserve mobile touch targets', () => {
+  const dormantMinus = cssRule('.history-reference-remodel .history-swipe-row>.edit-minus');
+  assert.match(dormantMinus, /position:absolute/, 'hidden Edit control must not create a tappable blank row above the card button');
   const minus = cssRule('.history-reference-remodel #historyList.editing .history-swipe-row .edit-minus');
   assert.match(minus, /width:44px/);
   assert.match(minus, /height:44px/);

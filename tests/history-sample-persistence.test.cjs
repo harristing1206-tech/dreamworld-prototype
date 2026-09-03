@@ -13,6 +13,7 @@ test('sample edits persist across reload and save restores focus by record ident
  d.getElementById('dreamEditName').value='Persistent edit check';d.getElementById('saveDreamEdit').click();await wait(first.dom);
  assert.equal(d.activeElement.dataset.entryId,'sample-2026-08-25','focus must move to the rerendered entry with the same immutable ID');
  assert.equal(d.querySelector('.history-entry[data-entry-id="sample-2026-08-25"] h2').textContent,'Persistent edit check');
+ assert.ok([...d.querySelectorAll('#historyList .edit-minus')].every(button=>button.tabIndex===0&&button.getAttribute('aria-hidden')==='false'),'rerendered Edit controls must retain visible Edit-mode accessibility');
  const state=first.dom.window.localStorage.getItem(SAMPLE_STATE_KEY);assert.ok(state,'sample edit must write durable overlay state');assert.deepEqual(first.errors,[]);first.dom.window.close();
  const second=makeDom(state);await wait(second.dom);const d2=second.dom.window.document;assert.equal(d2.querySelector('.history-entry[data-entry-id="sample-2026-08-25"] h2').textContent,'Persistent edit check');assert.deepEqual(second.errors,[]);second.dom.window.close();
 });
@@ -26,4 +27,17 @@ test('confirmed sample deletion persists across reload',async()=>{
 test('sample edit storage failure remains recoverable and never reports success',async()=>{
  const fixture=makeDom();await wait(fixture.dom);const {document,Storage}=fixture.dom.window;document.querySelector('[data-tab="history"]').click();document.getElementById('editDreams').click();const entry=document.querySelector('.history-entry[data-entry-id="sample-2026-08-25"]');entry.click();await wait(fixture.dom);const original=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new Error('denied')};document.getElementById('dreamEditName').value='Must not appear saved';document.getElementById('saveDreamEdit').click();await wait(fixture.dom);
  assert.equal(document.getElementById('dreamEditSheet').classList.contains('open'),true);assert.equal(document.querySelector('.history-entry[data-entry-id="sample-2026-08-25"] h2').textContent,'The station beneath the lake');assert.match(document.getElementById('toast').textContent,/could not save/i);Storage.prototype.setItem=original;assert.deepEqual(fixture.errors,[]);fixture.dom.window.close();
+});
+
+test('History delete affordances enter the keyboard and accessibility flow only in Edit mode',async()=>{
+ const fixture=makeDom();await wait(fixture.dom);const {document:d}=fixture.dom.window;d.querySelector('[data-tab="history"]').click();const minuses=()=>[...d.querySelectorAll('#historyList .edit-minus')],deletes=()=>[...d.querySelectorAll('#historyList .swipe-action.delete')];
+ assert.ok(minuses().length>0);assert.equal(fixture.dom.window.getComputedStyle(minuses()[0]).position,'absolute','hidden Edit control must not create a blank tappable strip');assert.ok(minuses().every(button=>button.tabIndex===-1&&button.getAttribute('aria-hidden')==='true'));assert.ok(deletes().every(button=>button.tabIndex===-1&&button.getAttribute('aria-hidden')==='true'));
+ const normalEntry=d.querySelector('#historyList .history-entry');normalEntry.click();await wait(fixture.dom);assert.equal(d.getElementById('historyFocus').hidden,false);assert.equal(d.getElementById('deleteConfirm').hidden,true);d.getElementById('historyFocusBack').click();
+ d.getElementById('editDreams').click();
+ assert.ok(minuses().every(button=>button.tabIndex===0&&button.getAttribute('aria-hidden')==='false'));assert.ok(deletes().every(button=>button.tabIndex===-1&&button.getAttribute('aria-hidden')==='true'));
+ minuses()[0].click();assert.equal(deletes()[0].tabIndex,0);assert.equal(deletes()[0].getAttribute('aria-hidden'),'false');
+ minuses()[0].click();assert.equal(deletes()[0].tabIndex,-1);assert.equal(deletes()[0].getAttribute('aria-hidden'),'true');
+ d.getElementById('editDreams').click();
+ assert.ok(minuses().every(button=>button.tabIndex===-1&&button.getAttribute('aria-hidden')==='true'));assert.ok(deletes().every(button=>button.tabIndex===-1&&button.getAttribute('aria-hidden')==='true'));
+ assert.deepEqual(fixture.errors,[]);fixture.dom.window.close();
 });

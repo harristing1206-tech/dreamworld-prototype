@@ -55,7 +55,10 @@ const d = dom.window.document;
 const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
 
 (async () => {
-  assert.doesNotMatch(source, /(?:linear|radial)-gradient/i);
+  const historyHeroGradientRules=source.match(/[^{}]*\.history-reference-remodel \.history-focus-hero\{[^}]*\}/g)||[];
+  assert.equal(historyHeroGradientRules.length,2,'only light and dark History detail hero rules may use gradients');
+  assert.ok(historyHeroGradientRules.every(rule=>/radial-gradient/i.test(rule)),'History detail hero must own the reference gradient');
+  assert.doesNotMatch(source.replace(/[^{}]*\.history-reference-remodel \.history-focus-hero\{[^}]*\}/g,''),/(?:linear|radial)-gradient/i,'gradients must remain scoped to the History detail hero');
   assert.doesNotMatch(source, />\s*Analysis\s*</i);
   assert.doesNotMatch(source, /See when dreams appear and how sleep, recording length, and recall move together\./);
   assert.match(source, /\.calendar-day,\.calendar-blank\{max-width:44px;width:44px;height:44px;aspect-ratio:1\/1[^}]*justify-self:center/, 'calendar dates must retain true 44-by-44px touch targets');

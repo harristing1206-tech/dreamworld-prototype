@@ -307,6 +307,59 @@
     :root[data-theme="dark"] .alarm-reference-remodel .page-header .header-action{border-color:#34352f;color:#f4f3ef}
     :root[data-theme="dark"] .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm){color:#f4f3ef;box-shadow:0 10px 28px rgba(0,0,0,.22)}
 
+    /* v82 — supplied warm card-grid treatment, scoped to History. */
+    .history-reference-remodel{--history-card:#fff;--history-ink:#1a1918;--history-muted:#6f6d68;--history-border:#e2e0da;background:#f4f3ef;color:var(--history-ink)}
+    .phone:has(.history-reference-remodel.active),.phone:has(.history-reference-remodel.active) .statusbar{background:#f4f3ef}
+    .history-reference-remodel .home-header{height:110px;margin-top:8px;padding-bottom:10px}
+    .history-reference-remodel .header-meta-row{height:28px}.history-reference-remodel .header-title-row{height:68px}
+    .history-reference-remodel .header-meta{color:var(--history-muted);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+    .history-reference-remodel .header-meta-action{color:var(--history-ink);font-size:13px}
+    .history-reference-remodel .page-header h1{font-family:"Newsreader",var(--font-editorial);font-size:44px!important;line-height:1!important;letter-spacing:-.035em!important;color:var(--history-ink)}
+    .history-reference-remodel .history-search{height:54px;margin-top:10px;padding:0 16px;border:1px solid var(--history-border);border-radius:20px;background:var(--history-card);color:var(--history-muted);box-shadow:0 2px 10px rgba(0,0,0,.025)}
+    .history-reference-remodel .history-search input{height:52px;color:var(--history-ink);font-size:15px;font-weight:400}.history-reference-remodel .history-search input::placeholder{color:var(--history-muted)}
+    .history-reference-remodel .history-list{margin-top:22px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;border:0}
+    .history-reference-remodel .history-swipe-row{position:relative;display:block;min-width:0;min-height:190px;margin:0;border:1px solid rgba(226,224,218,.7)!important;border-radius:28px;background:var(--history-card);box-shadow:0 8px 24px rgba(0,0,0,.04);overflow:hidden}
+    .history-reference-remodel .history-entry{position:relative;width:100%;min-height:190px;padding:20px;border:0;background:var(--history-card);color:var(--history-ink);display:flex;flex-direction:column;text-align:left}
+    .history-reference-remodel .history-entry-meta{margin:0 0 12px;color:var(--history-muted);font-size:11px;line-height:14px;font-weight:700;letter-spacing:.10em;text-transform:uppercase}
+    .history-reference-remodel .history-entry h2{min-width:0;margin:0 0 12px;font-family:"Newsreader",var(--font-editorial);font-size:22px;line-height:24px;font-weight:400;letter-spacing:-.02em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+    .history-reference-remodel .history-entry-excerpt{min-width:0;margin:auto 0 0;color:var(--history-muted);font-size:13px;line-height:19px;font-weight:400;white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+    .history-reference-remodel .history-entry-arrow{display:none}
+    .history-reference-remodel .history-swipe-row:active{transform:scale(.985)}
+    .history-reference-remodel .history-swipe-row,.history-reference-remodel .history-entry{transition:transform 150ms ease,background-color 150ms ease,padding 240ms cubic-bezier(.22,.61,.36,1)}
+    .history-reference-remodel #historyList.editing .history-swipe-row{display:block;grid-template-columns:none}
+    .history-reference-remodel #historyList.editing .history-swipe-row .edit-minus{position:absolute;z-index:5;left:4px;top:8px;width:44px;height:44px;grid-column:auto;grid-row:auto;align-self:auto;justify-self:auto;border-radius:50%;background:transparent;transform:none;transition:opacity 180ms ease}
+    .history-reference-remodel #historyList.editing .history-swipe-row .edit-minus:before{content:"";position:absolute;left:9px;top:9px;width:26px;height:26px;border-radius:50%;background:var(--danger)}
+    .history-reference-remodel #historyList.editing .history-swipe-row .edit-minus:after{left:16px;right:16px;top:21px;z-index:1}
+    .history-reference-remodel #historyList.editing .history-entry{padding-left:54px}
+    .history-reference-remodel .history-focus{position:absolute;z-index:6;inset:0;margin:0;padding:0 0 96px;overflow-y:auto;background:#f4f3ef;color:var(--history-ink);will-change:transform,opacity}
+    .history-reference-remodel .history-focus-hero{position:relative;min-height:360px;padding:108px 30px 54px;display:flex;align-items:flex-end;overflow:hidden;background:radial-gradient(circle at 76% 24%,rgba(132,150,122,.38) 0%,rgba(244,243,239,0) 56%),radial-gradient(circle at 12% 88%,rgba(132,150,122,.20) 0%,rgba(244,243,239,0) 58%),#f4f3ef}
+    .history-reference-remodel .history-focus-hero:after{content:"";position:absolute;width:210px;height:210px;right:-86px;top:20px;border-radius:50%;background:rgba(132,150,122,.10);filter:blur(54px);pointer-events:none}
+    .history-reference-remodel .history-focus-toolbar{position:absolute;z-index:2;left:24px;right:24px;top:24px;display:flex;align-items:center;justify-content:space-between}
+    .history-reference-remodel .history-focus-back{width:44px;height:44px;min-height:44px;padding:0;border:1px solid rgba(226,224,218,.9);border-radius:50%;background:rgba(255,255,255,.82);color:var(--history-ink);display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.05);backdrop-filter:blur(12px)}
+    .history-reference-remodel .history-focus-back svg{width:20px;height:20px;stroke-linecap:round;stroke-linejoin:round}
+    .history-reference-remodel .history-focus-privacy{padding:8px 12px;border:1px solid rgba(226,224,218,.8);border-radius:18px;background:rgba(255,255,255,.62);color:var(--history-muted);font-size:11px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;backdrop-filter:blur(12px)}
+    .history-reference-remodel .history-focus-hero-copy{position:relative;z-index:1;min-width:0;width:100%}
+    .history-reference-remodel .history-focus-date{margin:0 0 12px;color:#5e7057;font-size:11px;line-height:14px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+    .history-reference-remodel .history-focus h2{max-width:320px;margin:0;font-family:"Newsreader",var(--font-editorial);font-size:48px;line-height:52px;font-weight:400;letter-spacing:-.04em;color:var(--history-ink);overflow-wrap:anywhere}
+    .history-reference-remodel .history-focus h2:focus{outline:none}
+    .history-reference-remodel .history-focus-card{position:relative;z-index:2;margin:-28px 24px 0;padding:28px;border:1px solid rgba(226,224,218,.65);border-radius:32px;background:var(--history-card);box-shadow:0 12px 40px -10px rgba(0,0,0,.08)}
+    .history-reference-remodel .history-focus-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0 0 28px;padding:0 0 24px;border:0;border-bottom:1px solid var(--history-border);border-radius:0;background:transparent;overflow:visible}
+    .history-reference-remodel .history-focus-fact{min-width:0;padding:0 12px;background:transparent;text-align:center}.history-reference-remodel .history-focus-fact:first-child{padding-left:0;text-align:left}.history-reference-remodel .history-focus-fact:last-child{padding-right:0;text-align:right}
+    .history-reference-remodel .history-focus-fact strong{display:block;color:var(--history-ink);font-size:15px;line-height:20px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-reference-remodel .history-focus-fact span{display:block;margin-bottom:5px;color:var(--history-muted);font-size:11px;line-height:14px;font-weight:700;letter-spacing:.10em;text-transform:uppercase}
+    .history-reference-remodel .history-focus-section h3{margin:0 0 14px;font-family:"Newsreader",var(--font-editorial);font-size:22px;line-height:26px;font-weight:400;color:var(--history-ink)}
+    .history-reference-remodel .history-focus-summary{padding-bottom:28px}.history-reference-remodel .history-focus-excerpt{margin:0;color:#4e4d49;font-size:16px;line-height:25px;font-weight:400}
+    .history-reference-remodel .history-focus-transcript-section{padding-top:26px;border-top:1px solid var(--history-border)}
+    .history-reference-remodel .history-focus-action{width:100%;min-height:50px;margin:0;padding:0 18px;border:1px solid var(--history-border);border-radius:25px;background:var(--history-card);color:var(--history-ink);font-size:14px;line-height:20px;font-weight:600}
+    .history-reference-remodel .history-focus-transcript{margin:16px 0 0;padding:20px;border:0;border-radius:20px;background:#f4f3ef;color:#3f3e3a;font-size:16px;line-height:25px;font-weight:400;white-space:pre-wrap;overflow-wrap:anywhere}
+    .history-reference-remodel #historyFocusAudio{margin-top:12px;background:var(--history-ink);color:var(--history-card);border-color:var(--history-ink)}
+    .history-reference-remodel .history-audio-player{position:sticky;z-index:8;left:24px;right:24px;bottom:16px;margin:20px 24px 0;padding:16px;border:0;border-radius:24px;background:#1a1918;color:#fff;box-shadow:0 18px 42px rgba(0,0,0,.24)}
+    .history-reference-remodel .history-audio-status{margin:0 0 12px;color:rgba(255,255,255,.72);font-size:12px;line-height:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.history-reference-remodel .history-audio-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.history-reference-remodel .history-audio-controls button{min-height:44px;border:1px solid rgba(255,255,255,.20);border-radius:22px;background:rgba(255,255,255,.10);color:#fff;font-size:13px;font-weight:700}.history-reference-remodel .history-audio-controls #historyAudioPause{background:#607657;border-color:#607657}
+    :root[data-theme="dark"] .history-reference-remodel{--history-card:#1a1c19;--history-ink:#f4f3ef;--history-muted:#b4b1a9;--history-border:#343630;background:#111310;color:var(--history-ink)}
+    :root[data-theme="dark"] .phone:has(.history-reference-remodel.active),:root[data-theme="dark"] .phone:has(.history-reference-remodel.active) .statusbar{background:#111310}
+    :root[data-theme="dark"] .history-reference-remodel .history-swipe-row{border-color:var(--history-border)!important;box-shadow:0 10px 28px rgba(0,0,0,.22)}
+    :root[data-theme="dark"] .history-reference-remodel .history-focus{background:#111310}:root[data-theme="dark"] .history-reference-remodel .history-focus-hero{background:radial-gradient(circle at 76% 24%,rgba(132,150,122,.28) 0%,rgba(17,19,16,0) 58%),radial-gradient(circle at 12% 88%,rgba(132,150,122,.16) 0%,rgba(17,19,16,0) 60%),#111310}:root[data-theme="dark"] .history-reference-remodel .history-focus-back,:root[data-theme="dark"] .history-reference-remodel .history-focus-privacy{border-color:#3b3d37;background:rgba(26,28,25,.82);color:var(--history-ink)}
+    :root[data-theme="dark"] .history-reference-remodel .history-focus-date{color:#b5c5ab}:root[data-theme="dark"] .history-reference-remodel .history-focus-card{border-color:var(--history-border);box-shadow:0 14px 42px rgba(0,0,0,.30)}:root[data-theme="dark"] .history-reference-remodel .history-focus-excerpt,:root[data-theme="dark"] .history-reference-remodel .history-focus-transcript{color:#dedbd3}:root[data-theme="dark"] .history-reference-remodel .history-focus-transcript{background:#242620}
+
     @media(prefers-reduced-motion:reduce){#editAlarms:active,#addAlarm:active,#editDreams:active{scale:1!important;transition:none}.header-action.illuminating:after{animation:none;opacity:.14;transform:scale(1)}}
 
     @media(display-mode:standalone),(max-width:500px) and (pointer:coarse){.statusbar{display:none}.viewport{inset-top:max(12px,env(safe-area-inset-top))}.tabbar{bottom:0;padding-bottom:max(4px,env(safe-area-inset-bottom));height:calc(var(--tabbar-height) + env(safe-area-inset-bottom))}}
@@ -317,19 +370,20 @@
   <section class="phone" aria-label="Dreamworld five-slot insights demo">
     <div class="statusbar" aria-hidden="true"><span>7:18</span><span class="status-icons"><span>▮▮▮</span><span>◔</span><span class="battery"></span></span></div>
     <div class="viewport">
-      <section class="screen" data-screen="history" aria-label="Dream history">
+      <section class="screen history-reference-remodel" data-screen="history" aria-label="Dream history">
         <header class="home-header page-header"><div class="header-meta-row"><span class="header-meta">Private dream archive</span><span class="visually-hidden" id="historyRailCount">6 dreams</span><button class="header-meta-action" id="editDreams" type="button" aria-pressed="false">Edit</button></div><div class="header-title-row"><h1 class="greeting">Mapped fragments</h1></div></header>
         <label class="history-search" for="historySearch"><span class="search-symbol" aria-hidden="true"></span><input id="historySearch" type="search" autocomplete="off" placeholder="Search dreams" aria-label="Search dreams"></label>
         <p class="history-search-empty" id="historySearchEmpty" hidden>No matching dreams.</p>
         <section class="history-focus" id="historyFocus" aria-labelledby="historyFocusTitle" hidden>
-          <button class="history-focus-back" id="historyFocusBack" type="button">‹ All dreams</button>
-          <p class="history-focus-date" id="historyFocusDate"></p>
-          <h2 id="historyFocusTitle" tabindex="-1"></h2>
-          <div class="history-focus-facts"><div class="history-focus-fact"><strong id="historyFocusSleep"></strong><span>Sleep</span></div><div class="history-focus-fact"><strong id="historyFocusRecording"></strong><span>Recording</span></div><div class="history-focus-fact"><strong id="historyFocusRecall"></strong><span>Recall</span></div></div>
-          <p class="history-focus-excerpt" id="historyFocusExcerpt"></p>
-          <button class="history-focus-action" id="historyFocusTranscript" type="button" aria-expanded="false" aria-controls="historyFocusTranscriptText">Read full transcript</button>
-          <p class="history-focus-transcript" id="historyFocusTranscriptText" hidden></p>
-          <button class="history-focus-action" id="historyFocusAudio" type="button" hidden>Play raw audio</button>
+          <div class="history-focus-hero">
+            <div class="history-focus-toolbar"><button class="history-focus-back" id="historyFocusBack" type="button" aria-label="Back to all dreams"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><span class="history-focus-privacy">Private entry</span></div>
+            <div class="history-focus-hero-copy"><p class="history-focus-date" id="historyFocusDate"></p><h2 id="historyFocusTitle" tabindex="-1"></h2></div>
+          </div>
+          <div class="history-focus-card">
+            <div class="history-focus-facts"><div class="history-focus-fact"><span>Sleep</span><strong id="historyFocusSleep"></strong></div><div class="history-focus-fact"><span>Recording</span><strong id="historyFocusRecording"></strong></div><div class="history-focus-fact"><span>Recall</span><strong id="historyFocusRecall"></strong></div></div>
+            <section class="history-focus-section history-focus-summary"><h3>Summary</h3><p class="history-focus-excerpt" id="historyFocusExcerpt"></p></section>
+            <section class="history-focus-section history-focus-transcript-section"><h3>Transcript</h3><button class="history-focus-action" id="historyFocusTranscript" type="button" aria-expanded="false" aria-controls="historyFocusTranscriptText">Read full transcript</button><p class="history-focus-transcript" id="historyFocusTranscriptText" hidden></p><button class="history-focus-action" id="historyFocusAudio" type="button" hidden>Play raw audio</button></section>
+          </div>
           <div class="history-audio-player" id="historyAudioPlayer" role="group" aria-label="Raw audio playback" hidden><p class="history-audio-status" id="historyAudioStatus" role="status">Playing raw audio</p><div class="history-audio-controls"><button id="historyAudioPause" type="button" aria-label="Pause raw audio">Pause</button><button class="history-audio-exit" id="historyAudioExit" type="button" aria-label="Exit raw audio playback">Exit</button></div></div>
         </section>
         <div class="history-list" id="historyList"></div>

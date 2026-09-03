@@ -7,5 +7,5 @@ assert.match(html,/\.metric-symbol\{display:none\}/,'repeated Insight icon tiles
 assert.match(html,/\.setting-icon\{width:24px[^}]*background:transparent/,'Settings icon tiles remain');assert.match(html,/\.profile-avatar\{width:52px;height:52px/,'Profile identity avatar geometry is inconsistent');assert.match(html,/\.profile-identity\{[^}]*min-height:76px[^}]*border-top:1px solid var\(--separator\)[^}]*border-bottom:1px solid var\(--separator\)/,'Compact bordered Profile identity row hierarchy missing');
 assert.match(html,/\.statusbar\{display:none\}\.viewport\{inset:max\(env\(safe-area-inset-top\),12px\)/,'installed iPhone still uses the simulated status bar');
 assert.equal(manifest.background_color,'#ffffff');assert.equal(manifest.theme_color,'#ffffff');
-assert.doesNotMatch(html,/(?:linear|radial)-gradient/i,'visual refinement introduced a generic gradient');
+const allowedHistoryGradients=html.match(/[^{}]*\.history-reference-remodel \.history-focus-hero\{[^}]*\}/g)||[];assert.equal(allowedHistoryGradients.length,2,'History detail must own exactly two theme-specific gradient rules');assert.doesNotMatch(html.replace(/[^{}]*\.history-reference-remodel \.history-focus-hero\{[^}]*\}/g,''),/(?:linear|radial)-gradient/i,'generic gradients escaped the supplied History detail hero');
 console.log('DREAMWORLD_MOBBIN_NATIVE_REFINEMENT_VERIFIED');

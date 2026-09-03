@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/harristing1206-tech/dreamworld-prototype#readme",
   "devDependencies": {
-    "jsdom": "^26.1.0"
+    "jsdom": "^26.1.0",
+    "playwright": "^1.62.1"
   }
 }

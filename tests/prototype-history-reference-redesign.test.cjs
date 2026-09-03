@@ -122,7 +122,7 @@ test('opened dream redesign preserves back, transcript, metadata, playback, and 
     "requestAnimationFrame(()=>document.getElementById('historyFocusTitle').focus())"
   ]) assert.ok(html.includes(behavior), `Missing detail behavior: ${behavior}`);
   assert.doesNotMatch(html, /Symbols Identified|Phone Booth|Grey Fog|Heavy Coat/, 'Reference-only fabricated symbols must not enter real History');
-  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-83'/);
+  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-84'/);
 });
 
 test('History compact text meets the WCAG AA contrast floor in light and dark themes', () => {

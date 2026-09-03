@@ -14,6 +14,7 @@
   <script>(()=>{let choice='light',stored='';try{stored=localStorage.getItem('dreamworld:appearance')||''}catch{}if(stored==='light'||stored==='dark')choice=stored;else{choice=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';try{localStorage.setItem('dreamworld:appearance',choice)}catch{}}document.documentElement.dataset.theme=choice;document.documentElement.dataset.themePreference=choice})()</script>
   <style>
     @font-face{font-family:"DM Sans";src:url("./dm-sans-latin-wght-normal.woff2") format("woff2-variations");font-style:normal;font-weight:100 1000;font-display:swap}
+    @font-face{font-family:"Newsreader";src:url("./newsreader-latin-300-600.woff2") format("woff2");font-style:normal;font-weight:300 600;font-display:swap}
     :root{
       color-scheme:light;
       --canvas:#ffffff;
@@ -274,6 +275,38 @@
     .tabbar{height:calc(var(--tabbar-height) + env(safe-area-inset-bottom));padding:6px max(14px,calc(env(safe-area-inset-right) + 8px)) max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--defined-border);background:var(--tabbar-bg);box-shadow:none}.viewport{inset-bottom:calc(var(--tabbar-height) + env(safe-area-inset-bottom))}.tab{position:relative;min-height:60px;flex-direction:column;gap:5px;color:var(--faint)}.tab:before{display:none}.tab svg{width:20px;height:20px;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}.tab-label{font-size:var(--type-label-size);line-height:var(--type-label-line);font-weight:600}.tab.active{color:var(--ink)}.tab.active:not(.log-tab):after{content:"";position:absolute;bottom:1px;width:3px;height:3px;border-radius:50%;background:currentColor}.tab.log-tab{transform:translateY(-5px)}.tab.log-tab .plus-disc{width:44px;height:44px;min-width:44px;min-height:44px;flex-basis:44px;background:var(--ink);color:var(--canvas);box-shadow:none}.tab.log-tab.active .plus-disc{box-shadow:0 0 0 3px var(--tabbar-bg),0 0 0 4px var(--highlight)}.tab.log-tab .capture-tab-mic{width:22px;height:22px}
     .alarm-row:active,.history-entry:active,.insights-latest-card button:active{transform:scale(.985)}.alarm-row,.history-entry,.insights-latest-card button{transition:transform 150ms ease,background-color 150ms ease}.switch:before,.switch:after{transition:transform 180ms ease,background-color 180ms ease}.toast{border-radius:14px}
 
+    /* v81 — attached warm Alarm study, scoped to Alarm only. */
+    .alarm-reference-remodel{--alarm-card:#fff;--alarm-dark:#1a1918;--alarm-muted:#6f6d68;background:#f4f3ef;color:#1a1918}
+    .phone:has(.alarm-reference-remodel.active),.phone:has(.alarm-reference-remodel.active) .statusbar{background:#f4f3ef}
+    .alarm-reference-remodel .page-header{height:110px;margin-top:8px;padding-bottom:10px}
+    .alarm-reference-remodel .header-meta-row{height:28px}
+    .alarm-reference-remodel .header-title-row{height:68px;align-items:center}
+    .alarm-reference-remodel .header-meta{color:var(--alarm-muted);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+    .alarm-reference-remodel .header-meta-action{color:#1a1918;font-size:13px}
+    .alarm-reference-remodel .page-header h1{font-family:"Newsreader",var(--font-editorial);font-size:44px!important;line-height:1!important;letter-spacing:-.035em!important;color:#1a1918}
+    .alarm-reference-remodel .page-header .header-action{width:44px;height:44px;border:1px solid #e8e6e0;border-radius:50%;background:var(--alarm-card);color:#1a1918;box-shadow:0 2px 8px rgba(0,0,0,.045)}
+    .alarm-reference-remodel .alarm-list{margin-top:10px;gap:12px}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm{min-height:250px;border-radius:32px;background:var(--alarm-dark);color:#fff;box-shadow:0 12px 40px -10px rgba(0,0,0,.16)}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm:before{width:190px;height:190px;left:auto;right:-42px;top:-55px;bottom:auto;background:rgba(255,255,255,.045);filter:blur(35px)}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm .swipe-main{min-height:250px;padding:28px;align-items:flex-end}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm .alarm-copy:before{margin-bottom:56px;color:rgba(255,255,255,.50);font-size:11px;line-height:14px;letter-spacing:.20em}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm .alarm-time{font-family:"Newsreader",var(--font-editorial);font-size:68px;letter-spacing:-.055em}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm .alarm-period{margin-left:7px;font-size:18px;font-weight:600;color:rgba(255,255,255,.68)}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm .alarm-detail{margin-top:8px;color:rgba(255,255,255,.58);font-size:13px;font-weight:400;letter-spacing:.02em}
+    .alarm-reference-remodel #alarmList .alarm-row.next-alarm .switch{right:26px;top:24px}
+    .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm){min-height:104px;border-radius:32px;background:var(--alarm-card);color:#1a1918;box-shadow:0 8px 24px rgba(0,0,0,.045)}
+    .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm) .swipe-main{min-height:104px;padding:0 22px;background:inherit}
+    .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm) .alarm-time{font-family:"Newsreader",var(--font-editorial);font-size:40px;line-height:1;letter-spacing:-.035em}
+    .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm) .alarm-period{margin-left:5px;font-size:13px;color:var(--alarm-muted)}
+    .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm) .alarm-detail{margin-top:6px;color:var(--alarm-muted);font-size:13px;font-weight:400;letter-spacing:.015em}
+    .alarm-reference-remodel .alarm-storage-status{background:rgba(255,255,255,.7);color:#6f6d68}
+    .alarm-reference-remodel .sleep-note{margin-top:18px;padding:13px 2px;border-bottom-color:#e0ded8;color:#6f6d68;font-size:12px}
+    :root[data-theme="dark"] .alarm-reference-remodel{--alarm-card:#22231f;--alarm-dark:#0d0e0c;--alarm-muted:#aaa79f;background:#151613;color:#f4f3ef}
+    :root[data-theme="dark"] .phone:has(.alarm-reference-remodel.active),:root[data-theme="dark"] .phone:has(.alarm-reference-remodel.active) .statusbar{background:#151613}
+    :root[data-theme="dark"] .alarm-reference-remodel .page-header h1,:root[data-theme="dark"] .alarm-reference-remodel .header-meta-action{color:#f4f3ef}
+    :root[data-theme="dark"] .alarm-reference-remodel .page-header .header-action{border-color:#34352f;color:#f4f3ef}
+    :root[data-theme="dark"] .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm){color:#f4f3ef;box-shadow:0 10px 28px rgba(0,0,0,.22)}
+
     @media(prefers-reduced-motion:reduce){#editAlarms:active,#addAlarm:active,#editDreams:active{scale:1!important;transition:none}.header-action.illuminating:after{animation:none;opacity:.14;transform:scale(1)}}
 
     @media(display-mode:standalone),(max-width:500px) and (pointer:coarse){.statusbar{display:none}.viewport{inset-top:max(12px,env(safe-area-inset-top))}.tabbar{bottom:0;padding-bottom:max(4px,env(safe-area-inset-bottom));height:calc(var(--tabbar-height) + env(safe-area-inset-bottom))}}
@@ -302,7 +335,7 @@
         <div class="history-list" id="historyList"></div>
       </section>
 
-      <section class="screen active" data-screen="alarm" aria-label="Alarms">
+      <section class="screen active alarm-reference-remodel" data-screen="alarm" aria-label="Alarms">
         <header class="alarm-head page-header"><div class="header-meta-row"><time class="header-meta" id="alarmDate"></time><button class="header-meta-action" id="editAlarms" type="button" aria-pressed="false">Edit</button></div><div class="header-title-row"><h1 class="nav-title">Good morning.</h1><button class="alarm-add header-action" id="addAlarm" type="button" aria-label="Add alarm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div></header>
         <div class="alarm-list" id="alarmList">
           <article class="alarm-row" data-hour="6" data-minute="30" data-period="AM" data-label="Wake up" data-repeat="Weekdays"><button class="alarm-edit" type="button" aria-label="Edit 6:30 AM Wake up alarm"><div class="alarm-copy"><div class="alarm-time"><span class="alarm-value">6:30</span> <span class="alarm-period">AM</span></div><div class="alarm-detail">Wake up · Weekdays</div></div></button><button class="switch on" type="button" role="switch" aria-checked="true" aria-label="Toggle 6:30 AM alarm"></button></article>

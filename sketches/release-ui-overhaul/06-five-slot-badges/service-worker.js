@@ -1,5 +1,5 @@
-const CACHE='dreamworld-pwa-20260830-80';
-const SHELL=['./index.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png','./dm-sans-latin-wght-normal.woff2'];
+const CACHE='dreamworld-pwa-20260830-81';
+const SHELL=['./index.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png','./dm-sans-latin-wght-normal.woff2','./newsreader-latin-300-600.woff2'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });

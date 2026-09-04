@@ -10,7 +10,7 @@ assert.match(html,/\.history-entry-meta\{[^}]*font-size:11px[^}]*text-transform:
 assert.match(html,/\.history-entry h2\{[^}]*font-family:var\(--font-editorial\)[^}]*font-size:18px/,'History titles are not editorial');
 assert.match(html,/\.history-entry-excerpt\{[^}]*white-space:nowrap[^}]*text-overflow:ellipsis/,'History excerpts are not bounded');
 assert.match(html,/\.history-entry-arrow\{display:block[^}]*font-size:20px/,'History chevron is missing');
-assert.match(html,/button\.append\(meta,title,excerpt,arrow\)/,'History row hierarchy is not metadata, title, excerpt, chevron');
+assert.match(html,/button\.append\(meta,title,excerpt,arrow,indicator\)/,'History row hierarchy is not metadata, title, excerpt, chevron, and selection indicator');
 assert.match(html,/document\.getElementById\('historySearch'\)\.addEventListener\('input',filterHistoryRows\)/,'History search is not wired');
 assert.match(html,/historyFocus\.addEventListener\('touchstart'/,'dream-detail swipe start is missing');
 assert.match(html,/historySwipe\.dx>=72/,'swipe-right threshold is missing');

@@ -17,6 +17,6 @@ test('the shared app canvas is a semantic token rather than per-tab hardcoding',
  assert.match(html,/:root\[data-theme="dark"\]\{[^}]*--app-canvas:#111310/);
  assert.match(html,/\.phone,\.statusbar,\.viewport,\.screen,\.tabbar\{background:var\(--app-canvas\)!important/);
  assert.match(html,/\.capture-redesign \[data-log-state\]\{background:var\(--app-canvas\)!important/);
- assert.match(html,/const APP_SHELL_VERSION='92'/);
- assert.match(worker,/const CACHE='dreamworld-pwa-20260830-92'/);
+ assert.match(html,/const APP_SHELL_VERSION='93'/);
+ assert.match(worker,/const CACHE='dreamworld-pwa-20260830-93'/);
 });

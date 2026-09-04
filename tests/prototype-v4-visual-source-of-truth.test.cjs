@@ -15,7 +15,7 @@ test('v4 typography and surface tokens replace the legacy visual system',()=>{
 
 test('root destinations use the v4 page-header hierarchy and copy',()=>{
   assert.match(html,/<header class="alarm-head page-header">[\s\S]*?id="alarmDate"[\s\S]*?<h1 class="nav-title">Good morning\.<\/h1>/);
-  assert.match(html,/<header class="home-header page-header">[\s\S]*?Private dream archive[\s\S]*?<h1 class="greeting">Mapped fragments<\/h1>/);
+  assert.match(html,/<header class="home-header page-header">[\s\S]*?Private dream archive[\s\S]*?<h1 class="greeting"[^>]*>Mapped fragments<\/h1>/);
   assert.match(html,/<header class="home-header page-header"><div class="header-meta-row"><span class="header-meta">Private dream archive<\/span><span class="visually-hidden" id="historyRailCount">6 dreams<\/span><button class="header-meta-action" id="editDreams"/);
   assert.match(html,/<header class="page-header">[\s\S]*?Private capture[\s\S]*?<h1 class="log-title">Capture<\/h1>/);
   assert.match(html,/<header class="insights-head page-header">[\s\S]*?id="insightsHeaderMeta"[\s\S]*?<h1 class="nav-title">Your terrain<\/h1>/);
@@ -55,5 +55,5 @@ test('Capture and navigation adopt v4 geometry without replacing behavior',()=>{
   assert.match(html,/\.recording-stop-main\{[^}]*width:72px!important;height:72px!important/);
   assert.match(html,/\.tab svg\{[^}]*width:20px;height:20px[^}]*stroke-width:1\.75/);
   assert.match(html,/\.tab\.active:not\(\.log-tab\):after\{[^}]*width:3px;height:3px/);
-  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-92'/);
+  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-93'/);
 });

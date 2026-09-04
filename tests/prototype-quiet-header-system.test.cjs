@@ -6,7 +6,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','sketches','release-ui-overh
 
 test('destination headers use the v4 metadata and editorial-title hierarchy',()=>{
   assert.match(html,/<header class="alarm-head page-header">[\s\S]*?<time class="header-meta" id="alarmDate">[\s\S]*?<h1 class="nav-title">Good morning\.<\/h1>/);
-  assert.match(html,/<header class="home-header page-header">[\s\S]*?Private dream archive[\s\S]*?<h1 class="greeting">Mapped fragments<\/h1>/);
+  assert.match(html,/<header class="home-header page-header">[\s\S]*?Private dream archive[\s\S]*?<h1 class="greeting"[^>]*>Mapped fragments<\/h1>/);
   assert.match(html,/<header class="page-header">[\s\S]*?Private capture[\s\S]*?<h1 class="log-title">Capture<\/h1>/);
   assert.match(html,/<header class="insights-head page-header">[\s\S]*?id="insightsHeaderMeta"[\s\S]*?<h1 class="nav-title">Your terrain<\/h1>/);
   assert.match(html,/\.page-header h1\{[^}]*font-family:var\(--font-editorial\)[^}]*font-size:34px[^}]*line-height:38px/);

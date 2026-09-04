@@ -10,6 +10,6 @@ test('journal hydration distinguishes unavailable storage and never substitutes 
  assert.equal(d.querySelectorAll('#historyList .history-entry').length,0,'sample records must not cover an unavailable real journal');
  assert.equal(d.getElementById('historyRailCount').textContent,'0 dreams');
  assert.match(d.getElementById('toast').textContent,/saved dreams are temporarily unavailable/i);
- assert.match(source,/return\{state:'unavailable',records:\[\]\}/);
+ assert.match(source,/return\{state:'unavailable',records:\[\],keys:\[\]\}/);
  assert.deepEqual(errors,[]);dom.window.close();
 });

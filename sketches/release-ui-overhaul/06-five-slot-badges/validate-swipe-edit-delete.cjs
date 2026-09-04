@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');const html=fs.readFileSync('index.html','utf8');
-assert.match(html,/id="editDreams"[^>]*>Edit<\/button>/,'History Edit button missing');assert.match(html,/id="editAlarms"[^>]*>Edit<\/button>/,'Alarm Edit button missing');
+assert.match(html,/id="editDreams"[^>]*>Select<\/button>/,'History Select button missing');assert.match(html,/id="editAlarms"[^>]*>Edit<\/button>/,'Alarm Edit button missing');
 assert.match(html,/\.swipe-actions\{[^}]*inset:0[^}]*background:var\(--danger\)/,'full-row red swipe surface missing');
 assert.match(html,/\.swipe-action\.delete\{[^}]*width:100%[^}]*justify-content:flex-end/,'trash action does not stay compositor-friendly');
 assert.match(html,/className='swipe-action delete'[\s\S]*<svg viewBox="0 0 24 24"/,'trash-can icon is missing');

@@ -63,5 +63,5 @@ test('Capture redesign compact text and primary actions meet WCAG AA contrast',(
  assert.ok(contrast('#ffffff','#a7523f')>=4.5);
  assert.ok(contrast('#ffffff','#ad5944')>=4.5);
  assert.ok(contrast('#b4b1a9','#111310')>=4.5);
- assert.match(worker,/const CACHE='dreamworld-pwa-20260830-92'/);
+ assert.match(worker,/const CACHE='dreamworld-pwa-20260830-93'/);
 });

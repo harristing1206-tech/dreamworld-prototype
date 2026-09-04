@@ -56,7 +56,7 @@ test('History list adopts the supplied warm two-column card composition', () => 
   assert.match(excerpt, /-webkit-line-clamp:3/);
 });
 
-test('History list redesign preserves real data, search, edit, navigation, and deletion hooks', () => {
+test('History list redesign preserves real data, search, selection, detail editing, navigation, and deletion hooks', () => {
   for (const id of ['historyRailCount', 'editDreams', 'historySearch', 'historySearchEmpty', 'historyList']) {
     assert.match(html, new RegExp(`id="${id}"`), `Missing History hook #${id}`);
   }
@@ -64,7 +64,9 @@ test('History list redesign preserves real data, search, edit, navigation, and d
     "document.getElementById('historySearch').addEventListener('input',filterHistoryRows)",
     "document.getElementById('editDreams').addEventListener",
     "openDreamFromInsights(record)",
-    "openDreamEditor(record)",
+    "openDreamEditor(focusedDreamRecord,{returnView:'detail'})",
+    "shareSelectedDreams",
+    "requestDelete('dream-batch'",
     "buildSwipeActions(trigger=>requestDelete('dream',record,row,trigger))",
     "row.dataset.searchText=[shortHistoryDate(record),formatDuration(record.recording),record.title"
   ]) assert.ok(html.includes(behavior), `Missing History behavior: ${behavior}`);
@@ -122,7 +124,7 @@ test('opened dream redesign preserves back, transcript, metadata, playback, and 
     "requestAnimationFrame(()=>document.getElementById('historyFocusTitle').focus())"
   ]) assert.ok(html.includes(behavior), `Missing detail behavior: ${behavior}`);
   assert.doesNotMatch(html, /Symbols Identified|Phone Booth|Grey Fog|Heavy Coat/, 'Reference-only fabricated symbols must not enter real History');
-  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-92'/);
+  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-93'/);
 });
 
 test('History compact text meets the WCAG AA contrast floor in light and dark themes', () => {

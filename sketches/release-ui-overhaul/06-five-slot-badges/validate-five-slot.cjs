@@ -46,7 +46,7 @@ const dom = new JSDOM(source, {
     window.URL.createObjectURL = () => { const url=`blob:fixture-${window.__createdURLs.length+1}`;window.__createdURLs.push(url);return url; };
     window.URL.revokeObjectURL = url => window.__revokedURLs.push(url);
     const stores = new Map(); let currentVersion = 0; let idCounter = 0;window.__failDraftDelete=false;window.__idbStores=stores;
-    window.indexedDB = { open(_name, version) { const request = {}; window.setTimeout(() => { const db = { objectStoreNames: { contains: name => stores.has(name) }, createObjectStore(name) { if (!stores.has(name)) stores.set(name, new Map()); return {}; }, transaction(names) { const pending=[],tx={error:null,objectStore(storeName){const store=stores.get(storeName);return{put(value,key){pending.push({type:'put',store,value,key});schedule()},get(key){const result={};window.setTimeout(()=>{result.result=store.get(key);result.onsuccess?.()},0);return result},getAll(){const result={};window.setTimeout(()=>{result.result=[...store.values()];result.onsuccess?.()},0);return result},delete(key){pending.push({type:'delete',store,key,fail:window.__failDraftDelete&&storeName==='drafts'&&key==='latest'});schedule()}}}};let scheduled=false;const schedule=()=>{if(scheduled)return;scheduled=true;window.setTimeout(()=>{if(pending.some(operation=>operation.fail)){tx.error=new Error('draft delete failed');tx.onerror?.();return}for(const operation of pending){if(operation.type==='put')operation.store.set(operation.key,operation.value);else operation.store.delete(operation.key)}tx.oncomplete?.()},0)};return tx; }, close() {} }; request.result = db; if (version > currentVersion) { currentVersion = version; request.onupgradeneeded?.(); } request.onsuccess?.(); }, 0); return request; } };
+    window.indexedDB = { open(_name, version) { const request = {}; window.setTimeout(() => { const db = { objectStoreNames: { contains: name => stores.has(name) }, createObjectStore(name) { if (!stores.has(name)) stores.set(name, new Map()); return {}; }, transaction(names) { const pending=[],tx={error:null,objectStore(storeName){const store=stores.get(storeName);return{put(value,key){pending.push({type:'put',store,value,key});schedule()},get(key){const result={};window.setTimeout(()=>{result.result=store.get(key);result.onsuccess?.()},0);return result},getAll(){const result={};window.setTimeout(()=>{result.result=[...store.values()];result.onsuccess?.()},0);return result},getAllKeys(){const result={};window.setTimeout(()=>{result.result=[...store.keys()];result.onsuccess?.()},0);return result},delete(key){pending.push({type:'delete',store,key,fail:window.__failDraftDelete&&storeName==='drafts'&&key==='latest'});schedule()}}}};let scheduled=false;const schedule=()=>{if(scheduled)return;scheduled=true;window.setTimeout(()=>{if(pending.some(operation=>operation.fail)){tx.error=new Error('draft delete failed');tx.onerror?.();return}for(const operation of pending){if(operation.type==='put')operation.store.set(operation.key,operation.value);else operation.store.delete(operation.key)}tx.oncomplete?.()},0)};return tx; }, close() {} }; request.result = db; if (version > currentVersion) { currentVersion = version; request.onupgradeneeded?.(); } request.onsuccess?.(); }, 0); return request; } };
     Object.defineProperty(window.crypto, 'subtle', { configurable: true, value: { digest: async () => new Uint8Array(32).buffer } });
     Object.defineProperty(window.crypto, 'randomUUID', { configurable: true, value: () => `test-dream-${++idCounter}-abcdefgh` });
   }
@@ -85,7 +85,7 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.querySelectorAll('.tab.active').length, 1);
   assert.equal(d.querySelector('.tab[aria-current="page"]').dataset.tab, 'history');
   assert.equal(d.querySelectorAll('.history-entry').length, 6);
-  assert.ok([...d.querySelectorAll('.history-entry')].every(entry=>entry.children.length===4&&entry.children[0].classList.contains('history-entry-meta')&&entry.children[1].tagName==='H2'&&entry.children[2].classList.contains('history-entry-excerpt')&&entry.children[3].classList.contains('history-entry-arrow')),'History rows must use the v4 metadata, title, excerpt, and chevron hierarchy');
+  assert.ok([...d.querySelectorAll('.history-entry')].every(entry=>entry.children.length===5&&entry.children[0].classList.contains('history-entry-meta')&&entry.children[1].tagName==='H2'&&entry.children[2].classList.contains('history-entry-excerpt')&&entry.children[3].classList.contains('history-entry-arrow')&&entry.children[4].classList.contains('history-select-indicator')),'History rows must use the v4 metadata, title, excerpt, and chevron hierarchy');
   assert.equal(d.querySelector('[data-entry-id="sample-2026-08-15"] .history-entry-meta').textContent,'Aug 15 · 2:04');
 
   d.querySelector('[data-tab="insights"]').click();
@@ -276,16 +276,14 @@ const wait = ms => new Promise(resolve => dom.window.setTimeout(resolve, ms));
   assert.equal(d.activeElement,d.querySelector('[data-tab="profile"]'),'tab navigation must move focus out of inactive History content');
   todayButton.click();
   assert.match(d.querySelector('[data-log-state="logged"] p').textContent, /Insights/);
-  d.getElementById('editDreams').click();
-  assert.equal(d.getElementById('editDreams').textContent,'✓');
-  assert.ok(d.getElementById('historyList').classList.contains('editing'));
-  let dreamRow=d.querySelector('#historyList .history-swipe-row');
-  dreamRow.querySelector('.history-entry').click();
+  d.getElementById('historyFocusEdit').click();
   assert.ok(d.getElementById('dreamEditSheet').classList.contains('open'));
   d.getElementById('dreamEditName').value='The luminous underwater station';
   d.getElementById('dreamEditSummary').value='A bright station appeared beneath the lake while the dreamer walked through it.';
   d.getElementById('saveDreamEdit').click();await wait(25);
-  dreamRow=d.querySelector('#historyList .history-swipe-row');
+  assert.equal(d.getElementById('historyFocusTitle').textContent,'The luminous underwater station');
+  d.getElementById('historyFocusBack').click();
+  let dreamRow=d.querySelector('#historyList .history-swipe-row');
   assert.equal(dreamRow.querySelector('h2').textContent,'The luminous underwater station');
   dreamRow.querySelector('.swipe-action.delete').click();
   assert.equal(d.getElementById('deleteConfirm').hidden,false);

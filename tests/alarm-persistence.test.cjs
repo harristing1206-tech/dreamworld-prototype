@@ -19,7 +19,7 @@ function makeDom(savedAlarms = null, { storageReadFails = false } = {}) {
     beforeParse(window) {
       window.matchMedia = () => ({ matches: false, media: '', addEventListener() {}, removeEventListener() {} });
       Object.defineProperty(window.navigator, 'serviceWorker', { configurable: true, value: { register: async () => ({ update: async () => {} }) } });
-      const stores=new Map();let version=0;window.indexedDB={open(_name,nextVersion){const request={};window.setTimeout(()=>{const db={objectStoreNames:{contains:name=>stores.has(name)},createObjectStore(name){stores.set(name,new Map())},transaction(name){const tx={error:null,objectStore(){const store=stores.get(name);return{getAll(){const result={};window.setTimeout(()=>{result.result=[...store.values()];result.onsuccess?.()},0);return result},put(value,key){store.set(key,value);window.setTimeout(()=>tx.oncomplete?.(),0)},delete(key){store.delete(key);window.setTimeout(()=>tx.oncomplete?.(),0)}}}};return tx},close(){}};request.result=db;if(nextVersion>version){version=nextVersion;request.onupgradeneeded?.()}request.onsuccess?.()},0);return request}};
+      const stores=new Map();let version=0;window.indexedDB={open(_name,nextVersion){const request={};window.setTimeout(()=>{const db={objectStoreNames:{contains:name=>stores.has(name)},createObjectStore(name){stores.set(name,new Map())},transaction(name){const tx={error:null,objectStore(){const store=stores.get(name);return{getAll(){const result={};window.setTimeout(()=>{result.result=[...store.values()];result.onsuccess?.()},0);return result},getAllKeys(){const result={};window.setTimeout(()=>{result.result=[...store.keys()];result.onsuccess?.()},0);return result},put(value,key){store.set(key,value);window.setTimeout(()=>tx.oncomplete?.(),0)},delete(key){store.delete(key);window.setTimeout(()=>tx.oncomplete?.(),0)}}}};return tx},close(){}};request.result=db;if(nextVersion>version){version=nextVersion;request.onupgradeneeded?.()}request.onsuccess?.()},0);return request}};
       if (savedAlarms !== null) window.localStorage.setItem(STORAGE_KEY, savedAlarms);
       if (storageReadFails) window.Storage.prototype.getItem = function getItemDenied() { throw new Error('storage read denied'); };
     }
@@ -137,13 +137,13 @@ test('alarm and dream sheets contain focus and restore it on close', async () =>
   assert.equal(document.activeElement.classList.contains('alarm-edit'),true,document.activeElement.outerHTML);
   assert.equal(document.activeElement.closest('.alarm-row')?.dataset.id,alarmID,'deferred hydration must restore focus to the live opener alarm identity');
 
-  document.querySelector('[data-tab="history"]').click();document.getElementById('editDreams').click();
-  const entry=document.querySelector('#historyList .history-entry');entry.focus();entry.click();await wait(fixture.dom,10);
+  document.querySelector('[data-tab="history"]').click();
+  const entry=document.querySelector('#historyList .history-entry');entry.focus();entry.click();await new Promise(resolve=>fixture.dom.window.requestAnimationFrame(()=>resolve()));document.getElementById('historyFocusEdit').click();await wait(fixture.dom,10);
   assert.equal(document.querySelector('.viewport').inert,true);
   assert.equal(document.activeElement,document.getElementById('dreamEditName'));
   document.getElementById('cancelDreamEdit').click();await wait(fixture.dom,10);
   assert.equal(document.querySelector('.viewport').inert,false);
-  assert.equal(document.activeElement,entry);
+  assert.equal(document.activeElement,document.getElementById('historyFocusEdit'));
   assert.deepEqual(fixture.errors,[]);
   fixture.dom.window.close();
 });

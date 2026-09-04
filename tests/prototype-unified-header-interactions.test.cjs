@@ -6,7 +6,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','sketches','release-ui-overh
 
 test('Alarm and History adapt functional actions to the v4 header structure',()=>{
   assert.match(html,/<header class="alarm-head page-header"><div class="header-meta-row">[\s\S]*?id="editAlarms"[\s\S]*?<div class="header-title-row">[\s\S]*?id="addAlarm"/);
-  assert.match(html,/<header class="home-header page-header"><div class="header-meta-row">[\s\S]*?id="editDreams"[\s\S]*?<div class="header-title-row"><h1 class="greeting">Mapped fragments/);
+  assert.match(html,/<header class="home-header page-header"><div class="header-meta-row">[\s\S]*?id="editDreams"[\s\S]*?<div class="header-title-row"><h1 class="greeting"[^>]*>Mapped fragments/);
   assert.doesNotMatch(html,/<header class="(?:alarm|home)-head"><div class="list-toolbar">/);
 });
 

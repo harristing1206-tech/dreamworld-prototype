@@ -9,11 +9,11 @@ const worker=fs.readFileSync(path.join(route,'service-worker.js'),'utf8');
 test('PWA replaces legacy Dreamworld caches rather than retaining a stale transcription client',()=>{
  assert.match(worker,/key\.startsWith\('dreamworld-'\)&&key!==CACHE/);
  assert.doesNotMatch(worker,/key\.startsWith\('dreamworld-pwa-'\)/);
- assert.match(worker,/const CACHE='dreamworld-pwa-20260830-92'/);
+ assert.match(worker,/const CACHE='dreamworld-pwa-20260830-93'/);
 });
 
 test('a newly activated service worker reloads one stale document without a loop',()=>{
- assert.match(html,/const APP_SHELL_VERSION='92',SW_RELOAD_GUARD='dreamworld:sw-reloaded'/);
+ assert.match(html,/const APP_SHELL_VERSION='93',SW_RELOAD_GUARD='dreamworld:sw-reloaded'/);
  assert.match(html,/navigator\.serviceWorker\.addEventListener\('controllerchange'/);
  assert.match(html,/sessionStorage\.getItem\(SW_RELOAD_GUARD\)/);
  assert.match(html,/sessionStorage\.setItem\(SW_RELOAD_GUARD,APP_SHELL_VERSION\)/);

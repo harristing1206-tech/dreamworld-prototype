@@ -23,16 +23,14 @@ test('Capture ready redesign preserves navigation, explicit recording, no-dream,
  assert.match(html,/whisper\.cpp/);
 });
 
-test('active recording adopts the supplied status, reactive orbit, timer, and paired controls',()=>{
- assert.match(html,/<div class="capture-state recording-state capture-recording" data-log-state="recording">[\s\S]*?id="recordingStatus"[\s\S]*?id="exitRecording"[\s\S]*?<div class="recording-orbit">[\s\S]*?id="voiceVisual"[\s\S]*?id="voiceCanvas"[\s\S]*?class="recording-mic-mark"[\s\S]*?id="timer"[\s\S]*?id="pauseRecording"[\s\S]*?id="stopRecording"[\s\S]*?Exit preserves raw audio/);
- const state=cssRule('.capture-redesign .capture-recording');assert.match(state,/display:grid/);assert.match(state,/grid-template-rows:auto 256px auto auto auto/);
- const orbit=cssRule('.capture-redesign .recording-orbit');assert.match(orbit,/width:256px/);assert.match(orbit,/height:256px/);
- const visual=cssRule('.capture-redesign .capture-recording .voice-visual');assert.match(visual,/position:relative/);assert.match(visual,/width:256px/);assert.match(visual,/height:256px/);
- const timer=cssRule('.capture-redesign .capture-recording .timer');assert.match(timer,/font-family:"Newsreader",var\(--font-editorial\)/);assert.match(timer,/font-size:56px/);assert.match(timer,/border:0/);
- const controls=cssRule('.capture-redesign .capture-recording .recording-controls');assert.match(controls,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
- const paired=cssRule('.capture-redesign .capture-recording .recording-controls :is(.pause-recording,.stop)');assert.match(paired,/height:54px!important/);
- const stop=cssRule('.capture-redesign .capture-recording .stop');assert.match(stop,/background:#a7523f!important/);
- assert.match(html,/@media\(max-height:700px\)\{\.capture-redesign \.capture-recording\{min-height:458px!important;padding:8px 0!important;row-gap:10px\}/);
+test('active recording adopts the supplied memo header, responsive microphone, timer, waveform, and controls',()=>{
+ assert.match(html,/<div class="capture-state recording-state capture-recording" data-log-state="recording" data-recording-state="recording">[\s\S]*?class="recording-header"[\s\S]*?id="exitRecording"[\s\S]*?id="recordingStatus"[\s\S]*?class="recording-stage" id="voiceVisual"[\s\S]*?id="voiceCanvas"[\s\S]*?id="timer"[\s\S]*?class="recording-bars"[\s\S]*?id="stopRecording"[\s\S]*?id="pauseRecording"[\s\S]*?preserves raw audio/);
+ const state=cssRule('.capture-redesign .capture-recording');assert.match(state,/display:grid/);assert.match(state,/grid-template-rows:56px minmax\(160px,1fr\) auto auto 48px 92px auto/);
+ const stage=cssRule('.capture-redesign .recording-stage');assert.match(stage,/width:220px/);assert.match(stage,/height:220px/);
+ const timer=cssRule('.capture-redesign .capture-recording .timer');assert.match(timer,/font-family:var\(--font-ui\)/);assert.match(timer,/font-size:48px/);assert.match(timer,/font-variant-numeric:tabular-nums/);
+ const bars=cssRule('.capture-redesign .recording-bars');assert.match(bars,/height:48px/);assert.match(bars,/display:flex/);
+ const stop=cssRule('.capture-redesign .recording-stop-main');assert.match(stop,/background:#a7523f!important/);assert.match(stop,/width:72px!important/);
+ assert.match(html,/@media\(max-height:700px\)\{\.capture-redesign \.capture-recording\{grid-template-rows:52px minmax\(148px,1fr\)/);
 });
 
 test('recording redesign preserves one recorder, timer, visualizer, Pause/Resume, Stop, safe Exit, and navigation guards',()=>{
@@ -65,5 +63,5 @@ test('Capture redesign compact text and primary actions meet WCAG AA contrast',(
  assert.ok(contrast('#ffffff','#a7523f')>=4.5);
  assert.ok(contrast('#ffffff','#ad5944')>=4.5);
  assert.ok(contrast('#b4b1a9','#111310')>=4.5);
- assert.match(worker,/const CACHE='dreamworld-pwa-20260830-88'/);
+ assert.match(worker,/const CACHE='dreamworld-pwa-20260830-89'/);
 });

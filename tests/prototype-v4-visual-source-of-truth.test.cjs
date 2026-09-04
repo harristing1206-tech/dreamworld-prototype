@@ -50,10 +50,10 @@ test('Insights keeps behavior while adopting the v4 order and calendar card',()=
 });
 
 test('Capture and navigation adopt v4 geometry without replacing behavior',()=>{
-  assert.match(html,/<div class="recording-controls"><button class="pause-recording" id="pauseRecording"[\s\S]*?<button class="stop" id="stopRecording"[\s\S]*?<\/div>/);
-  assert.match(html,/\.recording-controls\{[^}]*display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\);gap:12px/);
-  assert.match(html,/\.recording-controls :is\(\.pause-recording,\.stop\)\{[^}]*width:100%!important;height:54px!important/);
+  assert.match(html,/<div class="recording-footer">[\s\S]*?<button class="recording-stop-main stop" id="stopRecording"[\s\S]*?<button class="pause-recording" id="pauseRecording"[\s\S]*?<\/div>/);
+  assert.match(html,/\.recording-footer\{[^}]*display:grid;grid-template-columns:64px minmax\(90px,1fr\) 64px/);
+  assert.match(html,/\.recording-stop-main\{[^}]*width:72px!important;height:72px!important/);
   assert.match(html,/\.tab svg\{[^}]*width:20px;height:20px[^}]*stroke-width:1\.75/);
   assert.match(html,/\.tab\.active:not\(\.log-tab\):after\{[^}]*width:3px;height:3px/);
-  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-88'/);
+  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-89'/);
 });

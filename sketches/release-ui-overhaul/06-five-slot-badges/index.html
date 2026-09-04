@@ -938,7 +938,8 @@
   applyReviewDream();
   void hydrateJournal().then(applyReviewDream);
   if(reviewParams.has('alarmEdit')){const alarmIndex=Number(reviewParams.get('alarmEdit'));const alarmRows=[...document.querySelectorAll('#alarmList .alarm-row')];if(alarmRows[alarmIndex])openAlarmEditor(alarmRows[alarmIndex])}
-  if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{}));
+  const APP_SHELL_VERSION='90',SW_RELOAD_GUARD='dreamworld:sw-reloaded';
+  if('serviceWorker' in navigator)window.addEventListener('load',()=>{let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;let current='';try{current=sessionStorage.getItem(SW_RELOAD_GUARD)||''}catch{}if(current===APP_SHELL_VERSION)return;refreshing=true;try{sessionStorage.setItem(SW_RELOAD_GUARD,APP_SHELL_VERSION)}catch{}window.location.reload()});navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{})});
 })();
 </script>
 </body>

@@ -78,6 +78,12 @@ class RequestBudget:
 REQUEST_BUDGET = RequestBudget()
 
 
+def format_internal_error(stage: str, error: BaseException) -> str:
+    """Return a content-free diagnostic safe for the private service journal."""
+    safe_stage = stage if stage in {"headers", "read", "parse", "normalize", "whisper", "respond"} else "unknown"
+    return f"dreamworld-stt internal_error stage={safe_stage} type={type(error).__name__}"
+
+
 def parse_multipart_form(body: bytes, content_type: str) -> tuple[dict[str, str], dict[str, tuple[str, bytes]]]:
     """Parse the bounded OpenAI/OpenWhispr multipart transcription contract.
 
@@ -328,6 +334,7 @@ class DreamworldSTTHandler(BaseHTTPRequestHandler):
             self._send_json(HTTPStatus.TOO_MANY_REQUESTS, {"error": "Another transcription is active."})
             return
         wav_path = None
+        stage = "headers"
         try:
             raw_length = self.headers.get("Content-Length", "")
             if not raw_length.isdigit():
@@ -335,7 +342,9 @@ class DreamworldSTTHandler(BaseHTTPRequestHandler):
             length = int(raw_length)
             if length <= 0 or length > MAX_BODY_BYTES:
                 raise RequestError("Request body is outside the supported range.")
+            stage = "read"
             body = self.rfile.read(length)
+            stage = "parse"
             fields, files = parse_multipart_form(body, self.headers.get("Content-Type", ""))
             if set(files) != {"file"}:
                 raise RequestError("Exactly one audio file is required.")
@@ -344,15 +353,19 @@ class DreamworldSTTHandler(BaseHTTPRequestHandler):
             if not SAFE_LANGUAGE.fullmatch(language):
                 raise RequestError("Unsupported language value.")
             prompt = re.sub(r"\s+", " ", fields.get("prompt", "")).strip()[:MAX_PROMPT_CHARS]
+            stage = "normalize"
             wav_path, duration, _rms = normalize_audio(file_bytes, Path(filename).suffix.lower())
+            stage = "whisper"
             result = transcribe(wav_path, language, prompt)
             result["durationSeconds"] = round(duration, 3)
+            stage = "respond"
             self._send_json(HTTPStatus.OK, result)
         except RequestError as exc:
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
         except UpstreamError as exc:
             self._send_json(HTTPStatus.BAD_GATEWAY, {"error": str(exc)})
-        except Exception:
+        except Exception as exc:
+            print(format_internal_error(stage, exc), file=sys.stderr, flush=True)
             self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "Private transcription failed safely."})
         finally:
             if wav_path:

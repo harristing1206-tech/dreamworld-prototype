@@ -56,6 +56,12 @@ class FakeResponse:
 
 
 class DreamworldSTTTests(unittest.TestCase):
+    def test_internal_error_log_names_stage_and_type_without_user_content(self):
+        error = RuntimeError("private spoken words must not be logged")
+        message = stt.format_internal_error("normalize", error)
+        self.assertEqual(message, "dreamworld-stt internal_error stage=normalize type=RuntimeError")
+        self.assertNotIn("spoken words", message)
+
     def test_openwhispr_multipart_contract(self):
         body, content_type = multipart(fields={"language": "auto", "prompt": "Dreamworld"})
         fields, files = stt.parse_multipart_form(body, content_type)

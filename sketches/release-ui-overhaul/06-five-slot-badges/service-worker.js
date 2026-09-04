@@ -1,10 +1,10 @@
-const CACHE='dreamworld-pwa-20260830-89';
+const CACHE='dreamworld-pwa-20260830-90';
 const SHELL=['./index.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png','./dm-sans-latin-wght-normal.woff2','./newsreader-latin-300-600.woff2'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
 self.addEventListener('activate',event=>{
-  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('dreamworld-pwa-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
+  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('dreamworld-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
 });
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;

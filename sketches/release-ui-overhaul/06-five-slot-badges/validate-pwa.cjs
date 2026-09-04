@@ -18,7 +18,7 @@ assert.match(worker,/event\.request\.mode==='navigate'/);
 assert.match(worker,/fetch\(event\.request\)/);
 assert.match(worker,/caches\.match\('\.\/index\.html'\)/);
 assert.match(worker,/self\.clients\.claim\(\)/);
-assert.match(worker,/keys\.filter\(key=>key\.startsWith\('dreamworld-pwa-'\)&&key!==CACHE\)/,'activation must delete only Dreamworld-owned caches');
+assert.match(worker,/keys\.filter\(key=>key\.startsWith\('dreamworld-'\)&&key!==CACHE\)/,'activation must delete only Dreamworld-owned caches, including legacy Dreamworld generations');
 assert.doesNotMatch(worker,/keys\.filter\(key=>key!==CACHE\)/,'activation must not delete unrelated origin caches');
 function pngSize(path){const b=fs.readFileSync(path);assert.equal(b.toString('hex',0,8),'89504e470d0a1a0a');return [b.readUInt32BE(16),b.readUInt32BE(20)];}
 assert.deepEqual(pngSize('icon-180.png'),[180,180]);

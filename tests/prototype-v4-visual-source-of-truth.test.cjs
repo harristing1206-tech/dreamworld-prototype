@@ -55,5 +55,5 @@ test('Capture and navigation adopt v4 geometry without replacing behavior',()=>{
   assert.match(html,/\.recording-stop-main\{[^}]*width:72px!important;height:72px!important/);
   assert.match(html,/\.tab svg\{[^}]*width:20px;height:20px[^}]*stroke-width:1\.75/);
   assert.match(html,/\.tab\.active:not\(\.log-tab\):after\{[^}]*width:3px;height:3px/);
-  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-91'/);
+  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-92'/);
 });

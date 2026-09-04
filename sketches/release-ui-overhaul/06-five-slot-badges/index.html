@@ -235,8 +235,8 @@
     .profile-head{margin:0;padding-bottom:20px}.section-label{margin-top:24px}.settings-group{margin-top:0}.setting-row{min-height:60px}.setting-icon{width:28px;height:28px;border-radius:0;background:transparent}.setting-icon svg{width:20px;height:20px}
 
     /* v76 — premium editorial mockup promoted to production source of truth. */
-    :root{--font-ui:Arial,Helvetica,sans-serif;--font-editorial:Georgia,"Times New Roman",serif;--defined-border:#d8d6d0;--bluegray:#e2e8e8;--card:#ffffff;--canvas:#ffffff;--surface:#ffffff;--raised:#f6f6f4;--ink:#20231f;--muted:#6e7169;--faint:#70736c;--accent:#20231f;--highlight:#a7523f;--tabbar-bg:#ffffff;--radius:14px;--tabbar-height:78px;--premium-dark:#ffffff;--premium-line:#d8d6d0}
-    :root[data-theme="dark"]{--defined-border:#343731;--bluegray:#202927;--card:#171a17;--canvas:#0b0d0b;--surface:#121512;--raised:#1b1f1b;--ink:#f3f1ea;--muted:#aaaDA5;--faint:#777c75;--accent:#f3f1ea;--highlight:#ad5944;--tabbar-bg:#0b0d0b;--premium-dark:#0b0d0b;--premium-line:#343731}
+    :root{--app-canvas:#f4f3ef;--font-ui:Arial,Helvetica,sans-serif;--font-editorial:Georgia,"Times New Roman",serif;--defined-border:#d8d6d0;--bluegray:#e2e8e8;--card:#ffffff;--canvas:#ffffff;--surface:#ffffff;--raised:#f6f6f4;--ink:#20231f;--muted:#6e7169;--faint:#70736c;--accent:#20231f;--highlight:#a7523f;--tabbar-bg:var(--app-canvas);--radius:14px;--tabbar-height:78px;--premium-dark:#ffffff;--premium-line:#d8d6d0}
+    :root[data-theme="dark"]{--app-canvas:#111310;--defined-border:#343731;--bluegray:#202927;--card:#171a17;--canvas:#0b0d0b;--surface:#121512;--raised:#1b1f1b;--ink:#f3f1ea;--muted:#aaaDA5;--faint:#777c75;--accent:#f3f1ea;--highlight:#ad5944;--tabbar-bg:var(--app-canvas);--premium-dark:#0b0d0b;--premium-line:#343731}
     body,button,input,textarea{font-family:var(--font-ui)}
     h1,h2,h3,strong,b{font-weight:inherit}.screen{padding-top:8px;padding-bottom:44px}.page-header{height:96px;margin-top:14px;padding:0 0 14px;border:0}.header-meta-row,.header-title-row{display:flex;align-items:center;justify-content:space-between;gap:14px}.header-meta-row{height:30px}.header-title-row{height:52px}.header-meta{min-width:0;margin:0;color:var(--muted);font-size:12px;line-height:16px;font-weight:600;letter-spacing:.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.header-meta-action{min-width:44px;height:44px;padding:0 4px;border:0;background:transparent;color:var(--ink);font-size:13px;font-weight:700}.page-header h1{margin:0;font-family:var(--font-editorial);font-size:34px!important;line-height:38px!important;font-weight:400!important;letter-spacing:-.025em!important;white-space:nowrap}.page-header .header-action{min-width:44px;height:44px;border:1px solid #e4e2dc;border-radius:22px;background:var(--raised);box-shadow:0 1px 2px rgba(32,35,31,.04)}
     :root[data-theme="dark"] .page-header .header-action{border-color:var(--defined-border);box-shadow:none}
@@ -475,6 +475,10 @@
       .alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm) .alarm-time{font-size:36px}.alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm) .alarm-period{font-size:12px}.alarm-reference-remodel .alarm-list .alarm-row:not(.next-alarm) .alarm-detail{margin-top:5px;font-size:12px;letter-spacing:0;white-space:nowrap}
       .alarm-reference-remodel .sleep-note{margin-top:14px;padding:12px 2px}
     }
+
+    /* v92 — one continuous canvas across every destination and shell layer. */
+    .phone,.statusbar,.viewport,.screen,.tabbar{background:var(--app-canvas)!important}
+    .capture-redesign [data-log-state]{background:var(--app-canvas)!important}
 
     @media(prefers-reduced-motion:reduce){#editAlarms:active,#addAlarm:active,#editDreams:active{scale:1!important;transition:none}.header-action.illuminating:after{animation:none;opacity:.14;transform:scale(1)}}
 
@@ -945,7 +949,7 @@
   applyReviewDream();
   void hydrateJournal().then(applyReviewDream);
   if(reviewParams.has('alarmEdit')){const alarmIndex=Number(reviewParams.get('alarmEdit'));const alarmRows=[...document.querySelectorAll('#alarmList .alarm-row')];if(alarmRows[alarmIndex])openAlarmEditor(alarmRows[alarmIndex])}
-  const APP_SHELL_VERSION='91',SW_RELOAD_GUARD='dreamworld:sw-reloaded';
+  const APP_SHELL_VERSION='92',SW_RELOAD_GUARD='dreamworld:sw-reloaded';
   if('serviceWorker' in navigator)window.addEventListener('load',()=>{let refreshing=false;if(typeof navigator.serviceWorker.addEventListener==='function')navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;let current='';try{current=sessionStorage.getItem(SW_RELOAD_GUARD)||''}catch{}if(current===APP_SHELL_VERSION)return;refreshing=true;try{sessionStorage.setItem(SW_RELOAD_GUARD,APP_SHELL_VERSION)}catch{}window.location.reload()});navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{})});
 })();
 </script>

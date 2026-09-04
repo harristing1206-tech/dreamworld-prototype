@@ -31,7 +31,7 @@ test('Insights redesign preserves recall, calendar, metrics, selected detail, di
  for(const id of['insightsHeaderMeta','recallPeriodLabel','recallIndex','recallTrend','insightsWave','insightsMonth','insightsCalendar','insightDreamNights','insightDreamNightsBasis','insightAverageSleep','insightAverageSleepBasis','insightAverageDream','insightAverageDreamBasis','insightRecall','insightRecallBasis','insightDetailDate','insightDetailTitle','insightDetailSleep','insightDetailDream','insightDetailRecall'])assert.match(html,new RegExp(`id="${id}"`),`Missing Insights hook #${id}`);
  for(const behavior of['renderInsightsSourceRail()','renderInsightsCalendar(periodDate)','updateInsights(periodDate)',"button.addEventListener('click',()=>{calendar.querySelectorAll('.calendar-day')","if(record)openDreamFromInsights(record);else renderInsightDetail(null)","hero.classList.toggle('no-data',currentScore===null)"])assert.ok(html.includes(behavior),`Missing Insights behavior: ${behavior}`);
  assert.match(html,/Sleep duration is sample data in this prototype/);
- assert.match(worker,/const CACHE='dreamworld-pwa-20260830-91'/);
+ assert.match(worker,/const CACHE='dreamworld-pwa-20260830-92'/);
 });
 
 test('Insights compact labels and recall guidance meet WCAG AA contrast',()=>{

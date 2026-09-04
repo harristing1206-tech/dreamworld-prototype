@@ -30,5 +30,5 @@ test('Profile redesign preserves real controls and truthful static capability ro
 });
 
 test('Profile redesign ships in a fresh installed app shell',()=>{
- assert.match(worker,/const CACHE='dreamworld-pwa-20260830-93'/);
+ assert.match(worker,/const CACHE='dreamworld-pwa-20260830-94'/);
 });

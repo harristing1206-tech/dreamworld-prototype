@@ -61,7 +61,7 @@ test('Alarm remodeling preserves interaction and persistence hooks', () => {
   }
   assert.match(html, /--alarm-on:#34c759/);
   assert.match(html, /role="switch" aria-checked="true"/);
-  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-90'/);
+  assert.match(worker, /const CACHE='dreamworld-pwa-20260830-91'/);
   assert.match(worker, /'\.\/newsreader-latin-300-600\.woff2'/);
 });
 

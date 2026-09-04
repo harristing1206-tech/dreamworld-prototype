@@ -14,7 +14,7 @@ test('every root header contains truthful metadata and one editorial title',()=>
   assert.match(html,/<header class="home-header page-header">[\s\S]*?Private dream archive[\s\S]*?<h1 class="greeting">Mapped fragments<\/h1>/);
   assert.match(html,/<header class="page-header">[\s\S]*?Private capture[\s\S]*?<h1 class="log-title">Capture<\/h1>/);
   assert.match(html,/<header class="insights-head page-header">[\s\S]*?id="insightsHeaderMeta"[\s\S]*?<h1 class="nav-title">Your terrain<\/h1>/);
-  assert.match(html,/<header class="profile-head page-header">[\s\S]*?Private profile[\s\S]*?<h1>My Dream World<\/h1>/);
+  assert.match(html,/<header class="profile-head page-header">[\s\S]*?My Dream World[\s\S]*?<h1>Profile<\/h1>/);
   assert.doesNotMatch(html,/class="header-meta"[^>]*(?:role="button"|tabindex=|onclick=)/);
   assert.match(html,/\.header-meta\{[^}]*color:var\(--muted\)[^}]*font-size:12px/);
 });

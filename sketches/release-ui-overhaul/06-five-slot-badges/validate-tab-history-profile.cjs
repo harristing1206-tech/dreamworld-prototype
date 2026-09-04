@@ -15,8 +15,8 @@ assert.match(html,/document\.getElementById\('historySearch'\)\.addEventListener
 assert.match(html,/historyFocus\.addEventListener\('touchstart'/,'dream-detail swipe start is missing');
 assert.match(html,/historySwipe\.dx>=72/,'swipe-right threshold is missing');
 assert.match(html,/event\.preventDefault\(\)[\s\S]*translateX/,'horizontal swipe feedback is missing');
-assert.match(html,/<header class="profile-head page-header">[\s\S]*?Private profile[\s\S]*?<h1>My Dream World<\/h1>/,'Profile context/title hierarchy is missing');
+assert.match(html,/<header class="profile-head page-header">[\s\S]*?My Dream World[\s\S]*?<h1>Profile<\/h1>/,'Profile context/title hierarchy is missing');
 assert.match(html,/class="profile-identity"[^>]*aria-label="Show Harris profile"/,'Profile identity row is missing');
-assert.match(html,/<h2 class="settings-heading">Settings<\/h2>/,'Settings heading is missing');
+assert.match(html,/<section class="profile-section profile-preferences"[\s\S]*?<h2[^>]*>Preferences<\/h2>/,'Profile Preferences group is missing');
 assert.doesNotMatch(html,/profile-stats|profileDreamCount|profileDreamNights/,'legacy profile statistics remain');
 console.log('DREAMWORLD_TAB_HISTORY_PROFILE_REFINEMENT_VERIFIED');

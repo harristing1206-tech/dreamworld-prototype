@@ -23,5 +23,5 @@ test('Capture signifier preserves the established center-disc geometry',()=>{
 });
 
 test('Capture signifier ships in a fresh app-shell cache',()=>{
-  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-90'/);
+  assert.match(worker,/const CACHE='dreamworld-pwa-20260830-91'/);
 });
